@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic-Claude — Installer</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222636;
+    --border: #2e3348;
+    --accent: #6c8fff;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --text: #e2e8f0;
+    --dim: #64748b;
+    --card-hover: #252a3d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header .logo { font-size: 28px; }
+  header h1 { font-size: 18px; font-weight: 700; color: var(--text); }
+  header p { font-size: 12px; color: var(--dim); margin-top: 2px; }
+  header .badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+
+  .layout { display: grid; grid-template-columns: 1fr 340px; gap: 0; min-height: calc(100vh - 65px); }
+
+  .main { padding: 28px 32px; overflow-y: auto; }
+  .sidebar { background: var(--surface); border-left: 1px solid var(--border); padding: 24px; position: sticky; top: 65px; height: calc(100vh - 65px); overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+
+  /* Presets */
+  .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--dim); font-weight: 700; margin-bottom: 14px; }
+  .presets { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; }
+  .preset-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(108,143,255,0.08); }
+  .preset-btn.active { border-color: var(--accent); background: rgba(108,143,255,0.15); color: var(--accent); }
+
+  /* Cards grid */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  }
+  .card:hover { background: var(--card-hover); border-color: #3e4560; }
+  .card.selected { border-color: var(--accent); background: rgba(108,143,255,0.08); }
+  .card.selected .card-icon { filter: none; }
+
+  .card-header { display: flex; align-items: center; gap: 10px; }
+  .card-icon { font-size: 22px; }
+  .card-name { font-weight: 700; font-size: 14px; }
+  .card-version { font-size: 10px; color: var(--dim); background: var(--surface2); padding: 2px 7px; border-radius: 10px; margin-left: auto; }
+  .card-desc { font-size: 12px; color: var(--dim); line-height: 1.5; }
+  .card-check {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    transition: all 0.15s;
+  }
+  .card.selected .card-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* Hook list */
+  .hook-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
+  .hook-item {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .hook-item:hover { background: var(--card-hover); }
+  .hook-item.selected { border-color: var(--accent2); background: rgba(167,139,250,0.08); }
+  .hook-icon { font-size: 18px; width: 28px; text-align: center; }
+  .hook-info { flex: 1; }
+  .hook-name { font-size: 13px; font-weight: 600; }
+  .hook-desc { font-size: 11px; color: var(--dim); margin-top: 2px; }
+  .hook-event { font-size: 10px; color: var(--accent2); background: rgba(167,139,250,0.1); padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+  .hook-toggle {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--border); background: transparent;
+    display: flex; align-items: center; justify-content: center; font-size: 11px;
+    transition: all 0.15s;
+  }
+  .hook-item.selected .hook-toggle { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+
+  /* Sidebar */
+  .sidebar-title { font-size: 13px; font-weight: 700; color: var(--text); }
+  .summary-empty { font-size: 12px; color: var(--dim); text-align: center; padding: 20px; }
+  .summary-group { margin-bottom: 14px; }
+  .summary-group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 6px; }
+  .summary-item { font-size: 12px; color: var(--text); padding: 4px 8px; background: var(--surface2); border-radius: 6px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+
+  .project-path { margin-top: auto; }
+  .project-path label { font-size: 11px; color: var(--dim); display: block; margin-bottom: 6px; }
+  .project-path input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 8px 12px;
+    font-size: 12px;
+    font-family: 'Consolas', monospace;
+    outline: none;
+  }
+  .project-path input:focus { border-color: var(--accent); }
+
+  .source-select { margin-bottom: 12px; }
+  .source-select label { font-size: 11px; color: var(--dim); display: block; margin-bottom: 6px; }
+  .source-select select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 8px 12px;
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .generate-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    margin-top: 8px;
+  }
+  .generate-btn:hover { opacity: 0.9; }
+  .generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Command output */
+  .command-box {
+    display: none;
+    margin-top: 14px;
+    background: #0a0c14;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .command-box.visible { display: block; }
+  .command-header { padding: 8px 14px; background: var(--surface2); display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--dim); }
+  .copy-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .copy-btn.copied { background: var(--green); }
+  .command-text { padding: 14px; font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; color: #a5f3fc; white-space: pre-wrap; word-break: break-all; line-height: 1.6; }
+
+  .count-badge { background: var(--accent); color: #fff; font-size: 10px; padding: 1px 7px; border-radius: 10px; margin-left: 6px; }
+
+  h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .section { margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🤖</div>
+  <div>
+    <h1>Agentic-Claude — Installer</h1>
+    <p>Sélectionne tes agents, skills et hooks, puis copie la commande d'installation</p>
+  </div>
+  <div class="badge">v1.2</div>
+</header>
+
+<div class="layout">
+  <div class="main">
+
+    <!-- Presets -->
+    <div class="section">
+      <div class="section-title">Démarrage rapide — Équipes prédéfinies</div>
+      <div class="presets">
+        <button class="preset-btn" onclick="applyPreset('feature')" id="preset-feature">🧩 Feature Team</button>
+        <button class="preset-btn" onclick="applyPreset('release')" id="preset-release">🚀 Release Team</button>
+        <button class="preset-btn" onclick="applyPreset('full')" id="preset-full">⭐ Full Team</button>
+        <button class="preset-btn" onclick="applyPreset('moex')" id="preset-moex">🏗️ MOEX / Intégration</button>
+        <button class="preset-btn" onclick="applyPreset('none')" id="preset-none" style="margin-left:auto;color:var(--dim)">✕ Tout décocher</button>
+      </div>
+    </div>
+
+    <!-- Agents -->
+    <div class="section">
+      <h2>🤖 Agents <span class="count-badge" id="agent-count">0</span></h2>
+      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Rôles spécialisés qui travaillent en parallèle ou en séquence dans tes projets</p>
+      <div class="cards" id="agent-cards"></div>
+    </div>
+
+    <!-- Skills -->
+    <div class="section">
+      <h2>⚡ Skills <span class="count-badge" id="skill-count">0</span></h2>
+      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Commandes slash (<code style="background:var(--surface2);padding:1px 5px;border-radius:4px">/skill-name</code>) qui définissent des workflows réutilisables</p>
+      <div class="cards" id="skill-cards"></div>
+    </div>
+
+    <!-- Hooks -->
+    <div class="section">
+      <h2>🔒 Hooks <span class="count-badge" id="hook-count">0</span></h2>
+      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Comportements automatiques déclenchés par les actions de Claude Code</p>
+      <div class="hook-list" id="hook-list"></div>
+    </div>
+
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-title">📋 Sélection</div>
+
+    <div id="summary">
+      <div class="summary-empty">Aucun élément sélectionné.<br>Choisis un preset ou coche manuellement.</div>
+    </div>
+
+    <div class="source-select">
+      <label>Source du repo</label>
+      <select id="source-select">
+        <option value="gitlab">GitLab TCS (recommandé)</option>
+        <option value="github">GitHub (Aletheia-Thomas)</option>
+      </select>
+    </div>
+
+    <div class="project-path">
+      <label>Chemin du projet cible</label>
+      <input type="text" id="project-path" value="." placeholder="Ex: C:\Projets\MonProjet ou ."/>
+    </div>
+
+    <button class="generate-btn" onclick="generateCommand()" id="gen-btn" disabled>
+      Générer la commande →
+    </button>
+
+    <div class="command-box" id="command-box">
+      <div class="command-header">
+        <span>PowerShell</span>
+        <button class="copy-btn" id="copy-btn" onclick="copyCommand()">Copier</button>
+      </div>
+      <div class="command-text" id="command-text"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const AGENTS = [
+  { id: 'developer',              icon: '👨‍💻', name: 'Developer',              version: '1.1', desc: 'Implémente les features et corrige les bugs en suivant SOLID/Clean Code. Ne génère pas de tests ni de docs.' },
+  { id: 'tester',                 icon: '🧪', name: 'Tester',                 version: '1.1', desc: 'Crée et exécute les tests (ISTQB/pytest). Valide les implémentations. Ne touche pas au code de prod.' },
+  { id: 'architect',              icon: '🏗️', name: 'Architect',              version: '1.0', desc: 'Analyse les architectures d\'intégration (APIC/ACE/MQ), cartographie les dépendances et documente les patterns.' },
+  { id: 'devops',                 icon: '⚙️', name: 'DevOps',                 version: '1.1', desc: 'Gère les pipelines CI/CD, Docker, GitHub Actions, Azure. Pas de code applicatif.' },
+  { id: 'documentarian',          icon: '📝', name: 'Documentarian',          version: '1.1', desc: 'Maintient CLAUDE.md, ADRs et la doc. Consolide les findings d\'équipe. Ne code pas.' },
+  { id: 'product-owner-assistant',icon: '🎯', name: 'Product Owner Assistant',version: '1.2', desc: 'Coordonne les agents, gère le backlog, écrit les handoffs de session. Ne code jamais.' },
+];
+
+const SKILLS = [
+  { id: 'develop',                      icon: '⚡', name: '/develop',                      desc: 'Workflow complet d\'implémentation feature : explore → planifie → implémente → rapporte.' },
+  { id: 'test',                         icon: '⚡', name: '/test',                         desc: 'Exécute et valide les tests : lance, analyse les échecs, écrit les tests manquants.' },
+  { id: 'deploy',                       icon: '⚡', name: '/deploy',                       desc: 'CI/CD et déploiement : évalue l\'infra, implémente les pipelines, valide les configs.' },
+  { id: 'review',                       icon: '⚡', name: '/review',                       desc: 'Code review : architecture, qualité, sécurité, Python-specific.' },
+  { id: 'document',                     icon: '⚡', name: '/document',                     desc: 'Sync documentation : détecte les changements, met à jour CLAUDE.md, crée des ADRs.' },
+  { id: 'postman-collection-generator', icon: '⚡', name: '/postman-collection-generator', desc: 'Génère des collections Postman v2.1 pour les tests non-régression (APIC/ACE/MQ).' },
+  { id: 'publish-confluence',           icon: '⚡', name: '/publish-confluence',           desc: 'Publie la doc HTML sur Confluence en arbre de pages avec conversion automatique.' },
+  { id: 'security-audit',               icon: '⚡', name: '/security-audit',               desc: 'Audit sécurité complet : OWASP, CVE, secrets, permissions, dépendances.' },
+  { id: 'pattern-diagram-design',       icon: '⚡', name: '/pattern-diagram-design',       desc: 'Génère des diagrammes Mermaid pour les patterns d\'intégration TCS (ARCHI/EIP).' },
+];
+
+const HOOKS = [
+  { id: 'pii-guard',          icon: '🔒', name: 'PII Guard',            event: 'UserPromptSubmit', desc: 'Bloque les prompts avec données personnelles (LPD/RGPD TCS).' },
+  { id: 'auto-test',          icon: '🧪', name: 'Auto Test',            event: 'PostToolUse',      desc: 'Lance pytest automatiquement après chaque Write/Edit.' },
+  { id: 'auto-format',        icon: '✨', name: 'Auto Format',          event: 'PostToolUse',      desc: 'Lance black + ruff sur les fichiers Python modifiés.' },
+  { id: 'security-scan',      icon: '🛡️', name: 'Security Scan',       event: 'PostToolUse',      desc: 'Lance bandit sur les fichiers Python modifiés.' },
+  { id: 'agent-pipeline',     icon: '🔗', name: 'Agent Pipeline',       event: 'SubagentStop',     desc: 'Chaîne automatiquement les 6 agents en séquence.' },
+  { id: 'confluence-publish', icon: '📤', name: 'Confluence Publish',   event: 'PostToolUse',      desc: 'Publie index.html sur Confluence à chaque sauvegarde.' },
+  { id: 'commit-guard',       icon: '⚠️', name: 'Commit Guard',        event: 'PreToolUse',       desc: 'Avertit avant les git push --force, reset --hard, rm -rf.' },
+  { id: 'notify-on-stop',     icon: '🔔', name: 'Notify on Stop',      event: 'Stop',             desc: 'Notification desktop quand Claude a terminé sa tâche.' },
+];
+
+const PRESETS = {
+  feature: { agents: ['developer','tester','documentarian'],            skills: ['develop','test','document'],                          hooks: ['auto-test'] },
+  release: { agents: ['devops','tester','documentarian'],               skills: ['deploy','test','document'],                           hooks: ['auto-test','commit-guard'] },
+  full:    { agents: AGENTS.map(a=>a.id),                              skills: SKILLS.map(s=>s.id),                                    hooks: ['pii-guard','auto-test','commit-guard','agent-pipeline'] },
+  moex:    { agents: ['architect','developer','tester','documentarian'], skills: ['develop','test','review','postman-collection-generator','pattern-diagram-design'], hooks: ['pii-guard','auto-test','commit-guard'] },
+  none:    { agents: [], skills: [], hooks: [] },
+};
+
+const SOURCES = {
+  gitlab: 'git@git-scm.tcsgroup.ch:tcs/it/artificial-intelligence/enterprise-architecture/claudeai/claude-agents.git',
+  github: 'https://github.com/Aletheia-Thomas/Claude-Agents.git',
+};
+
+let selected = { agents: new Set(), skills: new Set(), hooks: new Set() };
+
+function renderCards() {
+  // Agents
+  document.getElementById('agent-cards').innerHTML = AGENTS.map(a => `
+    <div class="card ${selected.agents.has(a.id)?'selected':''}" onclick="toggle('agents','${a.id}')" id="agent-${a.id}">
+      <div class="card-header">
+        <span class="card-icon">${a.icon}</span>
+        <span class="card-name">${a.name}</span>
+        <span class="card-version">v${a.version}</span>
+      </div>
+      <div class="card-desc">${a.desc}</div>
+      <div class="card-check">${selected.agents.has(a.id)?'✓':''}</div>
+    </div>`).join('');
+
+  // Skills
+  document.getElementById('skill-cards').innerHTML = SKILLS.map(s => `
+    <div class="card ${selected.skills.has(s.id)?'selected':''}" onclick="toggle('skills','${s.id}')" id="skill-${s.id}">
+      <div class="card-header">
+        <span class="card-icon">${s.icon}</span>
+        <span class="card-name">${s.name}</span>
+      </div>
+      <div class="card-desc">${s.desc}</div>
+      <div class="card-check">${selected.skills.has(s.id)?'✓':''}</div>
+    </div>`).join('');
+
+  // Hooks
+  document.getElementById('hook-list').innerHTML = HOOKS.map(h => `
+    <div class="hook-item ${selected.hooks.has(h.id)?'selected':''}" onclick="toggle('hooks','${h.id}')" id="hook-${h.id}">
+      <span class="hook-icon">${h.icon}</span>
+      <div class="hook-info">
+        <div class="hook-name">${h.name}</div>
+        <div class="hook-desc">${h.desc}</div>
+      </div>
+      <span class="hook-event">${h.event}</span>
+      <div class="hook-toggle">${selected.hooks.has(h.id)?'✓':''}</div>
+    </div>`).join('');
+
+  // Counts
+  document.getElementById('agent-count').textContent = selected.agents.size;
+  document.getElementById('skill-count').textContent = selected.skills.size;
+  document.getElementById('hook-count').textContent = selected.hooks.size;
+
+  updateSummary();
+}
+
+function toggle(type, id) {
+  if (selected[type].has(id)) selected[type].delete(id);
+  else selected[type].add(id);
+  renderCards();
+  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
+  document.getElementById('command-box').classList.remove('visible');
+}
+
+function applyPreset(name) {
+  const p = PRESETS[name];
+  selected.agents = new Set(p.agents);
+  selected.skills = new Set(p.skills);
+  selected.hooks  = new Set(p.hooks);
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('preset-'+name).classList.add('active');
+  renderCards();
+  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
+  document.getElementById('command-box').classList.remove('visible');
+}
+
+function updateSummary() {
+  const s = document.getElementById('summary');
+  const total = selected.agents.size + selected.skills.size + selected.hooks.size;
+  if (total === 0) {
+    s.innerHTML = '<div class="summary-empty">Aucun élément sélectionné.<br>Choisis un preset ou coche manuellement.</div>';
+    return;
+  }
+  let html = '';
+  if (selected.agents.size) {
+    html += '<div class="summary-group"><div class="summary-group-label">Agents</div>';
+    AGENTS.filter(a => selected.agents.has(a.id)).forEach(a => {
+      html += `<div class="summary-item">${a.icon} ${a.name}</div>`;
+    });
+    html += '</div>';
+  }
+  if (selected.skills.size) {
+    html += '<div class="summary-group"><div class="summary-group-label">Skills</div>';
+    SKILLS.filter(s => selected.skills.has(s.id)).forEach(s => {
+      html += `<div class="summary-item">${s.icon} ${s.name}</div>`;
+    });
+    html += '</div>';
+  }
+  if (selected.hooks.size) {
+    html += '<div class="summary-group"><div class="summary-group-label">Hooks</div>';
+    HOOKS.filter(h => selected.hooks.has(h.id)).forEach(h => {
+      html += `<div class="summary-item">${h.icon} ${h.name}</div>`;
+    });
+    html += '</div>';
+  }
+  s.innerHTML = html;
+}
+
+function generateCommand() {
+  const path    = document.getElementById('project-path').value.trim() || '.';
+  const source  = document.getElementById('source-select').value;
+  const repoUrl = SOURCES[source];
+  const agents  = [...selected.agents].join(',');
+  const skills  = [...selected.skills].join(',');
+  const hooks   = [...selected.hooks];
+
+  let cmd = `# 1. Cloner la librairie Agentic-Claude (si pas déjà fait)\n`;
+  cmd += `git clone ${repoUrl} "C:\\ClaudeAgents"\n\n`;
+  cmd += `# 2. Installer dans ton projet\n`;
+  cmd += `powershell -ExecutionPolicy Bypass -File "C:\\ClaudeAgents\\templates\\install.ps1" \`\n`;
+  cmd += `  -ProjectPath "${path}"`;
+  if (agents) cmd += ` \`\n  -Agents "${agents}"`;
+  if (skills) cmd += ` \`\n  -Skills "${skills}"`;
+  if (hooks.length) cmd += ` \`\n  -IncludeHooks`;
+  cmd += `\n`;
+  if (hooks.length) {
+    cmd += `\n# 3. Copier les hooks sélectionnés\n`;
+    hooks.forEach(h => {
+      cmd += `Copy-Item "C:\\ClaudeAgents\\templates\\hooks\\${h}.json" "${path}\\.claude\\hooks\\" -Force\n`;
+      if (h === 'pii-guard') {
+        cmd += `Copy-Item "C:\\ClaudeAgents\\templates\\hooks\\scripts\\pii_check.py" "${path}\\.claude\\hooks\\" -Force\n`;
+      }
+    });
+  }
+
+  document.getElementById('command-text').textContent = cmd;
+  document.getElementById('command-box').classList.add('visible');
+  document.getElementById('copy-btn').textContent = 'Copier';
+  document.getElementById('copy-btn').classList.remove('copied');
+}
+
+function copyCommand() {
+  const text = document.getElementById('command-text').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ Copié !';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// Init
+renderCards();
+</script>
+</body>
+</html>
