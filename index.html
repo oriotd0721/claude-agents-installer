@@ -117,6 +117,74 @@
   }
   .skill-cat-header:first-child { margin-top: 0; }
 
+  /* ── Team cards ── */
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .team-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .team-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+    border-color: var(--team-color, var(--accent));
+  }
+  .team-card.selected {
+    border-color: var(--team-color, var(--accent));
+    background: var(--card-hover);
+    box-shadow: 0 0 0 4px rgba(108,143,255,0.12), 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .team-color-bar {
+    height: 4px;
+    background: var(--team-color, var(--accent));
+  }
+  .team-body { padding: 18px 20px 18px; }
+  .tc-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+  .tc-icon { font-size: 30px; line-height: 1; flex-shrink: 0; }
+  .tc-meta { flex: 1; min-width: 0; }
+  .tc-name {
+    font-weight: 700; font-size: 15px;
+    color: var(--team-color, var(--accent));
+    font-family: 'Consolas', monospace;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .tc-ver { font-size: 10px; color: var(--dim); margin-top: 3px; }
+  .tc-check {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0; transition: all 0.15s; font-weight: 700;
+  }
+  .team-card.selected .tc-check {
+    background: var(--team-color, var(--accent));
+    border-color: var(--team-color, var(--accent));
+    color: #0f1117;
+  }
+  .tc-desc { font-size: 12px; color: var(--dim); line-height: 1.55; margin-bottom: 14px; }
+  .tc-agents-label {
+    font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.2px;
+    color: var(--dim); margin-bottom: 8px; font-weight: 700;
+  }
+  .tc-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tc-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 10px 4px 6px;
+    font-size: 11px; color: var(--text); font-weight: 500;
+    transition: border-color 0.15s;
+  }
+  .team-card.selected .tc-pill { border-color: var(--team-color, var(--accent)); }
+  .tc-pill-icon { font-size: 12px; }
+
   /* Hook list */
   .hook-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
   .hook-item {
@@ -274,11 +342,11 @@
       </div>
     </div>
 
-    <!-- Agents -->
+    <!-- Teams -->
     <div class="section">
-      <h2>🤖 Agents <span class="count-badge" id="agent-count">0</span></h2>
-      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Rôles spécialisés qui travaillent en parallèle ou en séquence dans tes projets</p>
-      <div class="cards" id="agent-cards"></div>
+      <h2>👥 Équipes <span class="count-badge" id="team-count">0</span></h2>
+      <p style="font-size:12px;color:var(--dim);margin-bottom:18px">Sélectionne une équipe — ses agents sont inclus automatiquement dans <code style="background:var(--surface2);padding:1px 5px;border-radius:4px">.claude/agents/</code></p>
+      <div id="team-cards"></div>
     </div>
 
     <!-- Skills -->
@@ -286,13 +354,6 @@
       <h2>⚡ Skills <span class="count-badge" id="skill-count">0</span></h2>
       <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Commandes slash (<code style="background:var(--surface2);padding:1px 5px;border-radius:4px">/skill-name</code>) qui définissent des workflows réutilisables</p>
       <div class="cards" id="skill-cards"></div>
-    </div>
-
-    <!-- Teams -->
-    <div class="section">
-      <h2>👥 Teams <span class="count-badge" id="team-count">0</span></h2>
-      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Groupes d'agents préconfigurés, installés dans <code style="background:var(--surface2);padding:1px 5px;border-radius:4px">.claude/teams/</code></p>
-      <div class="cards" id="team-cards"></div>
     </div>
 
     <!-- Hooks -->
@@ -422,21 +483,87 @@ const HOOKS = [
 ];
 
 const TEAMS = [
-  { id: 'feature-team',              icon: '🔵', name: 'feature-team',              version: '1.1.0', desc: 'Developer + Tester + Documentarian — implémenter une feature de bout en bout.' },
-  { id: 'release-team',              icon: '🟣', name: 'release-team',              version: '1.1.0', desc: 'DevOps + Tester + Documentarian — préparer et valider une release.' },
-  { id: 'full-team',                 icon: '🟡', name: 'full-team',                 version: '1.1.0', desc: 'Tous les agents — features majeures, bootstrapping, migrations.' },
-  { id: 'moex-team',                 icon: '🏗️', name: 'moex-team',                 version: '1.0.0', desc: 'Architect + Developer + Tester + Documentarian — migrations IBM (APIC, ACE, MQ).' },
-  { id: 'community-team',            icon: '💬', name: 'community-team',            version: '1.0.0', desc: 'Community-manager + Adoption-assistant + Best-practices — adoption Claude Code chez TCS.' },
-  { id: 'claude-agents-maintainers', icon: '⚙️', name: 'claude-agents-maintainers', version: '1.2.0', desc: 'Product-owner-assistant + Library-maintainer + Architect + DevOps — gouvernance de la librairie.' },
+  {
+    id: 'feature-team', icon: '🔵', name: 'feature-team', version: '1.1.0', color: '#6c8fff',
+    desc: 'Implémenter une feature de bout en bout — du code à la doc.',
+    agents: [
+      { id: 'developer',     icon: '💻', name: 'developer' },
+      { id: 'tester',        icon: '🧪', name: 'tester' },
+      { id: 'documentarian', icon: '📄', name: 'documentarian' },
+    ],
+  },
+  {
+    id: 'release-team', icon: '🟣', name: 'release-team', version: '1.1.0', color: '#a78bfa',
+    desc: 'Préparer et valider une release production.',
+    agents: [
+      { id: 'devops',        icon: '⚙️', name: 'devops' },
+      { id: 'tester',        icon: '🧪', name: 'tester' },
+      { id: 'documentarian', icon: '📄', name: 'documentarian' },
+    ],
+  },
+  {
+    id: 'full-team', icon: '⭐', name: 'full-team', version: '1.1.0', color: '#fbbf24',
+    desc: 'Tous les agents — features majeures, bootstrapping, migrations complètes.',
+    agents: [
+      { id: 'product-owner-assistant', icon: '🎯', name: 'product-owner-assistant' },
+      { id: 'architect',               icon: '🏗️', name: 'architect' },
+      { id: 'developer',               icon: '💻', name: 'developer' },
+      { id: 'tester',                  icon: '🧪', name: 'tester' },
+      { id: 'devops',                  icon: '⚙️', name: 'devops' },
+      { id: 'documentarian',           icon: '📄', name: 'documentarian' },
+      { id: 'business-analyst',        icon: '📊', name: 'business-analyst' },
+      { id: 'archimate-architect',     icon: '🗺️', name: 'archimate-architect' },
+      { id: 'adoption-assistant',      icon: '🤝', name: 'adoption-assistant' },
+      { id: 'best-practices',          icon: '💡', name: 'best-practices' },
+      { id: 'community-manager',       icon: '💬', name: 'community-manager' },
+      { id: 'evaluate-contribution',   icon: '✅', name: 'evaluate-contribution' },
+      { id: 'library-maintainer',      icon: '📦', name: 'library-maintainer' },
+    ],
+  },
+  {
+    id: 'moex-team', icon: '🏗️', name: 'moex-team', version: '1.0.0', color: '#f0a868',
+    desc: 'Migrations IBM — APIC, ACE, MQ — contexte MOEX TCS.',
+    agents: [
+      { id: 'architect',     icon: '🏗️', name: 'architect' },
+      { id: 'developer',     icon: '💻', name: 'developer' },
+      { id: 'tester',        icon: '🧪', name: 'tester' },
+      { id: 'documentarian', icon: '📄', name: 'documentarian' },
+    ],
+  },
+  {
+    id: 'community-team', icon: '💚', name: 'community-team', version: '1.0.0', color: '#34d399',
+    desc: 'Adoption Claude Code et communication interne TCS.',
+    agents: [
+      { id: 'community-manager',  icon: '💬', name: 'community-manager' },
+      { id: 'adoption-assistant', icon: '🤝', name: 'adoption-assistant' },
+      { id: 'best-practices',     icon: '💡', name: 'best-practices' },
+    ],
+  },
+  {
+    id: 'claude-agents-maintainers', icon: '⚙️', name: 'claude-agents-maintainers', version: '1.2.0', color: '#94a3b8',
+    desc: 'Gouvernance et maintenance de la librairie Agentic-Claude.',
+    agents: [
+      { id: 'product-owner-assistant', icon: '🎯', name: 'product-owner-assistant' },
+      { id: 'library-maintainer',      icon: '📦', name: 'library-maintainer' },
+      { id: 'architect',               icon: '🏗️', name: 'architect' },
+      { id: 'devops',                  icon: '⚙️', name: 'devops' },
+    ],
+  },
 ];
 
 const PRESETS = {
-  feature: { agents: ['developer','tester','documentarian'],            skills: ['develop','test','document'],                          teams: ['feature-team'],                       hooks: ['auto-test'] },
-  release: { agents: ['devops','tester','documentarian'],               skills: ['deploy','test','document'],                           teams: ['release-team'],                       hooks: ['auto-test','commit-guard'] },
-  full:    { agents: AGENTS.map(a=>a.id),                              skills: SKILLS.map(s=>s.id),                                    teams: TEAMS.map(t=>t.id),                     hooks: ['pii-guard','auto-test','commit-guard','agent-pipeline'] },
-  moex:    { agents: ['architect','developer','tester','documentarian'], skills: ['develop','test','review','postman-collection-generator','pattern-diagram-design'], teams: ['moex-team'], hooks: ['pii-guard','auto-test','commit-guard'] },
-  none:    { agents: [], skills: [], teams: [], hooks: [] },
+  feature: { skills: ['develop','test','document'],                                                                              teams: ['feature-team'],          hooks: ['auto-test'] },
+  release: { skills: ['deploy','test','document'],                                                                              teams: ['release-team'],          hooks: ['auto-test','commit-guard'] },
+  full:    { skills: SKILLS.map(s=>s.id),                                                                                      teams: TEAMS.map(t=>t.id),        hooks: ['pii-guard','auto-test','commit-guard','agent-pipeline'] },
+  moex:    { skills: ['develop','test','review','postman-collection-generator','pattern-diagram-design'],                       teams: ['moex-team'],             hooks: ['pii-guard','auto-test','commit-guard'] },
+  none:    { skills: [], teams: [], hooks: [] },
 };
+
+function resolveAgentsFromTeams(teamSet) {
+  const ids = new Set();
+  TEAMS.filter(t => teamSet.has(t.id)).forEach(t => (t.agents || []).forEach(a => ids.add(a.id)));
+  return ids;
+}
 
 const SOURCES = {
   gitlab: 'git@git-scm.tcsgroup.ch:tcs/it/artificial-intelligence/enterprise-architecture/claudeai/claude-agents.git',
@@ -457,17 +584,30 @@ const CATEGORY_LABELS = {
 };
 
 function renderCards() {
-  // Agents
-  document.getElementById('agent-cards').innerHTML = AGENTS.map(a => `
-    <div class="card ${selected.agents.has(a.id)?'selected':''}" onclick="toggle('agents','${a.id}')" id="agent-${a.id}">
-      <div class="card-header">
-        <span class="card-icon">${a.icon}</span>
-        <span class="card-name">${a.name}</span>
-        <span class="card-version">v${a.version}</span>
+  // Teams — beautiful cards with agent pills
+  document.getElementById('team-cards').innerHTML = `<div class="team-grid">${TEAMS.map(t => {
+    const sel = selected.teams.has(t.id);
+    const agentCount = t.agents.length;
+    const pillsHtml = t.id === 'full-team'
+      ? `<span class="tc-pill"><span class="tc-pill-icon">⭐</span> Tous les agents (${agentCount})</span>`
+      : t.agents.map(a => `<span class="tc-pill"><span class="tc-pill-icon">${a.icon}</span>${a.name}</span>`).join('');
+    return `<div class="team-card ${sel ? 'selected' : ''}" style="--team-color:${t.color}" onclick="toggle('teams','${t.id}')" id="team-${t.id}">
+      <div class="team-color-bar"></div>
+      <div class="team-body">
+        <div class="tc-header">
+          <span class="tc-icon">${t.icon}</span>
+          <div class="tc-meta">
+            <div class="tc-name">${t.name}</div>
+            <div class="tc-ver">v${t.version} · ${agentCount} agent${agentCount > 1 ? 's' : ''}</div>
+          </div>
+          <div class="tc-check">${sel ? '✓' : ''}</div>
+        </div>
+        <div class="tc-desc">${t.desc}</div>
+        <div class="tc-agents-label">Agents inclus</div>
+        <div class="tc-pills">${pillsHtml}</div>
       </div>
-      <div class="card-desc">${a.desc}</div>
-      <div class="card-check">${selected.agents.has(a.id)?'✓':''}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('')}</div>`;
 
   // Skills — grouped by category
   {
@@ -489,18 +629,6 @@ function renderCards() {
     document.getElementById('skill-cards').innerHTML = html;
   }
 
-  // Teams
-  document.getElementById('team-cards').innerHTML = TEAMS.map(t => `
-    <div class="card ${selected.teams.has(t.id)?'selected':''}" onclick="toggle('teams','${t.id}')" id="team-${t.id}">
-      <div class="card-header">
-        <span class="card-icon">${t.icon}</span>
-        <span class="card-name">${t.name}</span>
-        <span class="card-version">v${t.version}</span>
-      </div>
-      <div class="card-desc">${t.desc}</div>
-      <div class="card-check">${selected.teams.has(t.id)?'✓':''}</div>
-    </div>`).join('');
-
   // Hooks
   document.getElementById('hook-list').innerHTML = HOOKS.map(h => `
     <div class="hook-item ${selected.hooks.has(h.id)?'selected':''}" onclick="toggle('hooks','${h.id}')" id="hook-${h.id}">
@@ -514,7 +642,6 @@ function renderCards() {
     </div>`).join('');
 
   // Counts
-  document.getElementById('agent-count').textContent = selected.agents.size;
   document.getElementById('skill-count').textContent = selected.skills.size;
   document.getElementById('team-count').textContent  = selected.teams.size;
   document.getElementById('hook-count').textContent  = selected.hooks.size;
@@ -525,6 +652,7 @@ function renderCards() {
 function toggle(type, id) {
   if (selected[type].has(id)) selected[type].delete(id);
   else selected[type].add(id);
+  if (type === 'teams') selected.agents = resolveAgentsFromTeams(selected.teams);
   renderCards();
   document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
   document.getElementById('command-box').classList.remove('visible');
@@ -532,10 +660,10 @@ function toggle(type, id) {
 
 function applyPreset(name) {
   const p = PRESETS[name];
-  selected.agents = new Set(p.agents);
   selected.skills = new Set(p.skills);
   selected.teams  = new Set(p.teams || []);
   selected.hooks  = new Set(p.hooks);
+  selected.agents = resolveAgentsFromTeams(selected.teams);
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('preset-'+name).classList.add('active');
   renderCards();
@@ -545,16 +673,16 @@ function applyPreset(name) {
 
 function updateSummary() {
   const s = document.getElementById('summary');
-  const total = selected.agents.size + selected.skills.size + selected.teams.size + selected.hooks.size;
+  const total = selected.teams.size + selected.skills.size + selected.hooks.size;
   if (total === 0) {
     s.innerHTML = '<div class="summary-empty">Aucun élément sélectionné.<br>Choisis un preset ou coche manuellement.</div>';
     return;
   }
   let html = '';
-  if (selected.agents.size) {
-    html += '<div class="summary-group"><div class="summary-group-label">Agents</div>';
-    AGENTS.filter(a => selected.agents.has(a.id)).forEach(a => {
-      html += `<div class="summary-item">${a.icon} ${a.name}</div>`;
+  if (selected.teams.size) {
+    html += '<div class="summary-group"><div class="summary-group-label">Équipes · ' + selected.agents.size + ' agents</div>';
+    TEAMS.filter(t => selected.teams.has(t.id)).forEach(t => {
+      html += `<div class="summary-item" style="border-left:3px solid ${t.color};padding-left:8px;gap:8px">${t.icon} <span style="flex:1">${t.name}</span><span style="color:var(--dim);font-size:10px">${t.agents.length}a</span></div>`;
     });
     html += '</div>';
   }
@@ -562,13 +690,6 @@ function updateSummary() {
     html += '<div class="summary-group"><div class="summary-group-label">Skills</div>';
     SKILLS.filter(s => selected.skills.has(s.id)).forEach(s => {
       html += `<div class="summary-item">${s.icon} ${s.name}</div>`;
-    });
-    html += '</div>';
-  }
-  if (selected.teams.size) {
-    html += '<div class="summary-group"><div class="summary-group-label">Teams</div>';
-    TEAMS.filter(t => selected.teams.has(t.id)).forEach(t => {
-      html += `<div class="summary-item">${t.icon} ${t.name}</div>`;
     });
     html += '</div>';
   }
