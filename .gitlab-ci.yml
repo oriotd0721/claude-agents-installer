@@ -1,10 +1,14 @@
-pages:
-  stage: deploy
-  script:
-    - mkdir -p public
-    - cp index.html public/index.html
-  artifacts:
-    paths:
-      - public
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+# GitLab Pages deployment disabled — canonical installer is GitHub Pages:
+# https://oriotd0721.github.io/claude-agents-installer/
+# Re-enable by restoring the pages job below.
+#
+# pages:
+#   stage: deploy
+#   script:
+#     - mkdir -p public
+#     - cp index.html public/index.html
+#   artifacts:
+#     paths:
+#       - public
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
