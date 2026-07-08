@@ -288,6 +288,13 @@
       <div class="cards" id="skill-cards"></div>
     </div>
 
+    <!-- Teams -->
+    <div class="section">
+      <h2>👥 Teams <span class="count-badge" id="team-count">0</span></h2>
+      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Groupes d'agents préconfigurés, installés dans <code style="background:var(--surface2);padding:1px 5px;border-radius:4px">.claude/teams/</code></p>
+      <div class="cards" id="team-cards"></div>
+    </div>
+
     <!-- Hooks -->
     <div class="section">
       <h2>🔒 Hooks <span class="count-badge" id="hook-count">0</span></h2>
@@ -414,12 +421,21 @@ const HOOKS = [
   { id: 'notify-on-stop',     icon: '🔔', name: 'Notify on Stop',      event: 'Stop',             desc: 'Notification desktop quand Claude a terminé sa tâche.' },
 ];
 
+const TEAMS = [
+  { id: 'feature-team',              icon: '🔵', name: 'feature-team',              version: '1.1.0', desc: 'Developer + Tester + Documentarian — implémenter une feature de bout en bout.' },
+  { id: 'release-team',              icon: '🟣', name: 'release-team',              version: '1.1.0', desc: 'DevOps + Tester + Documentarian — préparer et valider une release.' },
+  { id: 'full-team',                 icon: '🟡', name: 'full-team',                 version: '1.1.0', desc: 'Tous les agents — features majeures, bootstrapping, migrations.' },
+  { id: 'moex-team',                 icon: '🏗️', name: 'moex-team',                 version: '1.0.0', desc: 'Architect + Developer + Tester + Documentarian — migrations IBM (APIC, ACE, MQ).' },
+  { id: 'community-team',            icon: '💬', name: 'community-team',            version: '1.0.0', desc: 'Community-manager + Adoption-assistant + Best-practices — adoption Claude Code chez TCS.' },
+  { id: 'claude-agents-maintainers', icon: '⚙️', name: 'claude-agents-maintainers', version: '1.2.0', desc: 'Product-owner-assistant + Library-maintainer + Architect + DevOps — gouvernance de la librairie.' },
+];
+
 const PRESETS = {
-  feature: { agents: ['developer','tester','documentarian'],            skills: ['develop','test','document'],                          hooks: ['auto-test'] },
-  release: { agents: ['devops','tester','documentarian'],               skills: ['deploy','test','document'],                           hooks: ['auto-test','commit-guard'] },
-  full:    { agents: AGENTS.map(a=>a.id),                              skills: SKILLS.map(s=>s.id),                                    hooks: ['pii-guard','auto-test','commit-guard','agent-pipeline'] },
-  moex:    { agents: ['architect','developer','tester','documentarian'], skills: ['develop','test','review','postman-collection-generator','pattern-diagram-design'], hooks: ['pii-guard','auto-test','commit-guard'] },
-  none:    { agents: [], skills: [], hooks: [] },
+  feature: { agents: ['developer','tester','documentarian'],            skills: ['develop','test','document'],                          teams: ['feature-team'],                       hooks: ['auto-test'] },
+  release: { agents: ['devops','tester','documentarian'],               skills: ['deploy','test','document'],                           teams: ['release-team'],                       hooks: ['auto-test','commit-guard'] },
+  full:    { agents: AGENTS.map(a=>a.id),                              skills: SKILLS.map(s=>s.id),                                    teams: TEAMS.map(t=>t.id),                     hooks: ['pii-guard','auto-test','commit-guard','agent-pipeline'] },
+  moex:    { agents: ['architect','developer','tester','documentarian'], skills: ['develop','test','review','postman-collection-generator','pattern-diagram-design'], teams: ['moex-team'], hooks: ['pii-guard','auto-test','commit-guard'] },
+  none:    { agents: [], skills: [], teams: [], hooks: [] },
 };
 
 const SOURCES = {
@@ -427,7 +443,7 @@ const SOURCES = {
   github: 'https://github.com/Aletheia-Thomas/Claude-Agents.git',
 };
 
-let selected = { agents: new Set(), skills: new Set(), hooks: new Set() };
+let selected = { agents: new Set(), skills: new Set(), teams: new Set(), hooks: new Set() };
 
 const CATEGORY_ORDER  = ['engineering','architecture','security','business-analysis','operations','documentation','governance'];
 const CATEGORY_LABELS = {
@@ -473,6 +489,18 @@ function renderCards() {
     document.getElementById('skill-cards').innerHTML = html;
   }
 
+  // Teams
+  document.getElementById('team-cards').innerHTML = TEAMS.map(t => `
+    <div class="card ${selected.teams.has(t.id)?'selected':''}" onclick="toggle('teams','${t.id}')" id="team-${t.id}">
+      <div class="card-header">
+        <span class="card-icon">${t.icon}</span>
+        <span class="card-name">${t.name}</span>
+        <span class="card-version">v${t.version}</span>
+      </div>
+      <div class="card-desc">${t.desc}</div>
+      <div class="card-check">${selected.teams.has(t.id)?'✓':''}</div>
+    </div>`).join('');
+
   // Hooks
   document.getElementById('hook-list').innerHTML = HOOKS.map(h => `
     <div class="hook-item ${selected.hooks.has(h.id)?'selected':''}" onclick="toggle('hooks','${h.id}')" id="hook-${h.id}">
@@ -488,7 +516,8 @@ function renderCards() {
   // Counts
   document.getElementById('agent-count').textContent = selected.agents.size;
   document.getElementById('skill-count').textContent = selected.skills.size;
-  document.getElementById('hook-count').textContent = selected.hooks.size;
+  document.getElementById('team-count').textContent  = selected.teams.size;
+  document.getElementById('hook-count').textContent  = selected.hooks.size;
 
   updateSummary();
 }
@@ -505,6 +534,7 @@ function applyPreset(name) {
   const p = PRESETS[name];
   selected.agents = new Set(p.agents);
   selected.skills = new Set(p.skills);
+  selected.teams  = new Set(p.teams || []);
   selected.hooks  = new Set(p.hooks);
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('preset-'+name).classList.add('active');
@@ -515,7 +545,7 @@ function applyPreset(name) {
 
 function updateSummary() {
   const s = document.getElementById('summary');
-  const total = selected.agents.size + selected.skills.size + selected.hooks.size;
+  const total = selected.agents.size + selected.skills.size + selected.teams.size + selected.hooks.size;
   if (total === 0) {
     s.innerHTML = '<div class="summary-empty">Aucun élément sélectionné.<br>Choisis un preset ou coche manuellement.</div>';
     return;
@@ -535,6 +565,13 @@ function updateSummary() {
     });
     html += '</div>';
   }
+  if (selected.teams.size) {
+    html += '<div class="summary-group"><div class="summary-group-label">Teams</div>';
+    TEAMS.filter(t => selected.teams.has(t.id)).forEach(t => {
+      html += `<div class="summary-item">${t.icon} ${t.name}</div>`;
+    });
+    html += '</div>';
+  }
   if (selected.hooks.size) {
     html += '<div class="summary-group"><div class="summary-group-label">Hooks</div>';
     HOOKS.filter(h => selected.hooks.has(h.id)).forEach(h => {
@@ -551,19 +588,28 @@ function generateCommand() {
   const repoUrl = SOURCES[source];
   const agents  = [...selected.agents].join(',');
   const skills  = [...selected.skills].join(',');
+  const teams   = [...selected.teams];
   const hooks   = [...selected.hooks];
 
-  let cmd = `# 1. Cloner la librairie Agentic-Claude (si pas déjà fait)\n`;
+  let step = 1;
+  let cmd = `# ${step++}. Cloner la librairie Agentic-Claude (si pas déjà fait)\n`;
   cmd += `git clone ${repoUrl} "C:\\ClaudeAgents"\n\n`;
-  cmd += `# 2. Installer dans ton projet\n`;
+  cmd += `# ${step++}. Installer agents et skills\n`;
   cmd += `powershell -ExecutionPolicy Bypass -File "C:\\ClaudeAgents\\templates\\install.ps1" \`\n`;
   cmd += `  -ProjectPath "${path}"`;
   if (agents) cmd += ` \`\n  -Agents "${agents}"`;
   if (skills) cmd += ` \`\n  -Skills "${skills}"`;
   if (hooks.length) cmd += ` \`\n  -IncludeHooks`;
   cmd += `\n`;
+  if (teams.length) {
+    cmd += `\n# ${step++}. Installer les équipes\n`;
+    cmd += `$null = New-Item -ItemType Directory -Force "${path}\\.claude\\teams"\n`;
+    teams.forEach(t => {
+      cmd += `New-Item -ItemType Junction -Force -Path "${path}\\.claude\\teams\\${t}" -Target "C:\\ClaudeAgents\\teams\\${t}" | Out-Null\n`;
+    });
+  }
   if (hooks.length) {
-    cmd += `\n# 3. Copier les hooks sélectionnés\n`;
+    cmd += `\n# ${step++}. Copier les hooks sélectionnés\n`;
     hooks.forEach(h => {
       cmd += `Copy-Item "C:\\ClaudeAgents\\templates\\hooks\\${h}.json" "${path}\\.claude\\hooks\\" -Force\n`;
       if (h === 'pii-guard') {
