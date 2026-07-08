@@ -322,7 +322,7 @@
   <div class="logo">🤖</div>
   <div>
     <h1>Agentic-Claude — Installer</h1>
-    <p>Sélectionne tes agents, skills et hooks, puis copie la commande d'installation</p>
+    <p>Sélectionne une équipe, des skills et des hooks, puis copie la commande d'installation</p>
   </div>
   <div class="badge">v1.2</div>
 </header>
@@ -330,23 +330,18 @@
 <div class="layout">
   <div class="main">
 
-    <!-- Presets -->
-    <div class="section">
-      <div class="section-title">Démarrage rapide — Équipes prédéfinies</div>
-      <div class="presets">
-        <button class="preset-btn" onclick="applyPreset('feature')" id="preset-feature">🧩 Feature Team</button>
-        <button class="preset-btn" onclick="applyPreset('release')" id="preset-release">🚀 Release Team</button>
-        <button class="preset-btn" onclick="applyPreset('full')" id="preset-full">⭐ Full Team</button>
-        <button class="preset-btn" onclick="applyPreset('moex')" id="preset-moex">🏗️ MOEX / Intégration</button>
-        <button class="preset-btn" onclick="applyPreset('none')" id="preset-none" style="margin-left:auto;color:var(--dim)">✕ Tout décocher</button>
-      </div>
-    </div>
-
     <!-- Teams -->
     <div class="section">
       <h2>👥 Équipes <span class="count-badge" id="team-count">0</span></h2>
-      <p style="font-size:12px;color:var(--dim);margin-bottom:18px">Sélectionne une équipe — ses agents sont inclus automatiquement dans <code style="background:var(--surface2);padding:1px 5px;border-radius:4px">.claude/agents/</code></p>
+      <p style="font-size:12px;color:var(--dim);margin-bottom:18px">Sélectionne une équipe — ses agents sont inclus automatiquement. Tu peux aussi ajouter des agents individuellement ci-dessous.</p>
       <div id="team-cards"></div>
+    </div>
+
+    <!-- Agents -->
+    <div class="section">
+      <h2>🤖 Agents <span class="count-badge" id="agent-count">0</span></h2>
+      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Rôles spécialisés installés dans <code style="background:var(--surface2);padding:1px 5px;border-radius:4px">.claude/agents/</code> — cochés automatiquement quand tu sélectionnes une équipe</p>
+      <div class="cards" id="agent-cards"></div>
     </div>
 
     <!-- Skills -->
@@ -609,6 +604,20 @@ function renderCards() {
     </div>`;
   }).join('')}</div>`;
 
+  // Agents — individual cards (auto-selected via teams, also manually toggleable)
+  document.getElementById('agent-cards').innerHTML = AGENTS.map(a => {
+    const sel = selected.agents.has(a.id);
+    return `<div class="card ${sel ? 'selected' : ''}" onclick="toggle('agents','${a.id}')" id="agent-${a.id}">
+      <div class="card-header">
+        <span class="card-icon">${a.icon}</span>
+        <span class="card-name">${a.name}</span>
+        <span class="card-version">v${a.version}</span>
+      </div>
+      <div class="card-desc">${a.desc}</div>
+      <div class="card-check">${sel ? '✓' : ''}</div>
+    </div>`;
+  }).join('');
+
   // Skills — grouped by category
   {
     let html = '';
@@ -642,6 +651,7 @@ function renderCards() {
     </div>`).join('');
 
   // Counts
+  document.getElementById('agent-count').textContent = selected.agents.size;
   document.getElementById('skill-count').textContent = selected.skills.size;
   document.getElementById('team-count').textContent  = selected.teams.size;
   document.getElementById('hook-count').textContent  = selected.hooks.size;
@@ -673,16 +683,23 @@ function applyPreset(name) {
 
 function updateSummary() {
   const s = document.getElementById('summary');
-  const total = selected.teams.size + selected.skills.size + selected.hooks.size;
+  const total = selected.agents.size + selected.teams.size + selected.skills.size + selected.hooks.size;
   if (total === 0) {
     s.innerHTML = '<div class="summary-empty">Aucun élément sélectionné.<br>Choisis un preset ou coche manuellement.</div>';
     return;
   }
   let html = '';
   if (selected.teams.size) {
-    html += '<div class="summary-group"><div class="summary-group-label">Équipes · ' + selected.agents.size + ' agents</div>';
+    html += '<div class="summary-group"><div class="summary-group-label">Équipes</div>';
     TEAMS.filter(t => selected.teams.has(t.id)).forEach(t => {
       html += `<div class="summary-item" style="border-left:3px solid ${t.color};padding-left:8px;gap:8px">${t.icon} <span style="flex:1">${t.name}</span><span style="color:var(--dim);font-size:10px">${t.agents.length}a</span></div>`;
+    });
+    html += '</div>';
+  }
+  if (selected.agents.size) {
+    html += '<div class="summary-group"><div class="summary-group-label">Agents</div>';
+    AGENTS.filter(a => selected.agents.has(a.id)).forEach(a => {
+      html += `<div class="summary-item">${a.icon} ${a.name}</div>`;
     });
     html += '</div>';
   }
