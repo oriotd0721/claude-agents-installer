@@ -103,6 +103,20 @@
   }
   .card.selected .card-check { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+  /* Skill category headers */
+  .skill-cat-header {
+    grid-column: 1 / -1;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--dim);
+    font-weight: 700;
+    padding: 4px 0 8px;
+    border-bottom: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .skill-cat-header:first-child { margin-top: 0; }
+
   /* Hook list */
   .hook-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
   .hook-item {
@@ -340,53 +354,53 @@ const AGENTS = [
   { id: 'developer',                icon: '💻', name: 'Developer',                version: '1.1.0', desc: 'Implémente les features et corrige les bugs en suivant SOLID/Clean Code. Ne génère pas de tests ni de docs.',                                       tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','WebFetch','NotebookEdit'] },
   { id: 'devops',                   icon: '⚙️', name: 'DevOps',                   version: '1.2.0', desc: 'Gère les pipelines CI/CD, Docker, GitHub Actions, Azure. Pas de code applicatif.',                                                                 tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','WebFetch'] },
   { id: 'documentarian',            icon: '📄', name: 'Documentarian',            version: '1.2.0', desc: 'Maintient CLAUDE.md, ADRs et la doc. Consolide les findings d\'équipe. Ne code pas.',                                                              tools: ['Read','Write','Edit','Grep','Glob','Task','WebSearch','mcp__claude_ai_Atlassian__*','mcp__claude_ai_Mermaid_Chart__validate_and_render_mermaid_diagram'] },
-  { id: 'evaluate-contribution',    icon: '✅', name: 'Evaluate Contribution',    version: '1.0.0', desc: 'Gouvernance : évalue les contributions (agents/skills/teams) avant ajout à la librairie. Détecte les doublons.',                                  tools: ['Read','Glob','Grep'] },
+  { id: 'evaluate-contribution', category: 'governance',    icon: '✅', name: 'Evaluate Contribution',    version: '1.0.0', desc: 'Gouvernance : évalue les contributions (agents/skills/teams) avant ajout à la librairie. Détecte les doublons.',                                  tools: ['Read','Glob','Grep'] },
   { id: 'library-maintainer',       icon: '📦', name: 'Library Maintainer',       version: '1.1.0', desc: 'Maintient la librairie Agentic-Claude (registry, docs, scripts, hooks, installer). Réservé aux mainteneurs.',                                     tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','WebFetch'] },
   { id: 'product-owner-assistant',  icon: '🎯', name: 'Product Owner Assistant',  version: '1.3.0', desc: 'Coordonne les agents, gère le backlog, écrit les handoffs de session. Ne code jamais.',                                                            tools: ['Read','Grep','Glob','Task','WebSearch','WebFetch','TodoWrite','AskUserQuestion','mcp__claude_ai_Atlassian__*'] },
   { id: 'tester',                   icon: '🧪', name: 'Tester',                   version: '1.1.0', desc: 'Crée et exécute les tests (ISTQB/pytest). Valide les implémentations. Ne touche pas au code de prod.',                                             tools: ['Read','Write','Edit','Bash','Grep','Glob','Task'] },
 ];
 
 const SKILLS = [
-  { id: 'agentic-claude-framework',          icon: '⚙️', name: '/agentic-claude-framework',          version: '1.1.0', desc: 'Gouvernance du framework Agentic-Claude : ajouter/modifier agents, skills, teams, semver, registry.',                          tools: ['Read','Write','Edit','Grep','Glob','Bash','TodoWrite'] },
-  { id: 'agile-user-stories',                icon: '📋', name: '/agile-user-stories',                version: '1.0.0', desc: 'Rédige, découpe et affine les user stories agiles (Connextra, INVEST, MoSCoW).',                                                tools: ['Read','Write','Edit','Grep','Glob','TodoWrite','AskUserQuestion','mcp__claude_ai_Atlassian__*'] },
-  { id: 'analyze-adoption',                  icon: '⚡', name: '/analyze-adoption',                  version: '1.0.0', desc: 'Analyse l\'état d\'adoption de claude-agents dans un workspace et génère un rapport de recommandations.',                        tools: ['Read','Glob','Grep','Write'] },
-  { id: 'api-and-interface-design',          icon: '🔗', name: '/api-and-interface-design',          version: '1.0.0', desc: 'Conception contract-first d\'APIs REST : spec OpenAPI 3.x, versioning, règles de compatibilité ascendante.',                    tools: ['Read','Write','Grep','Glob','Task','TodoWrite'] },
-  { id: 'arch-c4',                           icon: '🏗️', name: '/arch-c4',                           version: '1.0.0', desc: 'Génère des diagrammes C4 (Context, Container, Component, Deployment, Runtime) via Structurizr DSL.',                          tools: ['Read','Write','Edit','Bash','Grep','Glob','Task'] },
-  { id: 'archimate-generation',              icon: '🗺️', name: '/archimate-generation',              version: '1.0.0', desc: 'Génère target-architecture.yaml depuis Lucidchart/YAML et produit le .archimate pour Archi.',                                   tools: ['Read','Write','Edit','Bash','Glob','WebSearch','mcp__claude_ai_Lucid__*'] },
-  { id: 'architecture-decision-records',     icon: '🏗️', name: '/architecture-decision-records',     version: '1.1.0', desc: 'Rédige, révise et maintient les ADRs (format Nygard) dans docs/architecture/decisions/.',                                       tools: ['Read','Write','Edit','Grep','Glob','TodoWrite'] },
-  { id: 'azure-archimate',                   icon: '🗺️', name: '/azure-archimate',                   version: '1.0.0', desc: 'Représente un tenant Azure (MG, subscriptions, resource groups, ressources) en vues ArchiMate.',                               tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','mcp__claude_ai_Lucid__*'] },
-  { id: 'azure-naming',                      icon: '☁️', name: '/azure-naming',                      version: '1.0.0', desc: 'Applique la convention de nommage TCS Azure (IAM POL Naming Convention Cloud Services).',                                        tools: ['Read','Grep','Glob','Task','WebSearch','WebFetch'] },
-  { id: 'business-process-modeling',         icon: '📋', name: '/business-process-modeling',         version: '1.0.0', desc: 'Modélise les processus métier en BPMN 2.0 (AS-IS / TO-BE) pour automatisation et analyse.',                                     tools: ['Read','Write','Edit','Glob','WebSearch','WebFetch','TodoWrite'] },
-  { id: 'change-request',                    icon: '🔧', name: '/change-request',                    version: '1.0.0', desc: 'Rédige, valide et suit un RFC à travers le processus CAB (impact, rollback, MOEX).',                                             tools: ['Read','Write','Grep','Glob','Task','TodoWrite'] },
-  { id: 'context-window-management',         icon: '⚙️', name: '/context-window-management',         version: '1.0.0', desc: 'Gère la santé du contexte dans les sessions longues et pipelines multi-agents.',                                                 tools: ['Read','Write','Bash','Glob','Task','TodoWrite'] },
-  { id: 'deploy',                            icon: '⚙️', name: '/deploy',                            version: '1.1.0', desc: 'CI/CD et déploiement : évalue l\'infra, implémente les pipelines, valide les configs.',                                          tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite','WebSearch'] },
-  { id: 'deprecation-and-migration',         icon: '🔗', name: '/deprecation-and-migration',         version: '1.0.0', desc: 'Migre une API (auth, protocole, topologie) sans casser les consommateurs. Guide + coexistence.',                                 tools: ['Read','Write','Grep','Glob','Bash','Task','TodoWrite'] },
-  { id: 'develop',                           icon: '💻', name: '/develop',                           version: '1.4.0', desc: 'Workflow complet d\'implémentation feature : explore → planifie → implémente → rapporte.',                                        tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite'] },
-  { id: 'document',                          icon: '📄', name: '/document',                          version: '1.2.0', desc: 'Sync documentation : détecte les changements, met à jour CLAUDE.md, crée des ADRs.',                                             tools: ['Read','Write','Edit','Grep','Glob','Task','Bash','TodoWrite'] },
-  { id: 'documentation-build-order',         icon: '📄', name: '/documentation-build-order',         version: '1.0.0', desc: 'Séquence les artefacts documentaires dans le bon ordre de dépendance (greenfield, brownfield…).',                               tools: ['Read','Grep','Glob','TodoWrite','Task'] },
-  { id: 'draft-content',                     icon: '⚡', name: '/draft-content',                     version: '1.0.0', desc: 'Génère du contenu de communication interne TCS (daily tip, weekly focus, hackathon brief).',                                     tools: ['Read','Write','Glob'] },
-  { id: 'enterprise-architecture-framework', icon: '🏗️', name: '/enterprise-architecture-framework', version: '1.0.0', desc: 'Architecture d\'entreprise : domaines Business/Application/Data/Technology, vues ArchiMate, gouvernance.',                      tools: ['Read','Write','Edit','Grep','Glob','WebSearch','WebFetch','TodoWrite'] },
-  { id: 'eval-driven-development',           icon: '💻', name: '/eval-driven-development',           version: '1.0.0', desc: 'Définit critères d\'évaluation et métriques de succès avant toute implémentation.',                                              tools: ['Read','Write','Bash','Glob','Grep','Task','TodoWrite'] },
-  { id: 'evaluate-contribution',             icon: '✅', name: '/evaluate-contribution',             version: '1.1.0', desc: 'Évalue une contribution (agent/skill/team) avant ajout à la marketplace. Compare avec l\'existant.',                             tools: ['Read','Glob','Grep','mcp__claude_ai__atlassian'] },
-  { id: 'harness-engineering',               icon: '🤖', name: '/harness-engineering',               version: '1.0.0', desc: 'Conçoit une boucle d\'exécution autonome (harness) avec conditions de sortie et rollback.',                                      tools: ['Read','Write','Bash','Grep','Glob','Task','TodoWrite'] },
-  { id: 'incident-response',                 icon: '🔧', name: '/incident-response',                 version: '1.0.0', desc: 'Gère un incident de production de la détection au postmortem sans blame.',                                                        tools: ['Read','Write','Bash','Grep','Glob','Task','TodoWrite'] },
-  { id: 'integration-patterns',              icon: '🏗️', name: '/integration-patterns',              version: '1.0.0', desc: 'Identifie, sélectionne et documente les patterns EIP (messaging, routing, transformation).',                                     tools: ['Read','Write','Edit','Grep','Glob','WebSearch','WebFetch','TodoWrite'] },
-  { id: 'knowledge-capture',                 icon: '📚', name: '/knowledge-capture',                 version: '1.0.0', desc: 'Extrait les patterns, décisions et pièges découverts en session dans un fichier de connaissance durable.',                       tools: ['Read','Write','Grep','Glob','Task'] },
-  { id: 'observability-and-instrumentation', icon: '👁️', name: '/observability-and-instrumentation', version: '1.0.0', desc: 'Instrumente le code (logs, métriques, traces ELK) pour rendre le comportement prod visible.',                                    tools: ['Read','Grep','Bash','WebSearch'] },
-  { id: 'pattern-diagram-design',            icon: '🔗', name: '/pattern-diagram-design',            version: '1.1.0', desc: 'Génère des diagrammes Mermaid pour les patterns d\'intégration TCS (ARCHI/EIP).',                                                 tools: ['Read','Write','Edit','Grep','Glob','Task','WebSearch','WebFetch'] },
-  { id: 'postman-collection-generator',      icon: '🧪', name: '/postman-collection-generator',      version: '1.0.1', desc: 'Génère des collections Postman v2.1 pour les tests non-régression (APIC/ACE/MQ).',                                               tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','WebFetch'] },
-  { id: 'publish-confluence',                icon: '📄', name: '/publish-confluence',                version: '1.1.1', desc: 'Publie la doc HTML sur Confluence en arbre de pages avec conversion automatique.',                                               tools: ['Read','Grep','Glob','Task','mcp__claude_ai_Atlassian__*','mcp__claude_ai_Mermaid_Chart__validate_and_render_mermaid_diagram','mcp__claude_ai_Lucid__*'] },
-  { id: 'publish-insights',                  icon: '⚡', name: '/publish-insights',                  version: '1.0.0', desc: 'Publie un insight anonymisé dans docs/INSIGHTS.md et ouvre optionnellement une Issue GitLab.',                                   tools: ['Read','Write','Bash','WebFetch'] },
-  { id: 'requirements-analysis',             icon: '📋', name: '/requirements-analysis',             version: '1.0.0', desc: 'Élicite, analyse et valide les exigences logicielles (BRD/FRS) avec traçabilité.',                                              tools: ['Read','Write','Edit','Grep','Glob','WebSearch','WebFetch','TodoWrite','AskUserQuestion','mcp__claude_ai_Atlassian__*'] },
-  { id: 'review',                            icon: '💻', name: '/review',                            version: '1.3.0', desc: 'Code review : architecture, qualité, sécurité, patterns APIC/ACE, SOLID/OWASP.',                                                  tools: ['Read','Grep','Glob','Task','Bash','TodoWrite'] },
-  { id: 'runbook',                           icon: '🔧', name: '/runbook',                           version: '1.0.0', desc: 'Rédige ou exécute un runbook opérationnel avec vérifications et plan de rollback.',                                               tools: ['Read','Write','Bash','Grep','Glob','Task'] },
-  { id: 'security-audit',                    icon: '🔒', name: '/security-audit',                    version: '1.3.0', desc: 'Audit sécurité complet : OWASP, CVE, secrets, permissions, dépendances.',                                                         tools: ['Read','Grep','Glob','Bash','Task','TodoWrite','WebSearch'] },
-  { id: 'security-by-design',                icon: '🔒', name: '/security-by-design',                version: '1.0.0', desc: 'Applique la sécurité by design : threat modelling, moindre privilège, défense en profondeur.',                                    tools: ['Read','Write','Edit','Grep','Glob','WebSearch','WebFetch','TodoWrite'] },
-  { id: 'source-driven-development',         icon: '💻', name: '/source-driven-development',         version: '1.0.0', desc: 'Ancre chaque implémentation dans la doc officielle avant de coder (IBM APIC, ACE, MQ, OpenAPI).',                                 tools: ['Read','Glob','WebFetch','Bash'] },
-  { id: 'spec-review-with-rules',            icon: '🔗', name: '/spec-review-with-rules',            version: '1.0.0', desc: 'Révise une spec IBM APIC (YAML/JSON) avec règles path-specific avant cutover (critical→bloquant).',                              tools: ['Read','Grep','Glob','Task'] },
-  { id: 'systematic-debugging',              icon: '💻', name: '/systematic-debugging',              version: '1.0.0', desc: 'Débogue en 4 phases : root cause, analyse patterns, hypothèses, implémentation avec test en premier.',                            tools: ['Read','Grep','Bash','Glob','Edit','Task','TodoWrite'] },
-  { id: 'test',                              icon: '🧪', name: '/test',                              version: '1.1.0', desc: 'Exécute et valide les tests : lance, analyse les échecs, écrit les tests manquants.',                                              tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite'] },
-  { id: 'use-case-modeling',                 icon: '📋', name: '/use-case-modeling',                 version: '1.0.0', desc: 'Identifie acteurs/use cases, rédige les spécs et exprime les critères d\'acceptation en Gherkin BDD.',                            tools: ['Read','Write','Edit','Glob','WebSearch','WebFetch','TodoWrite'] },
+  { id: 'agentic-claude-framework', category: 'governance',          icon: '⚙️', name: '/agentic-claude-framework',          version: '1.1.0', desc: 'Gouvernance du framework Agentic-Claude : ajouter/modifier agents, skills, teams, semver, registry.',                          tools: ['Read','Write','Edit','Grep','Glob','Bash','TodoWrite'] },
+  { id: 'agile-user-stories', category: 'business-analysis',                icon: '📋', name: '/agile-user-stories',                version: '1.0.0', desc: 'Rédige, découpe et affine les user stories agiles (Connextra, INVEST, MoSCoW).',                                                tools: ['Read','Write','Edit','Grep','Glob','TodoWrite','AskUserQuestion','mcp__claude_ai_Atlassian__*'] },
+  { id: 'analyze-adoption', category: 'documentation',                  icon: '⚡', name: '/analyze-adoption',                  version: '1.0.0', desc: 'Analyse l\'état d\'adoption de claude-agents dans un workspace et génère un rapport de recommandations.',                        tools: ['Read','Glob','Grep','Write'] },
+  { id: 'api-and-interface-design', category: 'architecture',          icon: '🔗', name: '/api-and-interface-design',          version: '1.0.0', desc: 'Conception contract-first d\'APIs REST : spec OpenAPI 3.x, versioning, règles de compatibilité ascendante.',                    tools: ['Read','Write','Grep','Glob','Task','TodoWrite'] },
+  { id: 'arch-c4', category: 'architecture',                           icon: '🏗️', name: '/arch-c4',                           version: '1.0.0', desc: 'Génère des diagrammes C4 (Context, Container, Component, Deployment, Runtime) via Structurizr DSL.',                          tools: ['Read','Write','Edit','Bash','Grep','Glob','Task'] },
+  { id: 'archimate-generation', category: 'architecture',              icon: '🗺️', name: '/archimate-generation',              version: '1.0.0', desc: 'Génère target-architecture.yaml depuis Lucidchart/YAML et produit le .archimate pour Archi.',                                   tools: ['Read','Write','Edit','Bash','Glob','WebSearch','mcp__claude_ai_Lucid__*'] },
+  { id: 'architecture-decision-records', category: 'architecture',     icon: '🏗️', name: '/architecture-decision-records',     version: '1.1.0', desc: 'Rédige, révise et maintient les ADRs (format Nygard) dans docs/architecture/decisions/.',                                       tools: ['Read','Write','Edit','Grep','Glob','TodoWrite'] },
+  { id: 'azure-archimate', category: 'architecture',                   icon: '🗺️', name: '/azure-archimate',                   version: '1.0.0', desc: 'Représente un tenant Azure (MG, subscriptions, resource groups, ressources) en vues ArchiMate.',                               tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','mcp__claude_ai_Lucid__*'] },
+  { id: 'azure-naming', category: 'architecture',                      icon: '☁️', name: '/azure-naming',                      version: '1.0.0', desc: 'Applique la convention de nommage TCS Azure (IAM POL Naming Convention Cloud Services).',                                        tools: ['Read','Grep','Glob','Task','WebSearch','WebFetch'] },
+  { id: 'business-process-modeling', category: 'business-analysis',         icon: '📋', name: '/business-process-modeling',         version: '1.0.0', desc: 'Modélise les processus métier en BPMN 2.0 (AS-IS / TO-BE) pour automatisation et analyse.',                                     tools: ['Read','Write','Edit','Glob','WebSearch','WebFetch','TodoWrite'] },
+  { id: 'change-request', category: 'operations',                    icon: '🔧', name: '/change-request',                    version: '1.0.0', desc: 'Rédige, valide et suit un RFC à travers le processus CAB (impact, rollback, MOEX).',                                             tools: ['Read','Write','Grep','Glob','Task','TodoWrite'] },
+  { id: 'context-window-management', category: 'engineering',         icon: '⚙️', name: '/context-window-management',         version: '1.0.0', desc: 'Gère la santé du contexte dans les sessions longues et pipelines multi-agents.',                                                 tools: ['Read','Write','Bash','Glob','Task','TodoWrite'] },
+  { id: 'deploy', category: 'engineering',                            icon: '⚙️', name: '/deploy',                            version: '1.1.0', desc: 'CI/CD et déploiement : évalue l\'infra, implémente les pipelines, valide les configs.',                                          tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite','WebSearch'] },
+  { id: 'deprecation-and-migration', category: 'architecture',         icon: '🔗', name: '/deprecation-and-migration',         version: '1.0.0', desc: 'Migre une API (auth, protocole, topologie) sans casser les consommateurs. Guide + coexistence.',                                 tools: ['Read','Write','Grep','Glob','Bash','Task','TodoWrite'] },
+  { id: 'develop', category: 'engineering',                           icon: '💻', name: '/develop',                           version: '1.4.0', desc: 'Workflow complet d\'implémentation feature : explore → planifie → implémente → rapporte.',                                        tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite'] },
+  { id: 'document', category: 'documentation',                          icon: '📄', name: '/document',                          version: '1.2.0', desc: 'Sync documentation : détecte les changements, met à jour CLAUDE.md, crée des ADRs.',                                             tools: ['Read','Write','Edit','Grep','Glob','Task','Bash','TodoWrite'] },
+  { id: 'documentation-build-order', category: 'documentation',         icon: '📄', name: '/documentation-build-order',         version: '1.0.0', desc: 'Séquence les artefacts documentaires dans le bon ordre de dépendance (greenfield, brownfield…).',                               tools: ['Read','Grep','Glob','TodoWrite','Task'] },
+  { id: 'draft-content', category: 'documentation',                     icon: '⚡', name: '/draft-content',                     version: '1.0.0', desc: 'Génère du contenu de communication interne TCS (daily tip, weekly focus, hackathon brief).',                                     tools: ['Read','Write','Glob'] },
+  { id: 'enterprise-architecture-framework', category: 'architecture', icon: '🏗️', name: '/enterprise-architecture-framework', version: '1.0.0', desc: 'Architecture d\'entreprise : domaines Business/Application/Data/Technology, vues ArchiMate, gouvernance.',                      tools: ['Read','Write','Edit','Grep','Glob','WebSearch','WebFetch','TodoWrite'] },
+  { id: 'eval-driven-development', category: 'engineering',           icon: '💻', name: '/eval-driven-development',           version: '1.0.0', desc: 'Définit critères d\'évaluation et métriques de succès avant toute implémentation.',                                              tools: ['Read','Write','Bash','Glob','Grep','Task','TodoWrite'] },
+  { id: 'evaluate-contribution', category: 'governance',             icon: '✅', name: '/evaluate-contribution',             version: '1.1.0', desc: 'Évalue une contribution (agent/skill/team) avant ajout à la marketplace. Compare avec l\'existant.',                             tools: ['Read','Glob','Grep','mcp__claude_ai__atlassian'] },
+  { id: 'harness-engineering', category: 'engineering',               icon: '🤖', name: '/harness-engineering',               version: '1.0.0', desc: 'Conçoit une boucle d\'exécution autonome (harness) avec conditions de sortie et rollback.',                                      tools: ['Read','Write','Bash','Grep','Glob','Task','TodoWrite'] },
+  { id: 'incident-response', category: 'operations',                 icon: '🔧', name: '/incident-response',                 version: '1.0.0', desc: 'Gère un incident de production de la détection au postmortem sans blame.',                                                        tools: ['Read','Write','Bash','Grep','Glob','Task','TodoWrite'] },
+  { id: 'integration-patterns', category: 'architecture',              icon: '🏗️', name: '/integration-patterns',              version: '1.0.0', desc: 'Identifie, sélectionne et documente les patterns EIP (messaging, routing, transformation).',                                     tools: ['Read','Write','Edit','Grep','Glob','WebSearch','WebFetch','TodoWrite'] },
+  { id: 'knowledge-capture', category: 'documentation',                 icon: '📚', name: '/knowledge-capture',                 version: '1.0.0', desc: 'Extrait les patterns, décisions et pièges découverts en session dans un fichier de connaissance durable.',                       tools: ['Read','Write','Grep','Glob','Task'] },
+  { id: 'observability-and-instrumentation', category: 'operations', icon: '👁️', name: '/observability-and-instrumentation', version: '1.0.0', desc: 'Instrumente le code (logs, métriques, traces ELK) pour rendre le comportement prod visible.',                                    tools: ['Read','Grep','Bash','WebSearch'] },
+  { id: 'pattern-diagram-design', category: 'architecture',            icon: '🔗', name: '/pattern-diagram-design',            version: '1.1.0', desc: 'Génère des diagrammes Mermaid pour les patterns d\'intégration TCS (ARCHI/EIP).',                                                 tools: ['Read','Write','Edit','Grep','Glob','Task','WebSearch','WebFetch'] },
+  { id: 'postman-collection-generator', category: 'engineering',      icon: '🧪', name: '/postman-collection-generator',      version: '1.0.1', desc: 'Génère des collections Postman v2.1 pour les tests non-régression (APIC/ACE/MQ).',                                               tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','WebFetch'] },
+  { id: 'publish-confluence', category: 'documentation',                icon: '📄', name: '/publish-confluence',                version: '1.1.1', desc: 'Publie la doc HTML sur Confluence en arbre de pages avec conversion automatique.',                                               tools: ['Read','Grep','Glob','Task','mcp__claude_ai_Atlassian__*','mcp__claude_ai_Mermaid_Chart__validate_and_render_mermaid_diagram','mcp__claude_ai_Lucid__*'] },
+  { id: 'publish-insights', category: 'documentation',                  icon: '⚡', name: '/publish-insights',                  version: '1.0.0', desc: 'Publie un insight anonymisé dans docs/INSIGHTS.md et ouvre optionnellement une Issue GitLab.',                                   tools: ['Read','Write','Bash','WebFetch'] },
+  { id: 'requirements-analysis', category: 'business-analysis',             icon: '📋', name: '/requirements-analysis',             version: '1.0.0', desc: 'Élicite, analyse et valide les exigences logicielles (BRD/FRS) avec traçabilité.',                                              tools: ['Read','Write','Edit','Grep','Glob','WebSearch','WebFetch','TodoWrite','AskUserQuestion','mcp__claude_ai_Atlassian__*'] },
+  { id: 'review', category: 'engineering',                            icon: '💻', name: '/review',                            version: '1.3.0', desc: 'Code review : architecture, qualité, sécurité, patterns APIC/ACE, SOLID/OWASP.',                                                  tools: ['Read','Grep','Glob','Task','Bash','TodoWrite'] },
+  { id: 'runbook', category: 'operations',                           icon: '🔧', name: '/runbook',                           version: '1.0.0', desc: 'Rédige ou exécute un runbook opérationnel avec vérifications et plan de rollback.',                                               tools: ['Read','Write','Bash','Grep','Glob','Task'] },
+  { id: 'security-audit', category: 'security',                    icon: '🔒', name: '/security-audit',                    version: '1.3.0', desc: 'Audit sécurité complet : OWASP, CVE, secrets, permissions, dépendances.',                                                         tools: ['Read','Grep','Glob','Bash','Task','TodoWrite','WebSearch'] },
+  { id: 'security-by-design', category: 'security',                icon: '🔒', name: '/security-by-design',                version: '1.0.0', desc: 'Applique la sécurité by design : threat modelling, moindre privilège, défense en profondeur.',                                    tools: ['Read','Write','Edit','Grep','Glob','WebSearch','WebFetch','TodoWrite'] },
+  { id: 'source-driven-development', category: 'engineering',         icon: '💻', name: '/source-driven-development',         version: '1.0.0', desc: 'Ancre chaque implémentation dans la doc officielle avant de coder (IBM APIC, ACE, MQ, OpenAPI).',                                 tools: ['Read','Glob','WebFetch','Bash'] },
+  { id: 'spec-review-with-rules', category: 'architecture',            icon: '🔗', name: '/spec-review-with-rules',            version: '1.0.0', desc: 'Révise une spec IBM APIC (YAML/JSON) avec règles path-specific avant cutover (critical→bloquant).',                              tools: ['Read','Grep','Glob','Task'] },
+  { id: 'systematic-debugging', category: 'engineering',              icon: '💻', name: '/systematic-debugging',              version: '1.0.0', desc: 'Débogue en 4 phases : root cause, analyse patterns, hypothèses, implémentation avec test en premier.',                            tools: ['Read','Grep','Bash','Glob','Edit','Task','TodoWrite'] },
+  { id: 'test', category: 'engineering',                              icon: '🧪', name: '/test',                              version: '1.1.0', desc: 'Exécute et valide les tests : lance, analyse les échecs, écrit les tests manquants.',                                              tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite'] },
+  { id: 'use-case-modeling', category: 'business-analysis',                 icon: '📋', name: '/use-case-modeling',                 version: '1.0.0', desc: 'Identifie acteurs/use cases, rédige les spécs et exprime les critères d\'acceptation en Gherkin BDD.',                            tools: ['Read','Write','Edit','Glob','WebSearch','WebFetch','TodoWrite'] },
 ];
 
 const HOOKS = [
@@ -415,6 +429,17 @@ const SOURCES = {
 
 let selected = { agents: new Set(), skills: new Set(), hooks: new Set() };
 
+const CATEGORY_ORDER  = ['engineering','architecture','security','business-analysis','operations','documentation','governance'];
+const CATEGORY_LABELS = {
+  'engineering':       '⚙️ Engineering',
+  'architecture':      '🏗️ Architecture',
+  'security':          '🔒 Security',
+  'business-analysis': '📋 Business Analysis',
+  'operations':        '🔧 Operations',
+  'documentation':     '📄 Documentation',
+  'governance':        '⚖️ Governance',
+};
+
 function renderCards() {
   // Agents
   document.getElementById('agent-cards').innerHTML = AGENTS.map(a => `
@@ -428,8 +453,14 @@ function renderCards() {
       <div class="card-check">${selected.agents.has(a.id)?'✓':''}</div>
     </div>`).join('');
 
-  // Skills
-  document.getElementById('skill-cards').innerHTML = SKILLS.map(s => `
+  // Skills — grouped by category
+  {
+    let html = '';
+    CATEGORY_ORDER.forEach(cat => {
+      const skills = SKILLS.filter(s => s.category === cat);
+      if (!skills.length) return;
+      html += `<div class="skill-cat-header">${CATEGORY_LABELS[cat]}</div>`;
+      html += skills.map(s => `
     <div class="card ${selected.skills.has(s.id)?'selected':''}" onclick="toggle('skills','${s.id}')" id="skill-${s.id}">
       <div class="card-header">
         <span class="card-icon">${s.icon}</span>
@@ -438,6 +469,9 @@ function renderCards() {
       <div class="card-desc">${s.desc}</div>
       <div class="card-check">${selected.skills.has(s.id)?'✓':''}</div>
     </div>`).join('');
+    });
+    document.getElementById('skill-cards').innerHTML = html;
+  }
 
   // Hooks
   document.getElementById('hook-list').innerHTML = HOOKS.map(h => `
@@ -710,3 +744,4 @@ renderWorkflows();
 </script>
 </body>
 </html>
+
