@@ -866,52 +866,38 @@ const WORKFLOWS = [
     id: 'feature-release',
     icon: '🚀',
     name: 'feature-release',
-    version: '1.0.0',
-    desc: 'Pipeline séquentiel : feature-team implémente et teste, puis release-team valide et livre. Orchestré par product-owner-assistant.',
-    cmd: '# Dans Claude Code avec product-owner-assistant installé :\n# "Exécute feature-team pour implémenter [X], puis release-team pour livrer."',
-    svg: `<svg viewBox="0 0 620 398" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:620px;display:block;margin:0 auto" font-family="Segoe UI,system-ui,sans-serif">
+    version: '1.1.0',
+    desc: 'Pipeline feature-team : developer implémente, tester valide, devops déploie, documentarian documente. Orchestré par product-owner-assistant.',
+    cmd: '# Dans Claude Code avec product-owner-assistant installé :\n# "Exécute feature-team pour implémenter [X] et livrer en production."',
+    svg: `<svg viewBox="0 0 620 244" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:620px;display:block;margin:0 auto" font-family="Segoe UI,system-ui,sans-serif">
   <defs>
     <marker id="fr-ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#6c8fff"/></marker>
-    <marker id="fr-ap" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#a78bfa"/></marker>
     <marker id="fr-ag" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#34d399"/></marker>
-    <marker id="fr-ad" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#64748b"/></marker>
   </defs>
   <rect x="208" y="10" width="184" height="48" rx="11" fill="#f0a86818" stroke="#f0a868" stroke-width="1.5"/>
   <text x="300" y="31" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">🎯 orchestrateur</text>
   <text x="300" y="48" fill="#64748b" font-size="10" text-anchor="middle">product-owner-assistant</text>
   <line x1="300" y1="58" x2="300" y2="93" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#fr-ab)"/>
   <rect x="18" y="96" width="564" height="92" rx="13" fill="#6c8fff0b" stroke="#6c8fff" stroke-width="1.5" stroke-dasharray="6,4"/>
-  <text x="34" y="114" fill="#6c8fff" font-size="11" font-weight="700">Phase 1 — feature-team</text>
-  <rect x="92" y="122" width="115" height="50" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
-  <text x="149" y="143" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">💻 developer</text>
-  <text x="149" y="160" fill="#64748b" font-size="10" text-anchor="middle">Implémentation</text>
-  <line x1="207" y1="147" x2="242" y2="147" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#fr-ab)"/>
-  <rect x="245" y="122" width="100" height="50" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
-  <text x="295" y="143" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">🧪 tester</text>
-  <text x="295" y="160" fill="#64748b" font-size="10" text-anchor="middle">Tests unitaires</text>
-  <line x1="345" y1="147" x2="382" y2="147" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#fr-ab)"/>
-  <rect x="385" y="122" width="130" height="50" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
-  <text x="450" y="143" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">📄 documentarian</text>
-  <text x="450" y="160" fill="#64748b" font-size="10" text-anchor="middle">Docs + CLAUDE.md</text>
-  <line x1="300" y1="188" x2="300" y2="220" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#fr-ad)"/>
-  <rect x="214" y="196" width="172" height="20" rx="7" fill="#131520" stroke="#2e3348" stroke-width="1"/>
-  <text x="300" y="210" fill="#64748b" font-size="10" text-anchor="middle">📋 team-findings.md</text>
-  <rect x="18" y="223" width="564" height="92" rx="13" fill="#a78bfa0b" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="6,4"/>
-  <text x="34" y="241" fill="#a78bfa" font-size="11" font-weight="700">Phase 2 — release-team</text>
-  <rect x="100" y="249" width="100" height="50" rx="11" fill="#a78bfa18" stroke="#a78bfa" stroke-width="1.5"/>
-  <text x="150" y="270" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">🧪 tester</text>
-  <text x="150" y="287" fill="#64748b" font-size="10" text-anchor="middle">Suite complète</text>
-  <line x1="200" y1="274" x2="238" y2="274" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#fr-ap)"/>
-  <rect x="241" y="249" width="100" height="50" rx="11" fill="#a78bfa18" stroke="#a78bfa" stroke-width="1.5"/>
-  <text x="291" y="270" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">⚙️ devops</text>
-  <text x="291" y="287" fill="#64748b" font-size="10" text-anchor="middle">CI/CD + pipeline</text>
-  <line x1="341" y1="274" x2="379" y2="274" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#fr-ap)"/>
-  <rect x="382" y="249" width="130" height="50" rx="11" fill="#a78bfa18" stroke="#a78bfa" stroke-width="1.5"/>
-  <text x="447" y="270" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">📄 documentarian</text>
-  <text x="447" y="287" fill="#64748b" font-size="10" text-anchor="middle">Release notes</text>
-  <line x1="300" y1="315" x2="300" y2="351" stroke="#34d399" stroke-width="1.5" marker-end="url(#fr-ag)"/>
-  <ellipse cx="300" cy="371" rx="114" ry="24" fill="#34d39918" stroke="#34d399" stroke-width="1.5"/>
-  <text x="300" y="376" fill="#34d399" font-size="13" font-weight="700" text-anchor="middle">✅ Release livrée</text>
+  <text x="34" y="114" fill="#6c8fff" font-size="11" font-weight="700">feature-team — v1.2.0</text>
+  <rect x="30" y="122" width="108" height="50" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="84" y="143" fill="#e2e8f0" font-size="11.5" font-weight="600" text-anchor="middle">💻 developer</text>
+  <text x="84" y="160" fill="#64748b" font-size="10" text-anchor="middle">Implémentation</text>
+  <line x1="138" y1="147" x2="153" y2="147" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#fr-ab)"/>
+  <rect x="156" y="122" width="90" height="50" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="201" y="143" fill="#e2e8f0" font-size="11.5" font-weight="600" text-anchor="middle">🧪 tester</text>
+  <text x="201" y="160" fill="#64748b" font-size="10" text-anchor="middle">Tests</text>
+  <line x1="246" y1="147" x2="261" y2="147" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#fr-ab)"/>
+  <rect x="264" y="122" width="90" height="50" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="309" y="143" fill="#e2e8f0" font-size="11.5" font-weight="600" text-anchor="middle">⚙️ devops</text>
+  <text x="309" y="160" fill="#64748b" font-size="10" text-anchor="middle">CI/CD</text>
+  <line x1="354" y1="147" x2="369" y2="147" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#fr-ab)"/>
+  <rect x="372" y="122" width="130" height="50" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="437" y="143" fill="#e2e8f0" font-size="11.5" font-weight="600" text-anchor="middle">📄 documentarian</text>
+  <text x="437" y="160" fill="#64748b" font-size="10" text-anchor="middle">Docs + release notes</text>
+  <line x1="300" y1="188" x2="300" y2="202" stroke="#34d399" stroke-width="1.5" marker-end="url(#fr-ag)"/>
+  <ellipse cx="300" cy="220" rx="114" ry="20" fill="#34d39918" stroke="#34d399" stroke-width="1.5"/>
+  <text x="300" y="225" fill="#34d399" font-size="13" font-weight="700" text-anchor="middle">✅ Feature livrée</text>
 </svg>`,
   },
   {
