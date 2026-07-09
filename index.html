@@ -155,6 +155,18 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 
 .list-cat { padding: 8px 14px 3px; font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); }
 
+.agent-skills {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+  padding: 4px 14px 6px 36px;
+  background: rgba(200,96,16,0.07);
+  border-left: 2px solid var(--accent);
+  line-height: 1.6;
+  word-break: break-all;
+  cursor: default;
+}
+
 /* ── Workflow section ── */
 .wf-section { flex-shrink: 0; }
 .wf-section-hdr { display: flex; align-items: center; gap: 8px; padding: 12px 16px 10px; border-bottom: 1px solid var(--border); background: var(--panel); }
@@ -486,8 +498,13 @@ function renderCards() {
     panelHdr('AGENTS', AGENTS.length) +
     '<div class="item-list">' +
     AGENTS.map(a => {
-      const sel = selected.agents.has(a.id);
-      return `<div class="list-item${sel?' sel':''}" onclick="toggle('agents','${a.id}')" id="agent-${a.id}"><span class="li-icon">${a.icon}</span><span class="li-name">${a.id}</span></div>`;
+      const sel    = selected.agents.has(a.id);
+      const skills = AGENT_SKILLS[a.id] || [];
+      const badge  = skills.length ? `<span class="li-right">${skills.length}s</span>` : '';
+      const sub    = sel && skills.length
+        ? `<div class="agent-skills">${skills.join(' · ')}</div>`
+        : '';
+      return `<div class="list-item${sel?' sel':''}" onclick="toggle('agents','${a.id}')" id="agent-${a.id}"><span class="li-icon">${a.icon}</span><span class="li-name">${a.id}</span>${badge}</div>${sub}`;
     }).join('') + '</div>';
 
   // Skills by category
