@@ -479,20 +479,12 @@ const HOOKS = [
 
 const TEAMS = [
   {
-    id: 'feature-team', icon: '🔵', name: 'feature-team', version: '1.1.0', color: '#6c8fff',
+    id: 'feature-team', icon: '🔵', name: 'feature-team', version: '1.2.0', color: '#6c8fff',
     desc: 'Implémenter une feature de bout en bout — du code à la doc.',
     agents: [
       { id: 'developer',     icon: '💻', name: 'developer' },
       { id: 'tester',        icon: '🧪', name: 'tester' },
-      { id: 'documentarian', icon: '📄', name: 'documentarian' },
-    ],
-  },
-  {
-    id: 'release-team', icon: '🟣', name: 'release-team', version: '1.1.0', color: '#a78bfa',
-    desc: 'Préparer et valider une release production.',
-    agents: [
       { id: 'devops',        icon: '⚙️', name: 'devops' },
-      { id: 'tester',        icon: '🧪', name: 'tester' },
       { id: 'documentarian', icon: '📄', name: 'documentarian' },
     ],
   },
@@ -548,10 +540,26 @@ const TEAMS = [
 
 const PRESETS = {
   feature: { skills: ['develop','test','document'],                                                                              teams: ['feature-team'],          hooks: ['auto-test'] },
-  release: { skills: ['deploy','test','document'],                                                                              teams: ['release-team'],          hooks: ['auto-test','commit-guard'] },
+  release: { skills: ['deploy','test','document'],                                                                              teams: ['feature-team'],          hooks: ['auto-test','commit-guard'] },
   full:    { skills: SKILLS.map(s=>s.id),                                                                                      teams: TEAMS.map(t=>t.id),        hooks: ['pii-guard','auto-test','commit-guard','agent-pipeline'] },
   moex:    { skills: ['develop','test','review','postman-collection-generator','pattern-diagram-design'],                       teams: ['moex-team'],             hooks: ['pii-guard','auto-test','commit-guard'] },
   none:    { skills: [], teams: [], hooks: [] },
+};
+
+const AGENT_SKILLS = {
+  'developer':               ['develop','review','systematic-debugging','eval-driven-development','source-driven-development','harness-engineering','context-window-management'],
+  'tester':                  ['test','postman-collection-generator'],
+  'devops':                  ['deploy','runbook','incident-response','observability-and-instrumentation'],
+  'documentarian':           ['document','publish-confluence','knowledge-capture','documentation-build-order'],
+  'architect':               ['arch-c4','api-and-interface-design','architecture-decision-records','integration-patterns','deprecation-and-migration','spec-review-with-rules','security-by-design'],
+  'business-analyst':        ['agile-user-stories','requirements-analysis','business-process-modeling','use-case-modeling','change-request'],
+  'archimate-architect':     ['archimate-generation','azure-archimate','azure-naming'],
+  'adoption-assistant':      ['analyze-adoption'],
+  'best-practices':          ['publish-insights','knowledge-capture'],
+  'community-manager':       ['draft-content'],
+  'evaluate-contribution':   ['evaluate-contribution','agentic-claude-framework'],
+  'library-maintainer':      ['agentic-claude-framework'],
+  'product-owner-assistant': [],
 };
 
 function resolveAgentsFromTeams(teamSet) {
@@ -560,12 +568,19 @@ function resolveAgentsFromTeams(teamSet) {
   return ids;
 }
 
+function resolveSkillsFromAgents(agentSet) {
+  const ids = new Set();
+  agentSet.forEach(agentId => (AGENT_SKILLS[agentId] || []).forEach(s => ids.add(s)));
+  return ids;
+}
+
 const SOURCES = {
   gitlab: 'git@git-scm.tcsgroup.ch:tcs/it/artificial-intelligence/enterprise-architecture/claudeai/claude-agents.git',
   github: 'https://github.com/Aletheia-Thomas/Claude-Agents.git',
 };
 
-let selected = { agents: new Set(), skills: new Set(), teams: new Set(), hooks: new Set() };
+let selected     = { agents: new Set(), skills: new Set(), teams: new Set(), hooks: new Set() };
+let manualSkills = new Set();
 
 const CATEGORY_ORDER  = ['engineering','architecture','security','business-analysis','operations','documentation','governance'];
 const CATEGORY_LABELS = {
@@ -660,9 +675,17 @@ function renderCards() {
 }
 
 function toggle(type, id) {
-  if (selected[type].has(id)) selected[type].delete(id);
+  const wasSelected = selected[type].has(id);
+  if (wasSelected) selected[type].delete(id);
   else selected[type].add(id);
-  if (type === 'teams') selected.agents = resolveAgentsFromTeams(selected.teams);
+  if (type === 'teams') {
+    selected.agents = resolveAgentsFromTeams(selected.teams);
+    selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
+  } else if (type === 'agents') {
+    selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
+  } else if (type === 'skills') {
+    if (wasSelected) manualSkills.delete(id); else manualSkills.add(id);
+  }
   renderCards();
   document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
   document.getElementById('command-box').classList.remove('visible');
@@ -670,10 +693,11 @@ function toggle(type, id) {
 
 function applyPreset(name) {
   const p = PRESETS[name];
-  selected.skills = new Set(p.skills);
+  manualSkills    = new Set(p.skills);
   selected.teams  = new Set(p.teams || []);
   selected.hooks  = new Set(p.hooks);
   selected.agents = resolveAgentsFromTeams(selected.teams);
+  selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('preset-'+name).classList.add('active');
   renderCards();
