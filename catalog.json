@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-09T15:22:22Z",
+  "generated_at": "2026-07-09T16:11:40Z",
   "agents": [
     {
       "kind": "agent",
@@ -18,7 +18,7 @@
     {
       "kind": "agent",
       "name": "archimate-architect",
-      "version": "1.6.0",
+      "version": "1.7.0",
       "description": "Produces ArchiMate target-architecture files (.archimate) from source diagrams (Lucidchart) or structured YAML manifests. Invokes Python generator tooling via Bash. No application code, no tests.",
       "model": "opus",
       "tools": [
@@ -414,7 +414,7 @@
     {
       "kind": "skill",
       "name": "azure-naming",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "description": "Apply the TCS Azure resource naming convention (IAM \"POL Naming Convention Cloud Services\") when naming, creating, or reviewing any Azure resource — in Bicep/Terraform, in a design doc (BOM / target-architecture), in a PR review, or when reconciling an existing estate. Encodes the four-part {ResourceType}-{Project}-{Environment}[-{Instance}] pattern, the controlled abbreviation / project / environment token lists, the no-hyphen global variant, per-type charset/length constraints, and the AzGov + IAM-policy authority chain. If you are about to type an Azure resource name, run this skill first.",
       "type": "technological",
       "category": "architecture",
