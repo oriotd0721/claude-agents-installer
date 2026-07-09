@@ -54,6 +54,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
   display: flex;
   flex-direction: column;
   gap: 20px;
+  justify-content: center;
 }
 .hero::-webkit-scrollbar       { width: 4px; }
 .hero::-webkit-scrollbar-track { background: transparent; }
@@ -205,6 +206,26 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .ctx-item-name { font-family: var(--mono); font-size: 11px; color: var(--accent); display: block; margin-bottom: 2px; }
 .ctx-item-desc { font-size: 10px; color: var(--dim2); line-height: 1.4; }
 .ctx-wf-diagram { background: #080808; border: 1px solid var(--border); padding: 10px; overflow-x: auto; margin-top: 8px; border-radius: 2px; }
+
+/* ── Hero compact ── */
+.hero-cfg { display: flex; flex-direction: column; gap: 0; }
+
+/* ── Team builder ── */
+.list-create-team { border-top: 1px solid var(--border); color: var(--accent); }
+.list-create-team:hover { background: rgba(200,96,16,0.08); }
+.list-custom-team { border-top: 1px solid var(--border); color: var(--dim2); }
+.list-custom-team.sel { background: var(--accent); color: var(--sel-text); }
+
+.team-builder { padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; flex: 1; }
+.tb-section-label { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); margin-bottom: 6px; }
+.tb-agents-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.tb-agent-chip { display: flex; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 3px; font-family: var(--mono); font-size: 11px; color: var(--dim2); cursor: pointer; background: var(--panel2); transition: border-color 0.1s, color 0.1s, background 0.1s; user-select: none; }
+.tb-agent-chip:hover { border-color: var(--accent); color: var(--text); }
+.tb-agent-chip.sel { background: var(--accent); color: var(--sel-text); border-color: var(--accent); font-weight: 700; }
+.tb-actions { display: flex; gap: 8px; align-items: center; padding-top: 4px; }
+.tb-clear-btn { padding: 9px 14px; background: transparent; color: var(--dim2); border: 1px solid var(--border); border-radius: 3px; font-size: 12px; cursor: pointer; font-family: var(--mono); transition: border-color 0.15s, color 0.15s; }
+.tb-clear-btn:hover { border-color: #f87171; color: #f87171; }
+.tb-count { font-family: var(--mono); font-size: 10px; color: var(--dim2); margin-left: auto; }
 </style>
 </head>
 <body>
@@ -219,32 +240,14 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 
   <!-- Hero (left column) -->
   <div class="hero">
-    <div class="hero-label">— v1.2.13 · LIBRAIRIE AGENTIC-CLAUDE</div>
-
     <div class="hero-title">La librairie<br>d'agents pour<br><span class="hl">Claude Code</span><br>au TCS.</div>
 
-    <div class="hero-sub">13 agents spécialisés, 40 skills, 5 équipes — couverture complète du cycle de développement enterprise IBM/Azure.</div>
-
-    <div>
-      <div class="hero-section-label">COMPATIBLE AVEC</div>
-      <div class="compat-tags">
-        <span class="compat-tag active">Claude Code</span>
-        <span class="compat-tag">VS Code</span>
-        <span class="compat-tag">GitLab CI</span>
-        <span class="compat-tag">IBM APIC/ACE</span>
-        <span class="compat-tag">Azure</span>
-      </div>
-    </div>
-
-    <div>
-      <div class="hero-section-label">— CONFIGURATION</div>
-      <label class="cfg-label" for="source-select">Source du repo</label>
-      <select class="cfg-select" id="source-select">
-        <option value="gitlab">GitLab TCS (recommandé)</option>
-        <option value="github">GitHub (Aletheia-Thomas)</option>
+    <div class="hero-cfg">
+      <select class="cfg-select" id="source-select" aria-label="Source du repo">
+        <option value="gitlab">GitLab TCS</option>
+        <option value="github">GitHub</option>
       </select>
-      <label class="cfg-label" for="project-path">Chemin du projet cible</label>
-      <input class="cfg-input" type="text" id="project-path" value="." placeholder="Ex: C:\Projets\MonProjet ou ."/>
+      <input class="cfg-input" type="text" id="project-path" value="." placeholder="Chemin projet (ex: C:\Mon\Projet)" aria-label="Chemin du projet cible"/>
     </div>
 
     <button class="gen-btn" onclick="generateCommand()" id="gen-btn" disabled>⚡ Générer la commande</button>
@@ -446,6 +449,7 @@ const AGENT_SKILLS = {
 function resolveAgentsFromTeams(teamSet) {
   const ids = new Set();
   TEAMS.filter(t => teamSet.has(t.id)).forEach(t => (t.agents || []).forEach(a => ids.add(a.id)));
+  if (teamSet.has('__custom__') && customTeam) customTeam.agents.forEach(id => ids.add(id));
   return ids;
 }
 
@@ -460,9 +464,11 @@ const SOURCES = {
   github: 'https://github.com/Aletheia-Thomas/Claude-Agents.git',
 };
 
-let selected     = { agents: new Set(), skills: new Set(), teams: new Set(), hooks: new Set() };
-let manualSkills = new Set();
-let activeTeam   = null;
+let selected      = { agents: new Set(), skills: new Set(), teams: new Set(), hooks: new Set() };
+let manualSkills  = new Set();
+let activeTeam    = null;
+let teamBuilderOpen = false;
+let customTeam    = null; // { name: string, agents: Set<agentId> }
 
 const CATEGORY_ORDER  = ['engineering','architecture','security','business-analysis','operations','documentation','governance'];
 const CATEGORY_LABELS = {
@@ -481,13 +487,20 @@ function panelHdr(name, count) {
 
 function renderCards() {
   // Teams
-  document.getElementById('teams-panel').innerHTML =
-    panelHdr('ÉQUIPES', TEAMS.length) +
-    '<div class="item-list">' +
-    TEAMS.map(t => {
-      const sel = selected.teams.has(t.id);
-      return `<div class="list-item${sel?' sel':''}" onclick="toggle('teams','${t.id}')" id="team-${t.id}"><span class="li-dot" style="--dot:${t.color}">●</span><span class="li-info"><span class="li-name">${t.name}</span><span class="li-desc">${t.desc}</span></span><span class="li-right">${t.agents.length}a</span></div>`;
-    }).join('') + '</div>';
+  const customCount = customTeam ? customTeam.agents.size : 0;
+  const totalTeams = TEAMS.length + (customTeam ? 1 : 0);
+  let teamsHtml = panelHdr('ÉQUIPES', totalTeams) + '<div class="item-list">';
+  teamsHtml += TEAMS.map(t => {
+    const sel = selected.teams.has(t.id);
+    return `<div class="list-item${sel?' sel':''}" onclick="toggle('teams','${t.id}')" id="team-${t.id}"><span class="li-dot" style="--dot:${t.color}">●</span><span class="li-info"><span class="li-name">${t.name}</span><span class="li-desc">${t.desc}</span></span><span class="li-right">${t.agents.length}a</span></div>`;
+  }).join('');
+  if (customTeam) {
+    const csel = selected.teams.has('__custom__');
+    teamsHtml += `<div class="list-item list-custom-team${csel?' sel':''}" onclick="toggle('teams','__custom__')" id="team-__custom__"><span class="li-dot" style="--dot:#a78bfa">●</span><span class="li-info"><span class="li-name">✨ ${customTeam.name}</span><span class="li-desc">Équipe personnalisée</span></span><span class="li-right">${customCount}a</span></div>`;
+  }
+  teamsHtml += `<div class="list-item list-create-team" onclick="openTeamBuilder()"><span class="li-icon">＋</span><span class="li-name">${customTeam ? 'Modifier mon équipe' : 'Créer mon équipe'}</span></div>`;
+  teamsHtml += '</div>';
+  document.getElementById('teams-panel').innerHTML = teamsHtml;
 
   // Agents
   const sortedAgents = [...AGENTS].sort((a, b) => {
@@ -552,6 +565,7 @@ function toggle(type, id) {
   else selected[type].add(id);
   if (type === 'teams') {
     activeTeam = id;
+    teamBuilderOpen = false;
     selected.agents = resolveAgentsFromTeams(selected.teams);
     selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
   } else if (type === 'agents') {
@@ -562,6 +576,52 @@ function toggle(type, id) {
   renderCards();
   document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
   document.getElementById('command-box').classList.remove('visible');
+}
+
+function openTeamBuilder() {
+  teamBuilderOpen = true;
+  activeTeam = null;
+  renderContextPanel();
+}
+
+function toggleBuilderAgent(agentId) {
+  if (!customTeam) customTeam = { name: '', agents: new Set() };
+  const nameEl = document.getElementById('tb-name');
+  if (nameEl) customTeam.name = nameEl.value;
+  if (customTeam.agents.has(agentId)) customTeam.agents.delete(agentId);
+  else customTeam.agents.add(agentId);
+  renderContextPanel();
+}
+
+function createCustomTeam() {
+  const nameEl = document.getElementById('tb-name');
+  const name = nameEl ? nameEl.value.trim() : '';
+  if (!name) { if (nameEl) { nameEl.style.borderColor = 'var(--accent)'; nameEl.focus(); } return; }
+  if (!customTeam || customTeam.agents.size === 0) {
+    const grid = document.querySelector('.tb-agents-grid');
+    if (grid) grid.style.outline = '1px solid var(--accent)';
+    return;
+  }
+  customTeam.name = name;
+  teamBuilderOpen = false;
+  selected.teams.add('__custom__');
+  activeTeam = '__custom__';
+  selected.agents = resolveAgentsFromTeams(selected.teams);
+  selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
+  renderCards();
+  document.getElementById('gen-btn').disabled = false;
+  document.getElementById('command-box').classList.remove('visible');
+}
+
+function clearCustomTeam() {
+  customTeam = null;
+  teamBuilderOpen = false;
+  selected.teams.delete('__custom__');
+  if (activeTeam === '__custom__') activeTeam = null;
+  selected.agents = resolveAgentsFromTeams(selected.teams);
+  selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
+  renderCards();
+  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
 }
 
 function applyPreset(name) {
@@ -597,10 +657,11 @@ function generateCommand() {
   if (skills) cmd += ` \`\n  -Skills "${skills}"`;
   if (hooks.length) cmd += ` \`\n  -IncludeHooks`;
   cmd += `\n`;
-  if (teams.length) {
+  const stdTeams = teams.filter(t => t !== '__custom__');
+  if (stdTeams.length) {
     cmd += `\n# ${step++}. Installer les équipes\n`;
     cmd += `$null = New-Item -ItemType Directory -Force "${path}\\.claude\\teams"\n`;
-    teams.forEach(t => {
+    stdTeams.forEach(t => {
       cmd += `New-Item -ItemType Junction -Force -Path "${path}\\.claude\\teams\\${t}" -Target "C:\\ClaudeAgents\\teams\\${t}" | Out-Null\n`;
     });
   }
@@ -641,10 +702,66 @@ const TEAM_WORKFLOWS = {
 
 function renderContextPanel() {
   const el = document.getElementById('ctx-panel');
+
+  if (teamBuilderOpen) {
+    const ct = customTeam || { name: '', agents: new Set() };
+    const agentChips = AGENTS.map(a => {
+      const sel = ct.agents.has(a.id);
+      return `<div class="tb-agent-chip${sel?' sel':''}" onclick="toggleBuilderAgent('${a.id}')"><span>${a.icon}</span><span>${a.id}</span></div>`;
+    }).join('');
+    const selCount = ct.agents.size;
+    el.innerHTML = `
+      <div class="ctx-hdr">
+        <div class="ctx-team-row"><span class="ctx-team-icon">✨</span><span class="ctx-team-name">Créer mon équipe</span></div>
+        <div class="ctx-team-desc">Nommez votre équipe et sélectionnez les agents qui la composent.</div>
+      </div>
+      <div class="team-builder">
+        <div>
+          <div class="tb-section-label">Nom de l'équipe</div>
+          <input class="cfg-input" type="text" id="tb-name" value="${ct.name}" placeholder="Ex: mon-équipe-data" aria-label="Nom de l'équipe personnalisée" style="margin-bottom:0"/>
+        </div>
+        <div>
+          <div class="tb-section-label">Agents <span class="tb-count">${selCount} sélectionné${selCount>1?'s':''}</span></div>
+          <div class="tb-agents-grid">${agentChips}</div>
+        </div>
+        <div class="tb-actions">
+          <button class="gen-btn" style="flex:1;margin:0" onclick="createCustomTeam()">✓ Créer l'équipe</button>
+          ${customTeam ? `<button class="tb-clear-btn" onclick="clearCustomTeam()">✕ Supprimer</button>` : ''}
+        </div>
+      </div>`;
+    return;
+  }
+
   if (!activeTeam) {
     el.innerHTML = `<div class="ctx-empty"><span class="ctx-empty-icon">⬡</span><span>Cliquer sur une équipe pour voir sa définition</span></div>`;
     return;
   }
+
+  // Custom team detail view
+  if (activeTeam === '__custom__' && customTeam) {
+    const agentItems = [...customTeam.agents].map(aid => {
+      const agentData = AGENTS.find(ag => ag.id === aid);
+      return `<div class="ctx-item"><span class="ctx-item-icon">${agentData?.icon||'🤖'}</span><div><span class="ctx-item-name">${aid}</span><span class="ctx-item-desc">${agentData?.desc||''}</span></div></div>`;
+    }).join('');
+    const skillIdSet = new Set();
+    customTeam.agents.forEach(aid => (AGENT_SKILLS[aid]||[]).forEach(sid => skillIdSet.add(sid)));
+    const skillItems = [...skillIdSet].map(sid => {
+      const sd = SKILLS.find(s => s.id === sid);
+      return `<div class="ctx-item"><span class="ctx-item-icon">${sd?.icon||'⚙️'}</span><div><span class="ctx-item-name">${sid}</span><span class="ctx-item-desc">${sd?.desc||''}</span></div></div>`;
+    }).join('');
+    el.innerHTML = `
+      <div class="ctx-hdr">
+        <div class="ctx-team-row"><span class="ctx-team-icon">✨</span><span class="ctx-team-name">${customTeam.name}</span><button class="tb-clear-btn" style="margin-left:auto;padding:3px 10px;font-size:10px" onclick="openTeamBuilder()">Modifier</button></div>
+        <div class="ctx-team-desc">Équipe personnalisée — ${customTeam.agents.size} agents, ${skillIdSet.size} skills</div>
+      </div>
+      <div class="ctx-body">
+        <div class="ctx-col"><div class="ctx-col-hdr">Agents</div>${agentItems}</div>
+        <div class="ctx-col"><div class="ctx-col-hdr">Skills</div>${skillItems}</div>
+        <div class="ctx-col"><div class="ctx-col-hdr">Workflows</div><div class="ctx-item"><span class="ctx-item-desc" style="padding:8px 0">Aucun workflow prédéfini pour les équipes personnalisées.</span></div></div>
+      </div>`;
+    return;
+  }
+
   const team = TEAMS.find(t => t.id === activeTeam);
   if (!team) { el.innerHTML = ''; return; }
 
