@@ -1,409 +1,283 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agentic-Claude — Installer</title>
 <style>
-  :root {
-    --bg: #0f1117;
-    --surface: #1a1d27;
-    --surface2: #222636;
-    --border: #2e3348;
-    --accent: #6c8fff;
-    --accent2: #a78bfa;
-    --green: #34d399;
-    --yellow: #fbbf24;
-    --red: #f87171;
-    --text: #e2e8f0;
-    --dim: #64748b;
-    --card-hover: #252a3d;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+:root {
+  --bg:       #0c0c0c;
+  --panel:    #101010;
+  --panel2:   #141414;
+  --border:   #1e1e1e;
+  --accent:   #c86010;
+  --accent-h: #d4711a;
+  --sel-text: #0c0c0c;
+  --text:     #d0d0d0;
+  --dim:      #484848;
+  --dim2:     #686868;
+  --green:    #34d399;
+  --mono:     'JetBrains Mono','Cascadia Code','Consolas','Courier New',monospace;
+  --sans:     'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--sans); }
 
-  header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 18px 32px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  header .logo { font-size: 28px; }
-  header h1 { font-size: 18px; font-weight: 700; color: var(--text); }
-  header p { font-size: 12px; color: var(--dim); margin-top: 2px; }
-  header .badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+/* ── Topbar ── */
+.topbar {
+  height: 48px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.tb-logo  { font-size: 20px; color: var(--accent); }
+.tb-title { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: 0.3px; }
+.tb-pill  { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--dim2); background: var(--panel2); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; }
 
-  .layout { display: grid; grid-template-columns: 1fr 340px; gap: 0; min-height: calc(100vh - 65px); }
+/* ── App grid ── */
+.app {
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  height: calc(100vh - 88px);
+  overflow: hidden;
+}
 
-  .main { padding: 28px 32px; overflow-y: auto; }
-  .sidebar { background: var(--surface); border-left: 1px solid var(--border); padding: 24px; position: sticky; top: 65px; height: calc(100vh - 65px); overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+/* ── Hero (left) ── */
+.hero {
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+  padding: 28px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.hero::-webkit-scrollbar       { width: 4px; }
+.hero::-webkit-scrollbar-track { background: transparent; }
+.hero::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  /* Presets */
-  .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--dim); font-weight: 700; margin-bottom: 14px; }
-  .presets { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; }
-  .preset-btn {
-    padding: 8px 16px;
-    border-radius: 8px;
-    border: 1.5px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .preset-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(108,143,255,0.08); }
-  .preset-btn.active { border-color: var(--accent); background: rgba(108,143,255,0.15); color: var(--accent); }
+.hero-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); }
+.hero-title { font-size: 30px; font-weight: 800; line-height: 1.2; color: var(--text); }
+.hero-title .hl { color: var(--accent); }
+.hero-sub   { font-size: 13px; color: var(--dim2); line-height: 1.6; }
 
-  /* Cards grid */
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-bottom: 32px; }
-  .card {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    position: relative;
-  }
-  .card:hover { background: var(--card-hover); border-color: #3e4560; }
-  .card.selected { border-color: var(--accent); background: rgba(108,143,255,0.08); }
-  .card.selected .card-icon { filter: none; }
+.hero-section-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); margin-bottom: 8px; }
 
-  .card-header { display: flex; align-items: center; gap: 10px; }
-  .card-icon { font-size: 22px; }
-  .card-name { font-weight: 700; font-size: 14px; }
-  .card-version { font-size: 10px; color: var(--dim); background: var(--surface2); padding: 2px 7px; border-radius: 10px; margin-left: auto; }
-  .card-desc { font-size: 12px; color: var(--dim); line-height: 1.5; }
-  .card-check {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    transition: all 0.15s;
-  }
-  .card.selected .card-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+.compat-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.compat-tag  { font-family: var(--mono); font-size: 11px; padding: 3px 10px; border-radius: 3px; border: 1px solid var(--border); color: var(--dim2); background: var(--panel2); }
+.compat-tag.active { border-color: var(--accent); color: var(--accent); }
 
-  /* Skill category headers */
-  .skill-cat-header {
-    grid-column: 1 / -1;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1.4px;
-    color: var(--dim);
-    font-weight: 700;
-    padding: 4px 0 8px;
-    border-bottom: 1px solid var(--border);
-    margin-top: 8px;
-  }
-  .skill-cat-header:first-child { margin-top: 0; }
+/* Hook rows */
+.hook-rows { display: flex; flex-direction: column; gap: 2px; }
+.hook-row  { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; border-radius: 3px; transition: background 0.1s; }
+.hook-row:hover { background: var(--panel2); }
+.hook-row.sel   { background: var(--panel2); }
+.hk-chk  { font-family: var(--mono); font-size: 12px; color: var(--dim2); width: 14px; flex-shrink: 0; }
+.hook-row.sel .hk-chk { color: var(--accent); }
+.hk-name { font-family: var(--mono); font-size: 11px; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hk-event { font-family: var(--mono); font-size: 9px; color: var(--dim2); background: var(--panel2); border: 1px solid var(--border); padding: 1px 6px; border-radius: 2px; flex-shrink: 0; }
+.hook-row.sel .hk-event { border-color: var(--accent); color: var(--accent); }
 
-  /* ── Team cards ── */
-  .team-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-    gap: 16px;
-    margin-bottom: 32px;
-  }
-  .team-card {
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 16px;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .team-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 36px rgba(0,0,0,0.5);
-    border-color: var(--team-color, var(--accent));
-  }
-  .team-card.selected {
-    border-color: var(--team-color, var(--accent));
-    background: var(--card-hover);
-    box-shadow: 0 0 0 4px rgba(108,143,255,0.12), 0 8px 24px rgba(0,0,0,0.4);
-  }
-  .team-color-bar {
-    height: 4px;
-    background: var(--team-color, var(--accent));
-  }
-  .team-body { padding: 18px 20px 18px; }
-  .tc-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
-  .tc-icon { font-size: 30px; line-height: 1; flex-shrink: 0; }
-  .tc-meta { flex: 1; min-width: 0; }
-  .tc-name {
-    font-weight: 700; font-size: 15px;
-    color: var(--team-color, var(--accent));
-    font-family: 'Consolas', monospace;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .tc-ver { font-size: 10px; color: var(--dim); margin-top: 3px; }
-  .tc-check {
-    width: 24px; height: 24px; border-radius: 50%;
-    border: 2px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; flex-shrink: 0; transition: all 0.15s; font-weight: 700;
-  }
-  .team-card.selected .tc-check {
-    background: var(--team-color, var(--accent));
-    border-color: var(--team-color, var(--accent));
-    color: #0f1117;
-  }
-  .tc-desc { font-size: 12px; color: var(--dim); line-height: 1.55; margin-bottom: 14px; }
-  .tc-agents-label {
-    font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.2px;
-    color: var(--dim); margin-bottom: 8px; font-weight: 700;
-  }
-  .tc-pills { display: flex; flex-wrap: wrap; gap: 5px; }
-  .tc-pill {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 20px; padding: 4px 10px 4px 6px;
-    font-size: 11px; color: var(--text); font-weight: 500;
-    transition: border-color 0.15s;
-  }
-  .team-card.selected .tc-pill { border-color: var(--team-color, var(--accent)); }
-  .tc-pill-icon { font-size: 12px; }
+/* Config */
+.cfg-label { display: block; font-family: var(--mono); font-size: 10px; color: var(--dim); margin-bottom: 6px; }
+.cfg-select, .cfg-input {
+  width: 100%; background: var(--panel2); border: 1px solid var(--border);
+  border-radius: 3px; color: var(--text); padding: 7px 10px;
+  font-size: 12px; font-family: var(--mono); outline: none;
+  transition: border-color 0.15s; margin-bottom: 10px;
+}
+.cfg-select:focus, .cfg-input:focus { border-color: var(--accent); }
+.cfg-select option { background: var(--panel2); }
 
-  /* Hook list */
-  .hook-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
-  .hook-item {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .hook-item:hover { background: var(--card-hover); }
-  .hook-item.selected { border-color: var(--accent2); background: rgba(167,139,250,0.08); }
-  .hook-icon { font-size: 18px; width: 28px; text-align: center; }
-  .hook-info { flex: 1; }
-  .hook-name { font-size: 13px; font-weight: 600; }
-  .hook-desc { font-size: 11px; color: var(--dim); margin-top: 2px; }
-  .hook-event { font-size: 10px; color: var(--accent2); background: rgba(167,139,250,0.1); padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
-  .hook-toggle {
-    width: 20px; height: 20px; border-radius: 50%;
-    border: 2px solid var(--border); background: transparent;
-    display: flex; align-items: center; justify-content: center; font-size: 11px;
-    transition: all 0.15s;
-  }
-  .hook-item.selected .hook-toggle { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+/* Generate button */
+.gen-btn {
+  width: 100%; padding: 10px 14px; background: var(--accent);
+  color: var(--sel-text); border: none; border-radius: 3px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: background 0.15s; font-family: var(--mono); letter-spacing: 0.5px;
+}
+.gen-btn:hover    { background: var(--accent-h); }
+.gen-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-  /* Sidebar */
-  .sidebar-title { font-size: 13px; font-weight: 700; color: var(--text); }
-  .summary-empty { font-size: 12px; color: var(--dim); text-align: center; padding: 20px; }
-  .summary-group { margin-bottom: 14px; }
-  .summary-group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 6px; }
-  .summary-item { font-size: 12px; color: var(--text); padding: 4px 8px; background: var(--surface2); border-radius: 6px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+/* Command box */
+.cmd-box { display: none; margin-top: 10px; background: #080808; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+.cmd-box.visible { display: block; }
+.cmd-hdr  { padding: 6px 12px; background: var(--panel2); display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--dim2); }
+.cmd-copy-btn { background: var(--accent); color: var(--sel-text); border: none; border-radius: 2px; padding: 2px 8px; font-size: 10px; cursor: pointer; font-weight: 700; font-family: var(--mono); }
+.cmd-copy-btn.copied { background: var(--green); }
+.cmd-text { padding: 12px; font-family: var(--mono); font-size: 11px; color: #7dd3fc; white-space: pre-wrap; word-break: break-all; line-height: 1.6; }
 
-  .project-path { margin-top: auto; }
-  .project-path label { font-size: 11px; color: var(--dim); display: block; margin-bottom: 6px; }
-  .project-path input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    padding: 8px 12px;
-    font-size: 12px;
-    font-family: 'Consolas', monospace;
-    outline: none;
-  }
-  .project-path input:focus { border-color: var(--accent); }
+/* ── Right column ── */
+.right {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.right::-webkit-scrollbar       { width: 4px; }
+.right::-webkit-scrollbar-track { background: transparent; }
+.right::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  .source-select { margin-bottom: 12px; }
-  .source-select label { font-size: 11px; color: var(--dim); display: block; margin-bottom: 6px; }
-  .source-select select {
-    width: 100%;
-    background: var(--surface2);
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    padding: 8px 12px;
-    font-size: 12px;
-    outline: none;
-    cursor: pointer;
-  }
+/* ── 3-panel row ── */
+.panels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: 55vh;
+  flex-shrink: 0;
+  background: var(--border);
+  gap: 1px;
+  border-bottom: 1px solid var(--border);
+}
+.panel { background: var(--panel); display: flex; flex-direction: column; overflow: hidden; }
 
-  .generate-btn {
-    width: 100%;
-    padding: 12px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: opacity 0.15s;
-    margin-top: 8px;
-  }
-  .generate-btn:hover { opacity: 0.9; }
-  .generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.panel-hdr { display: flex; align-items: center; gap: 8px; padding: 12px 14px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.ph-dot   { color: var(--accent); font-size: 10px; }
+.ph-name  { font-family: var(--mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text); flex: 1; }
+.ph-count { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--text); }
 
-  /* Command output */
-  .command-box {
-    display: none;
-    margin-top: 14px;
-    background: #0a0c14;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .command-box.visible { display: block; }
-  .command-header { padding: 8px 14px; background: var(--surface2); display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--dim); }
-  .copy-btn {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 3px 10px;
-    font-size: 11px;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  .copy-btn.copied { background: var(--green); }
-  .command-text { padding: 14px; font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; color: #a5f3fc; white-space: pre-wrap; word-break: break-all; line-height: 1.6; }
+.item-list { overflow-y: auto; flex: 1; }
+.item-list::-webkit-scrollbar       { width: 3px; }
+.item-list::-webkit-scrollbar-track { background: transparent; }
+.item-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  .count-badge { background: var(--accent); color: #fff; font-size: 10px; padding: 1px 7px; border-radius: 10px; margin-left: 6px; }
+.list-item { display: flex; align-items: center; gap: 8px; padding: 6px 14px; font-family: var(--mono); font-size: 12px; color: var(--dim2); cursor: pointer; transition: background 0.08s; }
+.list-item:hover  { background: var(--panel2); }
+.list-item.sel    { background: var(--accent); color: var(--sel-text); font-weight: 700; }
 
-  h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-  .section { margin-bottom: 8px; }
+.li-dot   { color: var(--dot); flex-shrink: 0; }
+.list-item.sel .li-dot  { color: inherit; }
+.li-icon  { flex-shrink: 0; font-size: 13px; }
+.li-name  { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.li-right { font-size: 10px; color: var(--dim); flex-shrink: 0; }
+.list-item.sel .li-right { color: var(--sel-text); opacity: 0.7; }
 
-  /* ── Workflow cards ── */
-  .wf-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; transition: border-color .15s; }
-  .wf-card:hover { border-color: #3e4560; }
-  .wf-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .wf-icon { font-size: 22px; }
-  .wf-name { font-weight: 700; font-size: 14px; flex: 1; font-family: 'Consolas', monospace; color: var(--accent); }
-  .wf-version { font-size: 10px; color: var(--dim); background: var(--surface2); padding: 2px 7px; border-radius: 10px; }
-  .wf-desc { font-size: 12px; color: var(--dim); margin-bottom: 10px; line-height: 1.5; }
-  .wf-steps { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
-  .wf-step { font-size: 11px; background: var(--surface2); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; color: var(--text); }
-  .wf-step.team { border-color: var(--accent2); color: var(--accent2); }
-  .wf-step.gate { border-color: var(--yellow); color: var(--yellow); }
-  .wf-arrow { color: var(--dim); font-size: 14px; padding: 0 2px; }
-  .wf-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.wf-cmd-btn { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: .15s; }
-  .wf-cmd-btn:hover { border-color: var(--green); color: var(--green); }
-  .wf-cmd-btn.copied { border-color: var(--green); color: var(--green); }
-  .wf-diagram-area { margin-top: 14px; background: #0a0c14; border: 1px solid var(--border); border-radius: 10px; padding: 16px; overflow: auto; text-align: center; }
-  /* ── Workflow diagram (SVG) ── */
-  .wf-diagram-area svg { display: block; margin: 0 auto; }
+.list-cat { padding: 8px 14px 3px; font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); }
+
+/* ── Workflow section ── */
+.wf-section { flex-shrink: 0; }
+.wf-section-hdr { display: flex; align-items: center; gap: 8px; padding: 12px 16px 10px; border-bottom: 1px solid var(--border); background: var(--panel); }
+
+.wf-grid { display: flex; overflow-x: auto; background: var(--border); gap: 1px; }
+.wf-grid::-webkit-scrollbar        { height: 4px; }
+.wf-grid::-webkit-scrollbar-track  { background: transparent; }
+.wf-grid::-webkit-scrollbar-thumb  { background: var(--border); border-radius: 2px; }
+
+.wf-card  { flex-shrink: 0; width: 520px; background: var(--panel); padding: 16px; }
+.wf-hdr   { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.wf-icon  { font-size: 18px; }
+.wf-name  { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); flex: 1; }
+.wf-ver   { font-family: var(--mono); font-size: 10px; color: var(--dim); background: var(--panel2); border: 1px solid var(--border); padding: 1px 6px; border-radius: 2px; }
+.wf-copy-btn { background: var(--panel2); border: 1px solid var(--border); color: var(--dim2); font-family: var(--mono); font-size: 10px; padding: 3px 10px; border-radius: 2px; cursor: pointer; transition: .15s; }
+.wf-copy-btn:hover   { border-color: var(--accent); color: var(--accent); }
+.wf-copy-btn.copied  { border-color: var(--green); color: var(--green); }
+.wf-desc    { font-size: 11px; color: var(--dim2); margin-bottom: 10px; line-height: 1.5; }
+.wf-diagram { background: #080808; border: 1px solid var(--border); padding: 12px; overflow-x: auto; }
+
+/* ── Bottom bar ── */
+.bottombar {
+  height: 40px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim2);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.bb-item   { padding: 0 16px; border-right: 1px solid var(--border); height: 100%; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.bb-accent { color: var(--accent); font-weight: 700; font-size: 13px; }
+.bb-label  { color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">🤖</div>
-  <div>
-    <h1>Agentic-Claude — Installer</h1>
-    <p>Sélectionne une équipe, des skills et des hooks, puis copie la commande d'installation</p>
-  </div>
-  <div class="badge">v1.2</div>
-</header>
+<div class="topbar">
+  <span class="tb-logo">⬡</span>
+  <span class="tb-title">Agentic-Claude / TCS Enterprise</span>
+  <div class="tb-pill">● v1.2.13 · Jul 2026</div>
+</div>
 
-<div class="layout">
-  <div class="main">
+<div class="app">
 
-    <!-- Teams -->
-    <div class="section">
-      <h2>👥 Équipes <span class="count-badge" id="team-count">0</span></h2>
-      <p style="font-size:12px;color:var(--dim);margin-bottom:18px">Sélectionne une équipe — ses agents sont inclus automatiquement. Tu peux aussi ajouter des agents individuellement ci-dessous.</p>
-      <div id="team-cards"></div>
+  <!-- Hero (left column) -->
+  <div class="hero">
+    <div class="hero-label">— v1.2.13 · LIBRAIRIE AGENTIC-CLAUDE</div>
+
+    <div class="hero-title">La librairie<br>d'agents pour<br><span class="hl">Claude Code</span><br>au TCS.</div>
+
+    <div class="hero-sub">13 agents spécialisés, 40 skills, 5 équipes — couverture complète du cycle de développement enterprise IBM/Azure.</div>
+
+    <div>
+      <div class="hero-section-label">COMPATIBLE AVEC</div>
+      <div class="compat-tags">
+        <span class="compat-tag active">Claude Code</span>
+        <span class="compat-tag">VS Code</span>
+        <span class="compat-tag">GitLab CI</span>
+        <span class="compat-tag">IBM APIC/ACE</span>
+        <span class="compat-tag">Azure</span>
+      </div>
     </div>
 
-    <!-- Agents -->
-    <div class="section">
-      <h2>🤖 Agents <span class="count-badge" id="agent-count">0</span></h2>
-      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Rôles spécialisés installés dans <code style="background:var(--surface2);padding:1px 5px;border-radius:4px">.claude/agents/</code> — cochés automatiquement quand tu sélectionnes une équipe</p>
-      <div class="cards" id="agent-cards"></div>
+    <div>
+      <div class="hero-section-label">— HOOKS</div>
+      <div class="hook-rows" id="hook-list"></div>
     </div>
 
-    <!-- Skills -->
-    <div class="section">
-      <h2>⚡ Skills <span class="count-badge" id="skill-count">0</span></h2>
-      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Commandes slash (<code style="background:var(--surface2);padding:1px 5px;border-radius:4px">/skill-name</code>) qui définissent des workflows réutilisables</p>
-      <div class="cards" id="skill-cards"></div>
-    </div>
-
-    <!-- Hooks -->
-    <div class="section">
-      <h2>🔒 Hooks <span class="count-badge" id="hook-count">0</span></h2>
-      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Comportements automatiques déclenchés par les actions de Claude Code</p>
-      <div class="hook-list" id="hook-list"></div>
-    </div>
-
-    <!-- Workflows -->
-    <div class="section">
-      <h2>🔄 Workflows <span class="count-badge" id="wf-count">0</span></h2>
-      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">
-        Pipelines multi-agents — lancés via
-        <code style="background:var(--surface2);padding:1px 6px;border-radius:4px">python scripts/run_workflow.py &lt;name&gt;</code>
-        ou depuis le <strong>product-owner-assistant</strong>
-      </p>
-      <div id="wf-list"></div>
-    </div>
-
-  </div>
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-title">📋 Sélection</div>
-
-    <div id="summary">
-      <div class="summary-empty">Aucun élément sélectionné.<br>Choisis un preset ou coche manuellement.</div>
-    </div>
-
-    <div class="source-select">
-      <label>Source du repo</label>
-      <select id="source-select">
+    <div>
+      <div class="hero-section-label">— CONFIGURATION</div>
+      <label class="cfg-label" for="source-select">Source du repo</label>
+      <select class="cfg-select" id="source-select">
         <option value="gitlab">GitLab TCS (recommandé)</option>
         <option value="github">GitHub (Aletheia-Thomas)</option>
       </select>
+      <label class="cfg-label" for="project-path">Chemin du projet cible</label>
+      <input class="cfg-input" type="text" id="project-path" value="." placeholder="Ex: C:\Projets\MonProjet ou ."/>
     </div>
 
-    <div class="project-path">
-      <label>Chemin du projet cible</label>
-      <input type="text" id="project-path" value="." placeholder="Ex: C:\Projets\MonProjet ou ."/>
-    </div>
+    <button class="gen-btn" onclick="generateCommand()" id="gen-btn" disabled>⚡ Générer la commande</button>
 
-    <button class="generate-btn" onclick="generateCommand()" id="gen-btn" disabled>
-      Générer la commande →
-    </button>
-
-    <div class="command-box" id="command-box">
-      <div class="command-header">
+    <div class="cmd-box" id="command-box">
+      <div class="cmd-hdr">
         <span>PowerShell</span>
-        <button class="copy-btn" id="copy-btn" onclick="copyCommand()">Copier</button>
+        <button class="cmd-copy-btn" id="copy-btn" onclick="copyCommand()">Copier</button>
       </div>
-      <div class="command-text" id="command-text"></div>
+      <div class="cmd-text" id="command-text"></div>
     </div>
   </div>
+
+  <!-- Right column -->
+  <div class="right">
+    <div class="panels">
+      <div class="panel" id="teams-panel"></div>
+      <div class="panel" id="agents-panel"></div>
+      <div class="panel" id="skills-panel"></div>
+    </div>
+
+    <div class="wf-section">
+      <div class="wf-section-hdr">
+        <span class="ph-dot">●</span>
+        <span class="ph-name">WORKFLOWS</span>
+        <span class="ph-count" id="wf-count">0</span>
+      </div>
+      <div class="wf-grid" id="wf-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottombar">
+  <div class="bb-item"><span class="bb-accent" id="bb-sel-agents">0</span><span class="bb-label">agents sél.</span></div>
+  <div class="bb-item"><span class="bb-accent" id="bb-sel-skills">0</span><span class="bb-label">skills sél.</span></div>
+  <div class="bb-item"><span class="bb-label">13 AGENTS</span></div>
+  <div class="bb-item"><span class="bb-label">40 SKILLS</span></div>
+  <div class="bb-item"><span class="bb-label">5 ÉQUIPES</span></div>
+  <div class="bb-item"><span class="bb-label">5 WORKFLOWS</span></div>
+  <div class="bb-item"><span class="bb-label">MIT</span></div>
+  <div class="bb-item"><span class="bb-label">GitLab TCS</span></div>
 </div>
 
 <script>
@@ -593,85 +467,55 @@ const CATEGORY_LABELS = {
   'governance':        '⚖️ Governance',
 };
 
-function renderCards() {
-  // Teams — beautiful cards with agent pills
-  document.getElementById('team-cards').innerHTML = `<div class="team-grid">${TEAMS.map(t => {
-    const sel = selected.teams.has(t.id);
-    const agentCount = t.agents.length;
-    const pillsHtml = t.id === 'full-team'
-      ? `<span class="tc-pill"><span class="tc-pill-icon">⭐</span> Tous les agents (${agentCount})</span>`
-      : t.agents.map(a => `<span class="tc-pill"><span class="tc-pill-icon">${a.icon}</span>${a.name}</span>`).join('');
-    return `<div class="team-card ${sel ? 'selected' : ''}" style="--team-color:${t.color}" onclick="toggle('teams','${t.id}')" id="team-${t.id}">
-      <div class="team-color-bar"></div>
-      <div class="team-body">
-        <div class="tc-header">
-          <span class="tc-icon">${t.icon}</span>
-          <div class="tc-meta">
-            <div class="tc-name">${t.name}</div>
-            <div class="tc-ver">v${t.version} · ${agentCount} agent${agentCount > 1 ? 's' : ''}</div>
-          </div>
-          <div class="tc-check">${sel ? '✓' : ''}</div>
-        </div>
-        <div class="tc-desc">${t.desc}</div>
-        <div class="tc-agents-label">Agents inclus</div>
-        <div class="tc-pills">${pillsHtml}</div>
-      </div>
-    </div>`;
-  }).join('')}</div>`;
+function panelHdr(name, count) {
+  return `<div class="panel-hdr"><span class="ph-dot">●</span><span class="ph-name">${name}</span><span class="ph-count">${count}</span></div>`;
+}
 
-  // Agents — individual cards (auto-selected via teams, also manually toggleable)
-  document.getElementById('agent-cards').innerHTML = AGENTS.map(a => {
-    const sel = selected.agents.has(a.id);
-    return `<div class="card ${sel ? 'selected' : ''}" onclick="toggle('agents','${a.id}')" id="agent-${a.id}">
-      <div class="card-header">
-        <span class="card-icon">${a.icon}</span>
-        <span class="card-name">${a.name}</span>
-        <span class="card-version">v${a.version}</span>
-      </div>
-      <div class="card-desc">${a.desc}</div>
-      <div class="card-check">${sel ? '✓' : ''}</div>
-    </div>`;
+function renderCards() {
+  // Teams
+  document.getElementById('teams-panel').innerHTML =
+    panelHdr('ÉQUIPES', TEAMS.length) +
+    '<div class="item-list">' +
+    TEAMS.map(t => {
+      const sel = selected.teams.has(t.id);
+      return `<div class="list-item${sel?' sel':''}" onclick="toggle('teams','${t.id}')" id="team-${t.id}"><span class="li-dot" style="--dot:${t.color}">●</span><span class="li-name">${t.name}</span><span class="li-right">${t.agents.length}a</span></div>`;
+    }).join('') + '</div>';
+
+  // Agents
+  document.getElementById('agents-panel').innerHTML =
+    panelHdr('AGENTS', AGENTS.length) +
+    '<div class="item-list">' +
+    AGENTS.map(a => {
+      const sel = selected.agents.has(a.id);
+      return `<div class="list-item${sel?' sel':''}" onclick="toggle('agents','${a.id}')" id="agent-${a.id}"><span class="li-icon">${a.icon}</span><span class="li-name">${a.id}</span></div>`;
+    }).join('') + '</div>';
+
+  // Skills by category
+  let sh = panelHdr('SKILLS', SKILLS.length) + '<div class="item-list">';
+  CATEGORY_ORDER.forEach(cat => {
+    const catSkills = SKILLS.filter(s => s.category === cat);
+    if (!catSkills.length) return;
+    sh += `<div class="list-cat">${CATEGORY_LABELS[cat]}</div>`;
+    catSkills.forEach(s => {
+      const sel = selected.skills.has(s.id);
+      sh += `<div class="list-item${sel?' sel':''}" onclick="toggle('skills','${s.id}')" id="skill-${s.id}"><span class="li-name">${s.id}</span></div>`;
+    });
+  });
+  sh += '</div>';
+  document.getElementById('skills-panel').innerHTML = sh;
+
+  // Hooks in hero
+  document.getElementById('hook-list').innerHTML = HOOKS.map(h => {
+    const sel = selected.hooks.has(h.id);
+    return `<div class="hook-row${sel?' sel':''}" onclick="toggle('hooks','${h.id}')" id="hook-${h.id}"><span class="hk-chk">${sel?'■':'□'}</span><span class="hk-name">${h.id}</span><span class="hk-event">${h.event}</span></div>`;
   }).join('');
 
-  // Skills — grouped by category
-  {
-    let html = '';
-    CATEGORY_ORDER.forEach(cat => {
-      const skills = SKILLS.filter(s => s.category === cat);
-      if (!skills.length) return;
-      html += `<div class="skill-cat-header">${CATEGORY_LABELS[cat]}</div>`;
-      html += skills.map(s => `
-    <div class="card ${selected.skills.has(s.id)?'selected':''}" onclick="toggle('skills','${s.id}')" id="skill-${s.id}">
-      <div class="card-header">
-        <span class="card-icon">${s.icon}</span>
-        <span class="card-name">${s.name}</span>
-      </div>
-      <div class="card-desc">${s.desc}</div>
-      <div class="card-check">${selected.skills.has(s.id)?'✓':''}</div>
-    </div>`).join('');
-    });
-    document.getElementById('skill-cards').innerHTML = html;
-  }
+  updateBottomBar();
+}
 
-  // Hooks
-  document.getElementById('hook-list').innerHTML = HOOKS.map(h => `
-    <div class="hook-item ${selected.hooks.has(h.id)?'selected':''}" onclick="toggle('hooks','${h.id}')" id="hook-${h.id}">
-      <span class="hook-icon">${h.icon}</span>
-      <div class="hook-info">
-        <div class="hook-name">${h.name}</div>
-        <div class="hook-desc">${h.desc}</div>
-      </div>
-      <span class="hook-event">${h.event}</span>
-      <div class="hook-toggle">${selected.hooks.has(h.id)?'✓':''}</div>
-    </div>`).join('');
-
-  // Counts
-  document.getElementById('agent-count').textContent = selected.agents.size;
-  document.getElementById('skill-count').textContent = selected.skills.size;
-  document.getElementById('team-count').textContent  = selected.teams.size;
-  document.getElementById('hook-count').textContent  = selected.hooks.size;
-
-  updateSummary();
+function updateBottomBar() {
+  document.getElementById('bb-sel-agents').textContent = selected.agents.size;
+  document.getElementById('bb-sel-skills').textContent = selected.skills.size;
 }
 
 function toggle(type, id) {
@@ -703,45 +547,6 @@ function applyPreset(name) {
   renderCards();
   document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
   document.getElementById('command-box').classList.remove('visible');
-}
-
-function updateSummary() {
-  const s = document.getElementById('summary');
-  const total = selected.agents.size + selected.teams.size + selected.skills.size + selected.hooks.size;
-  if (total === 0) {
-    s.innerHTML = '<div class="summary-empty">Aucun élément sélectionné.<br>Choisis un preset ou coche manuellement.</div>';
-    return;
-  }
-  let html = '';
-  if (selected.teams.size) {
-    html += '<div class="summary-group"><div class="summary-group-label">Équipes</div>';
-    TEAMS.filter(t => selected.teams.has(t.id)).forEach(t => {
-      html += `<div class="summary-item" style="border-left:3px solid ${t.color};padding-left:8px;gap:8px">${t.icon} <span style="flex:1">${t.name}</span><span style="color:var(--dim);font-size:10px">${t.agents.length}a</span></div>`;
-    });
-    html += '</div>';
-  }
-  if (selected.agents.size) {
-    html += '<div class="summary-group"><div class="summary-group-label">Agents</div>';
-    AGENTS.filter(a => selected.agents.has(a.id)).forEach(a => {
-      html += `<div class="summary-item">${a.icon} ${a.name}</div>`;
-    });
-    html += '</div>';
-  }
-  if (selected.skills.size) {
-    html += '<div class="summary-group"><div class="summary-group-label">Skills</div>';
-    SKILLS.filter(s => selected.skills.has(s.id)).forEach(s => {
-      html += `<div class="summary-item">${s.icon} ${s.name}</div>`;
-    });
-    html += '</div>';
-  }
-  if (selected.hooks.size) {
-    html += '<div class="summary-group"><div class="summary-group-label">Hooks</div>';
-    HOOKS.filter(h => selected.hooks.has(h.id)).forEach(h => {
-      html += `<div class="summary-item">${h.icon} ${h.name}</div>`;
-    });
-    html += '</div>';
-  }
-  s.innerHTML = html;
 }
 
 function generateCommand() {
@@ -956,20 +761,17 @@ function renderWorkflows() {
   const el = document.getElementById('wf-list');
   el.innerHTML = WORKFLOWS.map(w => `
     <div class="wf-card" id="wf-${w.id}">
-      <div class="wf-header">
+      <div class="wf-hdr">
         <span class="wf-icon">${w.icon}</span>
         <span class="wf-name">${w.name}</span>
-        <span class="wf-version">v${w.version}</span>
+        <span class="wf-ver">v${w.version}</span>
+        <button class="wf-copy-btn" id="cbt-${w.id}" onclick="copyWfCmd('${w.id}')">▶ Copier</button>
       </div>
       <div class="wf-desc">${w.desc}</div>
-      <div class="wf-diagram-area">${w.svg}</div>
-      <div class="wf-actions">
-        <button class="wf-cmd-btn" id="cbt-${w.id}" onclick="copyWfCmd('${w.id}')">▶ Copier la commande</button>
-      </div>
+      <div class="wf-diagram">${w.svg}</div>
     </div>`).join('');
   document.getElementById('wf-count').textContent = WORKFLOWS.length;
 }
-
 
 function copyWfCmd(id) {
   const wf  = WORKFLOWS.find(w => w.id === id);
@@ -988,4 +790,3 @@ renderWorkflows();
 </script>
 </body>
 </html>
-
