@@ -112,7 +112,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 
 /* ── Right column ── */
 .right {
-  overflow-y: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -120,10 +120,10 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .right::-webkit-scrollbar-track { background: transparent; }
 .right::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* ── 3-panel row ── */
+/* ── 4-panel row ── */
 .panels {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   height: 55vh;
   flex-shrink: 0;
   background: var(--border);
@@ -167,26 +167,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
   cursor: default;
 }
 
-/* ── Workflow section ── */
-.wf-section { flex-shrink: 0; }
-.wf-section-hdr { display: flex; align-items: center; gap: 8px; padding: 12px 16px 10px; border-bottom: 1px solid var(--border); background: var(--panel); }
-
-.wf-grid { display: flex; overflow-x: auto; background: var(--border); gap: 1px; }
-.wf-grid::-webkit-scrollbar        { height: 4px; }
-.wf-grid::-webkit-scrollbar-track  { background: transparent; }
-.wf-grid::-webkit-scrollbar-thumb  { background: var(--border); border-radius: 2px; }
-
-.wf-card  { flex-shrink: 0; width: 520px; background: var(--panel); padding: 16px; }
-.wf-hdr   { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.wf-icon  { font-size: 18px; }
-.wf-name  { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); flex: 1; }
-.wf-ver   { font-family: var(--mono); font-size: 10px; color: var(--dim); background: var(--panel2); border: 1px solid var(--border); padding: 1px 6px; border-radius: 2px; }
-.wf-copy-btn { background: var(--panel2); border: 1px solid var(--border); color: var(--dim2); font-family: var(--mono); font-size: 10px; padding: 3px 10px; border-radius: 2px; cursor: pointer; transition: .15s; }
-.wf-copy-btn:hover   { border-color: var(--accent); color: var(--accent); }
-.wf-copy-btn.copied  { border-color: var(--green); color: var(--green); }
-.wf-desc    { font-size: 11px; color: var(--dim2); margin-bottom: 10px; line-height: 1.5; }
-.wf-diagram { background: #080808; border: 1px solid var(--border); padding: 12px; overflow-x: auto; }
-
 /* ── Bottom bar ── */
 .bottombar {
   height: 40px;
@@ -203,6 +183,27 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .bb-item   { padding: 0 16px; border-right: 1px solid var(--border); height: 100%; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .bb-accent { color: var(--accent); font-weight: 700; font-size: 13px; }
 .bb-label  { color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+.li-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.li-desc { font-family: var(--mono); font-size: 9px; color: var(--dim2); white-space: normal; line-height: 1.3; margin-top: 2px; }
+.list-item.sel .li-desc { color: rgba(12,12,12,0.55); }
+.ctx-wrap { flex: 1; overflow: hidden; border-top: 1px solid var(--border); display: flex; flex-direction: column; min-height: 0; }
+#ctx-panel { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.ctx-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--dim); font-family: var(--mono); font-size: 11px; gap: 10px; }
+.ctx-empty-icon { font-size: 28px; }
+.ctx-hdr { padding: 12px 16px 10px; border-bottom: 1px solid var(--border); background: var(--panel2); flex-shrink: 0; }
+.ctx-team-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+.ctx-team-icon { font-size: 18px; }
+.ctx-team-name { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text); }
+.ctx-team-v { font-family: var(--mono); font-size: 10px; color: var(--dim2); margin-left: 6px; }
+.ctx-team-desc { font-size: 12px; color: var(--dim2); line-height: 1.5; }
+.ctx-body { display: grid; grid-template-columns: 1fr 1fr 1fr; background: var(--border); gap: 1px; flex: 1; overflow: hidden; }
+.ctx-col { background: var(--panel); overflow-y: auto; display: flex; flex-direction: column; }
+.ctx-col-hdr { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); padding: 7px 12px 6px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--panel2); flex-shrink: 0; }
+.ctx-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 12px; border-bottom: 1px solid var(--border); }
+.ctx-item:last-child { border-bottom: none; }
+.ctx-item-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.ctx-item-name { font-family: var(--mono); font-size: 11px; color: var(--accent); display: block; margin-bottom: 2px; }
+.ctx-item-desc { font-size: 10px; color: var(--dim2); line-height: 1.4; }
 </style>
 </head>
 <body>
@@ -235,11 +236,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
     </div>
 
     <div>
-      <div class="hero-section-label">— HOOKS</div>
-      <div class="hook-rows" id="hook-list"></div>
-    </div>
-
-    <div>
       <div class="hero-section-label">— CONFIGURATION</div>
       <label class="cfg-label" for="source-select">Source du repo</label>
       <select class="cfg-select" id="source-select">
@@ -267,16 +263,10 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
       <div class="panel" id="teams-panel"></div>
       <div class="panel" id="agents-panel"></div>
       <div class="panel" id="skills-panel"></div>
+      <div class="panel" id="hooks-panel"></div>
     </div>
 
-    <div class="wf-section">
-      <div class="wf-section-hdr">
-        <span class="ph-dot">●</span>
-        <span class="ph-name">WORKFLOWS</span>
-        <span class="ph-count" id="wf-count">0</span>
-      </div>
-      <div class="wf-grid" id="wf-list"></div>
-    </div>
+    <div class="ctx-wrap"><div id="ctx-panel"></div></div>
   </div>
 
 </div>
@@ -471,6 +461,7 @@ const SOURCES = {
 
 let selected     = { agents: new Set(), skills: new Set(), teams: new Set(), hooks: new Set() };
 let manualSkills = new Set();
+let activeTeam   = null;
 
 const CATEGORY_ORDER  = ['engineering','architecture','security','business-analysis','operations','documentation','governance'];
 const CATEGORY_LABELS = {
@@ -494,14 +485,19 @@ function renderCards() {
     '<div class="item-list">' +
     TEAMS.map(t => {
       const sel = selected.teams.has(t.id);
-      return `<div class="list-item${sel?' sel':''}" onclick="toggle('teams','${t.id}')" id="team-${t.id}"><span class="li-dot" style="--dot:${t.color}">●</span><span class="li-name">${t.name}</span><span class="li-right">${t.agents.length}a</span></div>`;
+      return `<div class="list-item${sel?' sel':''}" onclick="toggle('teams','${t.id}')" id="team-${t.id}"><span class="li-dot" style="--dot:${t.color}">●</span><span class="li-info"><span class="li-name">${t.name}</span><span class="li-desc">${t.desc}</span></span><span class="li-right">${t.agents.length}a</span></div>`;
     }).join('') + '</div>';
 
   // Agents
+  const sortedAgents = [...AGENTS].sort((a, b) => {
+    const as = selected.agents.has(a.id) ? 0 : 1;
+    const bs = selected.agents.has(b.id) ? 0 : 1;
+    return as - bs || a.id.localeCompare(b.id);
+  });
   document.getElementById('agents-panel').innerHTML =
     panelHdr('AGENTS', AGENTS.length) +
     '<div class="item-list">' +
-    AGENTS.map(a => {
+    sortedAgents.map(a => {
       const sel    = selected.agents.has(a.id);
       const skills = AGENT_SKILLS[a.id] || [];
       const badge  = skills.length ? `<span class="li-right">${skills.length}s</span>` : '';
@@ -513,25 +509,35 @@ function renderCards() {
 
   // Skills by category
   let sh = panelHdr('SKILLS', SKILLS.length) + '<div class="item-list">';
+  const selectedSkills = SKILLS.filter(s => selected.skills.has(s.id));
+  if (selectedSkills.length) {
+    sh += `<div class="list-cat">▪ SÉLECTIONNÉS</div>`;
+    selectedSkills.forEach(s => {
+      sh += `<div class="list-item sel" onclick="toggle('skills','${s.id}')" id="skill-${s.id}"><span class="li-name">${s.id}</span></div>`;
+    });
+  }
   CATEGORY_ORDER.forEach(cat => {
-    const catSkills = SKILLS.filter(s => s.category === cat);
+    const catSkills = SKILLS.filter(s => s.category === cat && !selected.skills.has(s.id));
     if (!catSkills.length) return;
     sh += `<div class="list-cat">${CATEGORY_LABELS[cat]}</div>`;
     catSkills.forEach(s => {
-      const sel = selected.skills.has(s.id);
-      sh += `<div class="list-item${sel?' sel':''}" onclick="toggle('skills','${s.id}')" id="skill-${s.id}"><span class="li-name">${s.id}</span></div>`;
+      sh += `<div class="list-item" onclick="toggle('skills','${s.id}')" id="skill-${s.id}"><span class="li-name">${s.id}</span></div>`;
     });
   });
   sh += '</div>';
   document.getElementById('skills-panel').innerHTML = sh;
 
-  // Hooks in hero
-  document.getElementById('hook-list').innerHTML = HOOKS.map(h => {
-    const sel = selected.hooks.has(h.id);
-    return `<div class="hook-row${sel?' sel':''}" onclick="toggle('hooks','${h.id}')" id="hook-${h.id}"><span class="hk-chk">${sel?'■':'□'}</span><span class="hk-name">${h.id}</span><span class="hk-event">${h.event}</span></div>`;
-  }).join('');
+  // Hooks panel
+  document.getElementById('hooks-panel').innerHTML =
+    panelHdr('HOOKS', HOOKS.length) +
+    '<div class="item-list">' +
+    HOOKS.map(h => {
+      const sel = selected.hooks.has(h.id);
+      return `<div class="list-item${sel?' sel':''}" onclick="toggle('hooks','${h.id}')" id="hook-${h.id}"><span class="li-icon">${h.icon}</span><span class="li-info"><span class="li-name">${h.id}</span><span class="li-desc">${h.event}</span></span></div>`;
+    }).join('') + '</div>';
 
   updateBottomBar();
+  renderContextPanel();
 }
 
 function updateBottomBar() {
@@ -544,6 +550,7 @@ function toggle(type, id) {
   if (wasSelected) selected[type].delete(id);
   else selected[type].add(id);
   if (type === 'teams') {
+    activeTeam = id;
     selected.agents = resolveAgentsFromTeams(selected.teams);
     selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
   } else if (type === 'agents') {
@@ -620,6 +627,71 @@ function copyCommand() {
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
   });
+}
+
+// ── Context panel ─────────────────────────────────────────────────────────
+const TEAM_WORKFLOWS = {
+  'feature-team':              ['feature-release'],
+  'moex-team':                 ['feature-release', 'onboard-project'],
+  'community-team':            ['onboard-project'],
+  'claude-agents-maintainers': ['create-agent', 'create-skill', 'release'],
+  'full-team':                 ['feature-release', 'create-agent', 'create-skill', 'onboard-project', 'release'],
+};
+
+function renderContextPanel() {
+  const el = document.getElementById('ctx-panel');
+  if (!activeTeam) {
+    el.innerHTML = `<div class="ctx-empty"><span class="ctx-empty-icon">⬡</span><span>Cliquer sur une équipe pour voir sa définition</span></div>`;
+    return;
+  }
+  const team = TEAMS.find(t => t.id === activeTeam);
+  if (!team) { el.innerHTML = ''; return; }
+
+  // Agents column
+  const agentItems = team.agents.map(a => {
+    const agentData = AGENTS.find(ag => ag.id === a.id) || a;
+    return `<div class="ctx-item"><span class="ctx-item-icon">${agentData.icon || ''}</span><div><span class="ctx-item-name">${a.id}</span><span class="ctx-item-desc">${agentData.desc || ''}</span></div></div>`;
+  }).join('');
+
+  // Skills column — unique skills from AGENT_SKILLS for the team's agents
+  const skillIdSet = new Set();
+  team.agents.forEach(a => (AGENT_SKILLS[a.id] || []).forEach(sid => skillIdSet.add(sid)));
+  const skillItems = [...skillIdSet].map(sid => {
+    const skillData = SKILLS.find(s => s.id === sid);
+    return `<div class="ctx-item"><span class="ctx-item-icon">${skillData ? skillData.icon : '⚙️'}</span><div><span class="ctx-item-name">${sid}</span><span class="ctx-item-desc">${skillData ? skillData.desc : ''}</span></div></div>`;
+  }).join('');
+
+  // Workflows column
+  const wfIds = TEAM_WORKFLOWS[activeTeam] || [];
+  const wfItems = wfIds.map(wid => {
+    const wf = WORKFLOWS.find(w => w.id === wid);
+    if (!wf) return '';
+    return `<div class="ctx-item"><span class="ctx-item-icon">${wf.icon}</span><div><span class="ctx-item-name">${wf.id}</span><span class="ctx-item-desc">${wf.desc}</span></div></div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="ctx-hdr">
+      <div class="ctx-team-row">
+        <span class="ctx-team-icon">${team.icon}</span>
+        <span class="ctx-team-name">${team.name}</span>
+        <span class="ctx-team-v">v${team.version}</span>
+      </div>
+      <div class="ctx-team-desc">${team.desc}</div>
+    </div>
+    <div class="ctx-body">
+      <div class="ctx-col">
+        <div class="ctx-col-hdr">Agents</div>
+        ${agentItems}
+      </div>
+      <div class="ctx-col">
+        <div class="ctx-col-hdr">Skills</div>
+        ${skillItems}
+      </div>
+      <div class="ctx-col">
+        <div class="ctx-col-hdr">Workflows</div>
+        ${wfItems}
+      </div>
+    </div>`;
 }
 
 // ── Workflow definitions ───────────────────────────────────────────────────
@@ -778,36 +850,8 @@ const WORKFLOWS = [
   },
 ];
 
-function renderWorkflows() {
-  const el = document.getElementById('wf-list');
-  el.innerHTML = WORKFLOWS.map(w => `
-    <div class="wf-card" id="wf-${w.id}">
-      <div class="wf-hdr">
-        <span class="wf-icon">${w.icon}</span>
-        <span class="wf-name">${w.name}</span>
-        <span class="wf-ver">v${w.version}</span>
-        <button class="wf-copy-btn" id="cbt-${w.id}" onclick="copyWfCmd('${w.id}')">▶ Copier</button>
-      </div>
-      <div class="wf-desc">${w.desc}</div>
-      <div class="wf-diagram">${w.svg}</div>
-    </div>`).join('');
-  document.getElementById('wf-count').textContent = WORKFLOWS.length;
-}
-
-function copyWfCmd(id) {
-  const wf  = WORKFLOWS.find(w => w.id === id);
-  const btn = document.getElementById('cbt-' + id);
-  navigator.clipboard.writeText(wf.cmd).then(() => {
-    const orig = btn.textContent;
-    btn.textContent = '✓ Copié';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
-  });
-}
-
 // Init
 renderCards();
-renderWorkflows();
 </script>
 </body>
 </html>
