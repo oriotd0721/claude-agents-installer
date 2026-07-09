@@ -204,6 +204,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .ctx-item-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
 .ctx-item-name { font-family: var(--mono); font-size: 11px; color: var(--accent); display: block; margin-bottom: 2px; }
 .ctx-item-desc { font-size: 10px; color: var(--dim2); line-height: 1.4; }
+.ctx-wf-diagram { background: #080808; border: 1px solid var(--border); padding: 10px; overflow-x: auto; margin-top: 8px; border-radius: 2px; }
 </style>
 </head>
 <body>
@@ -533,7 +534,7 @@ function renderCards() {
     '<div class="item-list">' +
     HOOKS.map(h => {
       const sel = selected.hooks.has(h.id);
-      return `<div class="list-item${sel?' sel':''}" onclick="toggle('hooks','${h.id}')" id="hook-${h.id}"><span class="li-icon">${h.icon}</span><span class="li-info"><span class="li-name">${h.id}</span><span class="li-desc">${h.event}</span></span></div>`;
+      return `<div class="list-item${sel?' sel':''}" onclick="toggle('hooks','${h.id}')" id="hook-${h.id}"><span class="li-icon">${h.icon}</span><span class="li-info"><span class="li-name">${h.id}</span><span class="li-desc">${h.event} · ${h.desc}</span></span></div>`;
     }).join('') + '</div>';
 
   updateBottomBar();
@@ -666,7 +667,7 @@ function renderContextPanel() {
   const wfItems = wfIds.map(wid => {
     const wf = WORKFLOWS.find(w => w.id === wid);
     if (!wf) return '';
-    return `<div class="ctx-item"><span class="ctx-item-icon">${wf.icon}</span><div><span class="ctx-item-name">${wf.id}</span><span class="ctx-item-desc">${wf.desc}</span></div></div>`;
+    return `<div class="ctx-item"><span class="ctx-item-icon">${wf.icon}</span><div style="flex:1;min-width:0"><span class="ctx-item-name">${wf.id}</span><span class="ctx-item-desc">${wf.desc}</span>${wf.svg ? `<div class="ctx-wf-diagram">${wf.svg}</div>` : ''}</div></div>`;
   }).join('');
 
   el.innerHTML = `
