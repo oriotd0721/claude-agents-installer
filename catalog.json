@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-09T16:11:40Z",
+  "generated_at": "2026-07-10T08:55:12Z",
   "agents": [
     {
       "kind": "agent",
@@ -466,7 +466,7 @@
     {
       "kind": "skill",
       "name": "context-window-management",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "description": "Manage context window health in long-running agent sessions and multi-agent pipelines. Use when a session has been running for 30+ tool calls, when reasoning quality degrades, when sub-agents start forgetting earlier decisions, or when planning a MOEX migration run that will span multiple agents and sessions.",
       "type": "methodological",
       "category": "engineering",
