@@ -5,648 +5,672 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agentic-Claude — Installer</title>
 <style>
-  :root {
-    --bg: #0f1117;
-    --surface: #1a1d27;
-    --surface2: #222636;
-    --border: #2e3348;
-    --accent: #6c8fff;
-    --accent2: #a78bfa;
-    --green: #34d399;
-    --yellow: #fbbf24;
-    --red: #f87171;
-    --text: #e2e8f0;
-    --dim: #64748b;
-    --card-hover: #252a3d;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+:root {
+  --bg:       #0c0c0c;
+  --panel:    #101010;
+  --panel2:   #141414;
+  --border:   #1e1e1e;
+  --accent:   #c86010;
+  --accent-h: #d4711a;
+  --sel-text: #0c0c0c;
+  --text:     #d0d0d0;
+  --dim:      #484848;
+  --dim2:     #686868;
+  --green:    #34d399;
+  --mono:     'JetBrains Mono','Cascadia Code','Consolas','Courier New',monospace;
+  --sans:     'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--sans); }
 
-  header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 18px 32px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  header .logo { font-size: 28px; }
-  header h1 { font-size: 18px; font-weight: 700; color: var(--text); }
-  header p { font-size: 12px; color: var(--dim); margin-top: 2px; }
-  header .badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
-  header .doc-link { font-size: 12px; color: var(--dim); margin-right: 8px; }
-  header .doc-link:hover { color: var(--accent); }
+/* ── Topbar ── */
+.topbar {
+  height: 48px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.tb-logo  { font-size: 20px; color: var(--accent); }
+.tb-title { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: 0.3px; }
+.tb-pill  { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--dim2); background: var(--panel2); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; }
 
-  .layout { display: grid; grid-template-columns: 1fr 340px; gap: 0; min-height: calc(100vh - 65px); }
+/* ── App grid ── */
+.app {
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  height: calc(100vh - 88px);
+  overflow: hidden;
+}
 
-  .main { padding: 28px 32px; overflow-y: auto; }
-  .sidebar { background: var(--surface); border-left: 1px solid var(--border); padding: 24px; position: sticky; top: 65px; height: calc(100vh - 65px); overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+/* ── Hero (left) ── */
+.hero {
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+  padding: 28px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+}
+.hero::-webkit-scrollbar       { width: 4px; }
+.hero::-webkit-scrollbar-track { background: transparent; }
+.hero::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  /* Search */
-  .search-wrap { margin-bottom: 20px; position: relative; }
-  .search-wrap input {
-    width: 100%; background: var(--surface2); border: 1.5px solid var(--border);
-    border-radius: 8px; color: var(--text); padding: 8px 12px 8px 34px;
-    font-size: 13px; font-family: inherit; outline: none;
-  }
-  .search-wrap input:focus { border-color: var(--accent); }
-  .search-wrap::before { content: '🔍'; position: absolute; left: 10px; top: 9px; font-size: 13px; }
+.hero-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); }
+.hero-title { font-size: 30px; font-weight: 800; line-height: 1.2; color: var(--text); }
+.hero-title .hl { color: var(--accent); }
+.hero-sub   { font-size: 13px; color: var(--dim2); line-height: 1.6; }
 
-  /* Presets */
-  .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--dim); font-weight: 700; margin-bottom: 14px; }
-  .presets { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; }
-  .preset-btn {
-    padding: 8px 16px; border-radius: 8px; border: 1.5px solid var(--border);
-    background: var(--surface); color: var(--text); cursor: pointer;
-    font-size: 13px; font-weight: 600; transition: all 0.15s;
-    display: flex; align-items: center; gap: 6px; font-family: inherit;
-  }
-  .preset-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(108,143,255,0.08); }
-  .preset-btn.active { border-color: var(--accent); background: rgba(108,143,255,0.15); color: var(--accent); }
+.hero-section-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); margin-bottom: 8px; }
 
-  /* Cards grid */
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 32px; }
-  .card {
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 12px; padding: 16px; cursor: pointer;
-    transition: all 0.15s; display: flex; flex-direction: column;
-    gap: 8px; position: relative;
-  }
-  .card:hover { background: var(--card-hover); border-color: #3e4560; }
-  .card.selected { border-color: var(--accent); background: rgba(108,143,255,0.08); }
-  .card.hidden { display: none; }
+.compat-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.compat-tag  { font-family: var(--mono); font-size: 11px; padding: 3px 10px; border-radius: 3px; border: 1px solid var(--border); color: var(--dim2); background: var(--panel2); }
+.compat-tag.active { border-color: var(--accent); color: var(--accent); }
 
-  .card-header { display: flex; align-items: center; gap: 10px; }
-  .card-icon { font-size: 22px; }
-  .card-name { font-weight: 700; font-size: 14px; }
-  .card-version { font-size: 10px; color: var(--dim); background: var(--surface2); padding: 2px 7px; border-radius: 10px; margin-left: auto; white-space: nowrap; }
-  .card-desc { font-size: 12px; color: var(--dim); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .card-check {
-    position: absolute; top: 14px; right: 14px;
-    width: 20px; height: 20px; border-radius: 50%;
-    border: 2px solid var(--border); background: transparent;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; transition: all 0.15s;
-  }
-  .card.selected .card-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+/* Hook rows */
+.hook-rows { display: flex; flex-direction: column; gap: 2px; }
+.hook-row  { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; border-radius: 3px; transition: background 0.1s; }
+.hook-row:hover { background: var(--panel2); }
+.hook-row.sel   { background: var(--panel2); }
+.hk-chk  { font-family: var(--mono); font-size: 12px; color: var(--dim2); width: 14px; flex-shrink: 0; }
+.hook-row.sel .hk-chk { color: var(--accent); }
+.hk-name { font-family: var(--mono); font-size: 11px; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hk-event { font-family: var(--mono); font-size: 9px; color: var(--dim2); background: var(--panel2); border: 1px solid var(--border); padding: 1px 6px; border-radius: 2px; flex-shrink: 0; }
+.hook-row.sel .hk-event { border-color: var(--accent); color: var(--accent); }
 
-  /* Hook list */
-  .hook-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
-  .hook-item {
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 10px; padding: 12px 16px;
-    display: flex; align-items: center; gap: 12px;
-    cursor: pointer; transition: all 0.15s;
-  }
-  .hook-item:hover { background: var(--card-hover); }
-  .hook-item.selected { border-color: var(--accent2); background: rgba(167,139,250,0.08); }
-  .hook-item.hidden { display: none; }
-  .hook-icon { font-size: 18px; width: 28px; text-align: center; }
-  .hook-info { flex: 1; }
-  .hook-name { font-size: 13px; font-weight: 600; }
-  .hook-desc { font-size: 11px; color: var(--dim); margin-top: 2px; }
-  .hook-event { font-size: 10px; color: var(--accent2); background: rgba(167,139,250,0.1); padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
-  .hook-toggle {
-    width: 20px; height: 20px; border-radius: 50%;
-    border: 2px solid var(--border); background: transparent;
-    display: flex; align-items: center; justify-content: center; font-size: 11px;
-    transition: all 0.15s;
-  }
-  .hook-item.selected .hook-toggle { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+/* Config */
+.cfg-label { display: block; font-family: var(--mono); font-size: 10px; color: var(--dim); margin-bottom: 6px; }
+.cfg-select, .cfg-input {
+  width: 100%; background: var(--panel2); border: 1px solid var(--border);
+  border-radius: 3px; color: var(--text); padding: 7px 10px;
+  font-size: 12px; font-family: var(--mono); outline: none;
+  transition: border-color 0.15s; margin-bottom: 10px;
+}
+.cfg-select:focus, .cfg-input:focus { border-color: var(--accent); }
+.cfg-select option { background: var(--panel2); }
 
-  /* Sidebar */
-  .sidebar-title { font-size: 13px; font-weight: 700; color: var(--text); }
-  .summary-empty { font-size: 12px; color: var(--dim); text-align: center; padding: 20px; }
-  .summary-group { margin-bottom: 14px; }
-  .summary-group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 6px; }
-  .summary-item { font-size: 12px; color: var(--text); padding: 4px 8px; background: var(--surface2); border-radius: 6px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+/* Generate button */
+.gen-btn {
+  width: 100%; padding: 10px 14px; background: var(--accent);
+  color: var(--sel-text); border: none; border-radius: 3px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: background 0.15s; font-family: var(--mono); letter-spacing: 0.5px;
+}
+.gen-btn:hover    { background: var(--accent-h); }
+.gen-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-  .project-path label { font-size: 11px; color: var(--dim); display: block; margin-bottom: 6px; }
-  .project-path input {
-    width: 100%; background: var(--surface2); border: 1.5px solid var(--border);
-    border-radius: 8px; color: var(--text); padding: 8px 12px;
-    font-size: 12px; font-family: 'Consolas', monospace; outline: none;
-  }
-  .project-path input:focus { border-color: var(--accent); }
+/* Command box */
+.cmd-box { display: none; margin-top: 10px; background: #080808; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+.cmd-box.visible { display: block; }
+.cmd-hdr  { padding: 6px 12px; background: var(--panel2); display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--dim2); }
+.cmd-copy-btn { background: var(--accent); color: var(--sel-text); border: none; border-radius: 2px; padding: 2px 8px; font-size: 10px; cursor: pointer; font-weight: 700; font-family: var(--mono); }
+.cmd-copy-btn.copied { background: var(--green); }
+.cmd-text { padding: 12px; font-family: var(--mono); font-size: 11px; color: #7dd3fc; white-space: pre-wrap; word-break: break-all; line-height: 1.6; }
 
-  .source-select label { font-size: 11px; color: var(--dim); display: block; margin-bottom: 6px; }
-  .source-select select {
-    width: 100%; background: var(--surface2); border: 1.5px solid var(--border);
-    border-radius: 8px; color: var(--text); padding: 8px 12px;
-    font-size: 12px; outline: none; cursor: pointer; font-family: inherit;
-  }
+/* ── Right column ── */
+.right {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.right::-webkit-scrollbar       { width: 4px; }
+.right::-webkit-scrollbar-track { background: transparent; }
+.right::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  .generate-btn {
-    width: 100%; padding: 12px; background: var(--accent); color: #fff;
-    border: none; border-radius: 10px; font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: opacity 0.15s; font-family: inherit;
-  }
-  .generate-btn:hover { opacity: 0.9; }
-  .generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+/* ── 4-panel row ── */
+.panels {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 55vh;
+  flex-shrink: 0;
+  background: var(--border);
+  gap: 1px;
+  border-bottom: 1px solid var(--border);
+}
+.panel { background: var(--panel); display: flex; flex-direction: column; overflow: hidden; }
 
-  /* Command output */
-  .command-box { display: none; margin-top: 14px; background: #0a0c14; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
-  .command-box.visible { display: block; }
-  .command-header { padding: 8px 14px; background: var(--surface2); display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--dim); }
-  .copy-btn { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 3px 10px; font-size: 11px; cursor: pointer; font-weight: 600; font-family: inherit; }
-  .copy-btn.copied { background: var(--green); }
-  .command-text { padding: 14px; font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; color: #a5f3fc; white-space: pre-wrap; word-break: break-all; line-height: 1.6; }
+.panel-hdr { display: flex; align-items: center; gap: 8px; padding: 12px 14px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.ph-dot   { color: var(--accent); font-size: 10px; }
+.ph-name  { font-family: var(--mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text); flex: 1; }
+.ph-count { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--text); }
 
-  .count-badge { background: var(--accent); color: #fff; font-size: 10px; padding: 1px 7px; border-radius: 10px; margin-left: 6px; }
+.item-list { overflow-y: auto; flex: 1; }
+.item-list::-webkit-scrollbar       { width: 3px; }
+.item-list::-webkit-scrollbar-track { background: transparent; }
+.item-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-  .section { margin-bottom: 8px; }
+.list-item { display: flex; align-items: center; gap: 8px; padding: 6px 14px; font-family: var(--mono); font-size: 12px; color: var(--dim2); cursor: pointer; transition: background 0.08s; }
+.list-item:hover  { background: var(--panel2); }
+.list-item.sel    { background: var(--accent); color: var(--sel-text); font-weight: 700; }
 
-  .loading { color: var(--dim); font-size: 13px; padding: 20px 0; text-align: center; }
-  .catalog-date { font-size: 10px; color: var(--dim); margin-top: 4px; }
+.li-dot   { color: var(--dot); flex-shrink: 0; }
+.list-item.sel .li-dot  { color: inherit; }
+.li-icon  { flex-shrink: 0; font-size: 13px; }
+.li-name  { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.li-right { font-size: 10px; color: var(--dim); flex-shrink: 0; }
+.list-item.sel .li-right { color: var(--sel-text); opacity: 0.7; }
 
-  /* Category / group sections */
-  .cat-section { margin-bottom: 16px; }
-  .cat-header {
-    display: flex; align-items: center; gap: 9px;
-    padding: 9px 14px; background: var(--surface2);
-    border-radius: 10px; border: 1.5px solid var(--border);
-    cursor: pointer; user-select: none; margin-bottom: 8px;
-    transition: border-color 0.15s;
-  }
-  .cat-header:hover { border-color: #3e4560; }
-  .cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .cat-name { font-size: 12px; font-weight: 700; flex: 1; }
-  .cat-count-pill { font-size: 10px; color: var(--dim); background: var(--surface); padding: 2px 8px; border-radius: 10px; }
-  .cat-select-all {
-    font-size: 10px; color: var(--accent); background: rgba(108,143,255,0.1);
-    border: 1px solid rgba(108,143,255,0.3); border-radius: 8px;
-    padding: 2px 10px; cursor: pointer; font-family: inherit; font-weight: 600;
-    transition: background 0.15s;
-  }
-  .cat-select-all:hover { background: rgba(108,143,255,0.2); }
-  .cat-chevron { font-size: 10px; color: var(--dim); transition: transform 0.2s; margin-left: 2px; }
-  .cat-section.collapsed .cat-chevron { transform: rotate(-90deg); }
-  .cat-section.collapsed .cat-cards { display: none; }
-  .cat-cards {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 10px; margin-bottom: 4px;
-  }
-  .workflow-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 12px; margin-bottom: 32px;
-  }
+.list-cat { padding: 8px 14px 3px; font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); }
+
+.agent-skills {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+  padding: 4px 14px 6px 36px;
+  background: rgba(200,96,16,0.07);
+  border-left: 2px solid var(--accent);
+  line-height: 1.6;
+  word-break: break-all;
+  cursor: default;
+}
+
+/* ── Bottom bar ── */
+.bottombar {
+  height: 40px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim2);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.bb-item   { padding: 0 16px; border-right: 1px solid var(--border); height: 100%; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.bb-accent { color: var(--accent); font-weight: 700; font-size: 13px; }
+.bb-label  { color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+.li-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.li-desc { font-family: var(--mono); font-size: 9px; color: var(--dim2); white-space: normal; line-height: 1.3; margin-top: 2px; }
+.list-item.sel .li-desc { color: rgba(12,12,12,0.55); }
+.ctx-wrap { flex: 1; overflow: hidden; border-top: 1px solid var(--border); display: flex; flex-direction: column; min-height: 0; }
+#ctx-panel { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.ctx-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--dim); font-family: var(--mono); font-size: 11px; gap: 10px; }
+.ctx-empty-icon { font-size: 28px; }
+.ctx-hdr { padding: 12px 16px 10px; border-bottom: 1px solid var(--border); background: var(--panel2); flex-shrink: 0; }
+.ctx-team-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+.ctx-team-icon { font-size: 18px; }
+.ctx-team-name { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text); }
+.ctx-team-v { font-family: var(--mono); font-size: 10px; color: var(--dim2); margin-left: 6px; }
+.ctx-team-desc { font-size: 12px; color: var(--dim2); line-height: 1.5; }
+.ctx-body { display: grid; grid-template-columns: 1fr 1fr 1fr; background: var(--border); gap: 1px; flex: 1; overflow: hidden; }
+.ctx-col { background: var(--panel); overflow-y: auto; display: flex; flex-direction: column; }
+.ctx-col-hdr { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); padding: 7px 12px 6px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--panel2); flex-shrink: 0; }
+.ctx-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 12px; border-bottom: 1px solid var(--border); }
+.ctx-item:last-child { border-bottom: none; }
+.ctx-item-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.ctx-item-name { font-family: var(--mono); font-size: 11px; color: var(--accent); display: block; margin-bottom: 2px; }
+.ctx-item-desc { font-size: 10px; color: var(--dim2); line-height: 1.4; }
+.ctx-wf-diagram { background: #080808; border: 1px solid var(--border); padding: 10px; overflow-x: auto; margin-top: 8px; border-radius: 2px; }
+
+/* ── Hero compact ── */
+.hero-cfg { display: flex; flex-direction: column; gap: 0; }
+
+/* ── Team builder ── */
+.list-create-team { border-top: 1px solid var(--border); color: var(--accent); }
+.list-create-team:hover { background: rgba(200,96,16,0.08); }
+.list-custom-team { border-top: 1px solid var(--border); color: var(--dim2); }
+.list-custom-team.sel { background: var(--accent); color: var(--sel-text); }
+
+.team-builder { padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; flex: 1; }
+.tb-section-label { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); margin-bottom: 6px; }
+.tb-agents-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.tb-agent-chip { display: flex; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 3px; font-family: var(--mono); font-size: 11px; color: var(--dim2); cursor: pointer; background: var(--panel2); transition: border-color 0.1s, color 0.1s, background 0.1s; user-select: none; }
+.tb-agent-chip:hover { border-color: var(--accent); color: var(--text); }
+.tb-agent-chip.sel { background: var(--accent); color: var(--sel-text); border-color: var(--accent); font-weight: 700; }
+.tb-actions { display: flex; gap: 8px; align-items: center; padding-top: 4px; }
+.tb-clear-btn { padding: 9px 14px; background: transparent; color: var(--dim2); border: 1px solid var(--border); border-radius: 3px; font-size: 12px; cursor: pointer; font-family: var(--mono); transition: border-color 0.15s, color 0.15s; }
+.tb-clear-btn:hover { border-color: #f87171; color: #f87171; }
+.tb-count { font-family: var(--mono); font-size: 10px; color: var(--dim2); margin-left: auto; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">🤖</div>
-  <div>
-    <h1>Agentic-Claude — Installer</h1>
-    <p id="header-sub">Chargement du catalogue...</p>
-  </div>
-  <a class="doc-link" href="./index.html">&#8592; Documentation</a>
-  <div class="badge" id="header-badge">...</div>
-</header>
-
-<div class="layout">
-  <div class="main">
-
-    <!-- Search -->
-    <div class="search-wrap">
-      <input type="text" id="search" placeholder="Filtrer agents, skills, hooks..." oninput="applySearch()">
-    </div>
-
-    <!-- Presets -->
-    <div class="section">
-      <div class="section-title">Démarrage rapide — Équipes prédéfinies</div>
-      <div class="presets">
-        <button class="preset-btn" onclick="applyPreset('feature')"     id="preset-feature">🧩 Feature Team</button>
-        <button class="preset-btn" onclick="applyPreset('release')"     id="preset-release">🚀 Release Team</button>
-        <button class="preset-btn" onclick="applyPreset('full')"        id="preset-full">⭐ Full Team</button>
-        <button class="preset-btn" onclick="applyPreset('moex')"        id="preset-moex">🏗️ MOEX / Intégration</button>
-        <button class="preset-btn" onclick="applyPreset('community')"   id="preset-community">📣 Community &amp; Adoption</button>
-        <button class="preset-btn" onclick="applyPreset('repoimprove')" id="preset-repoimprove">🔒 Repo Improvement</button>
-        <button class="preset-btn" onclick="applyPreset('none')" id="preset-none" style="margin-left:auto;color:var(--dim)">✕ Tout décocher</button>
-      </div>
-    </div>
-
-    <!-- Agents -->
-    <div class="section">
-      <h2>🤖 Agents <span class="count-badge" id="agent-count">0</span></h2>
-      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Rôles spécialisés qui travaillent en parallèle ou en séquence dans tes projets</p>
-      <div id="agent-cards"><div class="loading">Chargement...</div></div>
-    </div>
-
-    <!-- Skills -->
-    <div class="section">
-      <h2>⚡ Skills <span class="count-badge" id="skill-count">0</span></h2>
-      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Commandes slash (<code style="background:var(--surface2);padding:1px 5px;border-radius:4px">/skill-name</code>) qui définissent des workflows réutilisables</p>
-      <div id="skill-cards"><div class="loading">Chargement...</div></div>
-    </div>
-
-    <!-- Hooks -->
-    <div class="section">
-      <h2>🔒 Hooks <span class="count-badge" id="hook-count">0</span></h2>
-      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Comportements automatiques déclenchés par les actions de Claude Code</p>
-      <div class="hook-list" id="hook-list"><div class="loading">Chargement...</div></div>
-    </div>
-
-    <!-- Workflows -->
-    <div class="section">
-      <h2>🔄 Workflows <span class="count-badge" id="workflow-count">0</span></h2>
-      <p style="font-size:12px;color:var(--dim);margin-bottom:14px">Pipelines multi-agents — séquences d'agents qui collaborent pour accomplir une tâche complexe end-to-end</p>
-      <div class="workflow-grid" id="workflow-cards"><div class="loading">Chargement...</div></div>
-    </div>
-
-  </div>
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-title">📋 Sélection</div>
-
-    <div id="summary">
-      <div class="summary-empty">Aucun élément sélectionné.<br>Choisis un preset ou coche manuellement.</div>
-    </div>
-
-    <div class="source-select">
-      <label>Source du repo</label>
-      <select id="source-select">
-        <option value="gitlab">GitLab TCS (recommandé)</option>
-        <option value="github">GitHub (Aletheia-Thomas)</option>
-      </select>
-    </div>
-
-    <div class="project-path">
-      <label>Chemin du projet cible</label>
-      <input type="text" id="project-path" value="." placeholder="Ex: C:\Projets\MonProjet ou ."/>
-    </div>
-
-    <button class="generate-btn" onclick="generateCommand()" id="gen-btn" disabled>
-      Générer la commande →
-    </button>
-
-    <div class="command-box" id="command-box">
-      <div class="command-header">
-        <span>PowerShell</span>
-        <button class="copy-btn" id="copy-btn" onclick="copyCommand()">Copier</button>
-      </div>
-      <div class="command-text" id="command-text"></div>
-    </div>
-  </div>
+<div class="topbar">
+  <span class="tb-logo">⬡</span>
+  <span class="tb-title">Agentic-Claude / TCS Enterprise</span>
+  <div class="tb-pill">● v1.2.14 · Jul 2026</div>
 </div>
 
-<script type="application/json" id="catalog-json">{"generated_at": "2026-07-10T09:13:48Z", "agents": [{"kind": "agent", "name": "adoption-assistant", "version": "1.1.0", "description": "Analyses Claude Code usage in a project workspace and produces personalised next-step recommendations. Identifies which agents and skills are installed but unused, detects gaps, proposes a prioritised adoption roadmap, and guides users on how to publish quality content with the right format. Read-only — never modifies files in the analysed project.", "model": "sonnet", "tools": ["Read", "Glob", "Grep"], "memory": "project", "path": "agents/adoption-assistant/AGENT.md"}, {"kind": "agent", "name": "archimate-architect", "version": "1.7.0", "description": "Produces ArchiMate target-architecture files (.archimate) from source diagrams (Lucidchart) or structured YAML manifests. Invokes Python generator tooling via Bash. No application code, no tests.", "model": "opus", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch", "WebFetch", "mcp__claude_ai_Lucid__*"], "memory": "project", "path": "agents/archimate-architect/AGENT.md"}, {"kind": "agent", "name": "architect", "version": "1.2.0", "description": "Analyzes integration architectures, maps system dependencies, and documents integration patterns across IBM APIC, ACE, MQ, and other middleware. Reads source code, configuration, and documentation to produce architecture mappings and design assessments. Does NOT write application code, tests, or deploy.", "model": "opus", "tools": ["Read", "Write", "Edit", "Grep", "Glob", "Task", "WebSearch", "WebFetch", "TodoWrite"], "memory": "project", "path": "agents/architect/AGENT.md"}, {"kind": "agent", "name": "best-practices", "version": "1.0.0", "description": "Reads consuming project repositories to extract patterns, anti-patterns, and insights about how claude-agents is used in practice. Publishes anonymised findings to the claude-agents repo as INSIGHTS.md entries, and proposes library improvements to the backlog. Never modifies the analysed projects.", "model": "sonnet", "tools": ["Read", "Glob", "Grep", "Write", "Bash"], "memory": "project", "path": "agents/best-practices/AGENT.md"}, {"kind": "agent", "name": "business-analyst", "version": "1.0.0", "description": "Elicits, formalises, and maintains requirements artefacts (user stories, functional specifications, process models). Bridges the Product Owner's strategic intent and the Architect's technical solution. Does NOT write code, architecture diagrams, or deploy infrastructure.", "model": "opus", "tools": ["Read", "Write", "Edit", "Grep", "Glob", "Task", "WebSearch", "WebFetch", "TodoWrite", "AskUserQuestion", "mcp__claude_ai_Atlassian__*"], "memory": "project", "path": "agents/business-analyst/AGENT.md"}, {"kind": "agent", "name": "community-manager", "version": "1.0.0", "description": "Drives adoption of claude-agents at TCS through structured internal communication. Produces daily tips, weekly focus posts, monthly experience reports, and hackathon briefs. Formats all content for Confluence, Teams, and email. Never writes code.", "model": "sonnet", "tools": ["Read", "Write", "Glob", "mcp__claude_ai__atlassian"], "memory": "project", "path": "agents/community-manager/AGENT.md"}, {"kind": "agent", "name": "developer", "version": "1.1.0", "description": "Implements features, fixes bugs, and writes production code following SOLID principles and Clean Code practices. Delegates to this agent when code needs to be written, modified, or refactored. Does NOT run tests, deploy, or update documentation.", "model": "opus", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch", "WebFetch", "NotebookEdit"], "memory": "project", "path": "agents/developer/AGENT.md"}, {"kind": "agent", "name": "devops", "version": "1.5.0", "description": "Manages CI/CD pipelines and deployment across GitHub Actions, GitLab CI/CD, and Azure targets, plus Docker configurations and cloud provisioning. Delegates to this agent for build pipelines, container setup, cloud provisioning, and release management. Does NOT write application code or tests.", "model": "opus", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch", "WebFetch"], "memory": "project", "path": "agents/devops/AGENT.md"}, {"kind": "agent", "name": "documentarian", "version": "1.2.0", "description": "Maintains project documentation, CLAUDE.md context files, architecture decision records, and ensures documentation stays in sync with code changes. Delegates to this agent after features are implemented, when context needs updating, or when architectural decisions need recording. Does NOT write application code or tests.", "model": "sonnet", "tools": ["Read", "Write", "Edit", "Grep", "Glob", "Task", "WebSearch", "mcp__claude_ai_Atlassian__getAccessibleAtlassianResources", "mcp__claude_ai_Atlassian__getConfluenceSpaces", "mcp__claude_ai_Atlassian__getConfluencePage", "mcp__claude_ai_Atlassian__createConfluencePage", "mcp__claude_ai_Atlassian__updateConfluencePage", "mcp__claude_ai_Atlassian__searchConfluenceUsingCql", "mcp__claude_ai_Mermaid_Chart__validate_and_render_mermaid_diagram"], "memory": "project", "path": "agents/documentarian/AGENT.md"}, {"kind": "agent", "name": "evaluate-contribution", "version": "1.0.0", "description": "Governance agent for the claude-agents library. Evaluates proposed agents, skills, and teams before they are added to the library. Detects duplicates, checks quality and portability, decides the right type (agent vs skill vs team vs patch), and produces a structured approval/rejection report. Automatically triggered by the evaluate-contribution hook when unknown agents or skills are detected in the workspace.", "model": "opus", "tools": ["Read", "Glob", "Grep"], "memory": "project", "path": "agents/evaluate-contribution/AGENT.md"}, {"kind": "agent", "name": "library-maintainer", "version": "1.1.0", "description": "Maintains the entire Agentic-Claude library — agent/skill/team definitions, artefact registry, docs, scripts, hooks, and installer tooling. Belongs ONLY to the claude-agents-maintainers. The Agentic-Claude repo IS its workspace (the one exception to the \"AI Tools repo is read-only\" rule). Recommends improvements to a human and applies only approved changes. Never commits.", "model": "opus", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch", "WebFetch"], "memory": "project", "path": "agents/library-maintainer/AGENT.md"}, {"kind": "agent", "name": "product-owner-assistant", "version": "1.3.1", "description": "Assists the Product Owner with prioritization, requirement refinement, stakeholder communication, and agent coordination. This agent does NOT write code, tests, or infrastructure. It helps the PO make decisions and delegates work to specialized agents. Use this agent as the default orchestration layer in interactive sessions.", "model": "opus", "tools": ["Read", "Grep", "Glob", "Task", "WebSearch", "WebFetch", "TodoWrite", "AskUserQuestion", "mcp__claude_ai_Atlassian__*"], "memory": "project", "path": "agents/product-owner-assistant/AGENT.md"}, {"kind": "agent", "name": "tester", "version": "1.1.0", "description": "Creates and runs tests, validates implementations against acceptance criteria, and reports quality metrics. Delegates to this agent when tests need to be written, executed, or when code quality must be validated. Does NOT write production code.", "model": "opus", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task"], "memory": "project", "path": "agents/tester/AGENT.md"}], "skills": [{"kind": "skill", "name": "agentic-claude-framework", "version": "1.1.0", "description": "Author and govern the Agentic-Claude framework itself: how to add or change agents, skills, and teams; how per-object semver versioning works; how to keep the CLAUDE.md inventory in sync with disk; what the PreToolUse commit-guard enforces; and how plugin/marketplace packaging ties it together. Use when proposing or applying any change to the structure or governance of THIS repository — never to modify a consuming project. Runs inside the claude-agents-maintainers.", "type": "methodological", "category": "governance", "tools": ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "TodoWrite"], "path": "skills/agentic-claude-framework/SKILL.md"}, {"kind": "skill", "name": "agile-user-stories", "version": "1.0.0", "description": "Write, split, and refine agile user stories with well-formed acceptance criteria. Applies the Connextra format, INVEST criteria, and MoSCoW prioritisation. Use when building or grooming a product backlog, refining epics into stories, or preparing stories for sprint planning.", "type": "methodological", "category": "business-analysis", "tools": ["Read", "Write", "Edit", "Grep", "Glob", "TodoWrite", "AskUserQuestion", "mcp__claude_ai_Atlassian__*"], "path": "skills/agile-user-stories/SKILL.md"}, {"kind": "skill", "name": "analyze-adoption", "version": "1.0.0", "description": "Analyse l'état d'adoption de claude-agents dans un workspace projet et génère un rapport de recommandations personnalisées et actionnables.", "type": "methodological", "category": "documentation", "tools": ["Read", "Glob", "Grep", "Write"], "path": "skills/analyze-adoption/SKILL.md"}, {"kind": "skill", "name": "api-and-interface-design", "version": "1.0.1", "description": "Design a new API or evolve an existing one contract-first before writing any code. Use when defining a new REST endpoint, designing an IBM APIC product, specifying request/response shapes, or establishing versioning and backward-compatibility rules. Produces an OpenAPI 3.x spec and a design decision record.", "type": "methodological", "category": "architecture", "tools": ["Read", "Write", "Grep", "Glob", "Task", "TodoWrite"], "path": "skills/api-and-interface-design/SKILL.md"}, {"kind": "skill", "name": "arch-c4", "version": "1.0.1", "description": "Author and refresh C4 diagrams (Context, Container, Component, Deployment, Runtime) via Structurizr DSL, and write the DSL-derived tables into arc42 §3 / §5 / §7 as fenced generated blocks. Five modes: context, container, component, deployment, runtime. Use when the user asks for a C4 diagram, system context, container diagram, component diagram, deployment view, or runtime scenario view.", "type": "methodological", "category": "architecture", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task"], "path": "skills/arch-c4/SKILL.md"}, {"kind": "skill", "name": "archimate-generation", "version": "1.2.0", "description": "End-to-end skill: reads source diagrams (Lucidchart) or a YAML manifest, generates or updates target-architecture.yaml, and runs the single canonical manifest-driven generator (cmdb_to_archimate.archimate_generator) to produce a .archimate file for the Archi modelling tool.", "type": "technological", "category": "architecture", "tools": ["Read", "Write", "Edit", "Bash", "Glob", "WebSearch", "mcp__claude_ai_Lucid__*"], "path": "skills/archimate-generation/SKILL.md"}, {"kind": "skill", "name": "architecture-decision-records", "version": "1.1.0", "description": "Write, review, and maintain Architecture Decision Records (ADRs) following the Nygard format. Use when a significant architectural decision is made, revisited, or superseded. Produces artefacts stored in docs/architecture/decisions/.", "type": "methodological", "category": "architecture", "tools": ["Read", "Write", "Edit", "Grep", "Glob", "TodoWrite"], "path": "skills/architecture-decision-records/SKILL.md"}, {"kind": "skill", "name": "azure-archimate", "version": "1.0.0", "description": "Represent an Azure estate as ArchiMate views: a management-group / subscription hierarchy view (org-chart) plus per-subscription Core/Detail resource views with resource-group swim lanes. Encodes the Azure→ArchiMate element-type mapping, the synthetic-grouping rules, the Core/Detail view pattern, and the deterministic layout conventions. Use when the user wants to visualise, document, or diagram an Azure tenant, subscriptions, resource groups, or resources as ArchiMate. Pairs with the archimate-generation skill (serialisation) and the archimate-architect agent (ownership).", "type": "technological", "category": "architecture", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch", "mcp__claude_ai_Lucid__*"], "path": "skills/azure-archimate/SKILL.md"}, {"kind": "skill", "name": "azure-deploy", "version": "1.0.0", "description": "Deploy to Azure targets: Bicep infrastructure-as-code, Container Apps and App Service, Key Vault secret references, and the `az` deploy runbook (containerapp up/update, App Service slot swap + rollback, OIDC federated `az login`). Builds on the shared /deploy methodology — does not re-document generic pipeline stages, Docker, SBOM, or quality gates. Platform-neutral by CI system; pair with /github-deploy or /gitlab-cicd for the pipeline wiring. Use when the user says \"azure deploy\", \"bicep\", \"container apps\", \"app service\", \"key vault\", \"slot swap\", or \"az cli deploy\".", "type": "technological", "category": "devops-toolchain", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "TodoWrite", "WebSearch"], "path": "skills/azure-deploy/SKILL.md"}, {"kind": "skill", "name": "azure-naming", "version": "1.1.0", "description": "Apply the TCS Azure resource naming convention (IAM \"POL Naming Convention Cloud Services\") when naming, creating, or reviewing any Azure resource — in Bicep/Terraform, in a design doc (BOM / target-architecture), in a PR review, or when reconciling an existing estate. Encodes the four-part {ResourceType}-{Project}-{Environment}[-{Instance}] pattern, the controlled abbreviation / project / environment token lists, the no-hyphen global variant, per-type charset/length constraints, and the AzGov + IAM-policy authority chain. If you are about to type an Azure resource name, run this skill first.", "type": "technological", "category": "architecture", "tools": ["Read", "Grep", "Glob", "Task", "WebSearch", "WebFetch"], "path": "skills/azure-naming/SKILL.md"}, {"kind": "skill", "name": "business-process-modeling", "version": "1.0.0", "description": "Model business processes using BPMN 2.0 notation to capture current-state (AS-IS) or future-state (TO-BE) workflows. Use when stakeholders need to understand a process before automating it, or when analysing process inefficiencies.", "type": "methodological", "category": "business-analysis", "tools": ["Read", "Write", "Edit", "Glob", "WebSearch", "WebFetch", "TodoWrite"], "path": "skills/business-process-modeling/SKILL.md"}, {"kind": "skill", "name": "change-request", "version": "1.0.0", "description": "Draft, validate, and track a change request (RFC) through the CAB process. Use before any production change that could affect availability, data integrity, or security. Use when submitting a MOEX migration wave for CAB approval. Use when planning a rollout with a formal impact assessment and rollback plan.", "type": "methodological", "category": "operations", "tools": ["Read", "Write", "Grep", "Glob", "Task", "TodoWrite"], "path": "skills/change-request/SKILL.md"}, {"kind": "skill", "name": "context-window-management", "version": "1.1.0", "description": "Manage context window health in long-running agent sessions and multi-agent pipelines. Use when a session has been running for 30+ tool calls, when reasoning quality degrades, when sub-agents start forgetting earlier decisions, or when planning a MOEX migration run that will span multiple agents and sessions.", "type": "methodological", "category": "engineering", "tools": ["Read", "Write", "Bash", "Glob", "Task", "TodoWrite"], "path": "skills/context-window-management/SKILL.md"}, {"kind": "skill", "name": "deploy", "version": "2.0.0", "description": "Shared, stack-agnostic CI/CD methodology: generic pipeline stages, secrets + OIDC principles, SHA/version pinning, validation and quality gates, multi-stage Docker/container builds, and SBOM generation. This is the common base every deployment skill builds on — for platform-specific procedure use /github-deploy (GitHub Actions), /azure-deploy (Azure targets), or /gitlab-cicd (GitLab). Use when the user says \"deploy\", \"pipeline\", \"CI/CD\", \"Docker\", \"container build\", \"SBOM\", or \"release\".", "type": "methodological", "category": "devops-toolchain", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "TodoWrite", "WebSearch"], "path": "skills/deploy/SKILL.md"}, {"kind": "skill", "name": "deprecation-and-migration", "version": "1.0.0", "description": "Migrate an existing API or integration from one auth/protocol/topology to another without breaking consumers. Use when deprecating an endpoint, changing auth schemes (e.g., Basic/header → OAuth2 JWT), adding a gateway layer, or retiring a version. Produces a migration guide, coexistence window plan, and a breaking-changes checklist.", "type": "methodological", "category": "architecture", "tools": ["Read", "Write", "Grep", "Glob", "Bash", "Task", "TodoWrite"], "path": "skills/deprecation-and-migration/SKILL.md"}, {"kind": "skill", "name": "develop", "version": "1.4.1", "description": "Implement a feature or fix a bug. Reads project context and team findings, plans the implementation, writes code following SOLID/Clean Code principles, performs a self-review, and reports changes with testing requirements. Use when the user says \"implement\", \"build\", \"code\", \"fix\", or \"add feature\".", "type": "methodological", "category": "engineering", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "TodoWrite"], "path": "skills/develop/SKILL.md"}, {"kind": "skill", "name": "document", "version": "1.2.0", "description": "Update project documentation to reflect recent changes. Updates CLAUDE.md, creates ADRs, consolidates team-findings.md, maintains domain and operations docs, and detects documentation drift. Use when the user says \"update docs\", \"document\", \"update context\", \"ADR\", or after other skills complete their work.", "type": "methodological", "category": "documentation", "tools": ["Read", "Write", "Edit", "Grep", "Glob", "Task", "Bash", "TodoWrite"], "path": "skills/document/SKILL.md"}, {"kind": "skill", "name": "documentation-build-order", "version": "1.0.0", "description": "Sequences all documentation artefacts in the correct dependency order for a project. Selects a variant (greenfield, brownfield, single-feature, or strategy-only) and produces a build plan that chains the other skills (/requirements-analysis, /agile-user-stories, /enterprise-architecture-framework, /architecture-decision-records, /business-process-modeling, /use-case-modeling, /document) in the right order. Use when starting a new project, kicking off a major feature, or auditing whether documentation is complete and in the right sequence.", "type": "methodological", "category": "documentation", "tools": ["Read", "Grep", "Glob", "TodoWrite", "Task"], "path": "skills/documentation-build-order/SKILL.md"}, {"kind": "skill", "name": "draft-content", "version": "1.0.0", "description": "Génère du contenu de communication interne TCS sur claude-agents — daily tip, weekly focus, monthly share, hackathon brief — prêt à publier sur Confluence ou Teams.", "type": "methodological", "category": "documentation", "tools": ["Read", "Write", "Glob"], "path": "skills/draft-content/SKILL.md"}, {"kind": "skill", "name": "enterprise-architecture-framework", "version": "1.0.0", "description": "Apply enterprise architecture discipline: scope domains (Business/Application/Data/ Technology), produce architecture views, select the right ArchiMate elements, and manage governance gates. Use when designing system-wide structure, reviewing an architectural proposal, or mapping a solution to the enterprise landscape.", "type": "methodological", "category": "architecture", "tools": ["Read", "Write", "Edit", "Grep", "Glob", "WebSearch", "WebFetch", "TodoWrite"], "path": "skills/enterprise-architecture-framework/SKILL.md"}, {"kind": "skill", "name": "eval-driven-development", "version": "1.0.0", "description": "Define evaluation criteria and success metrics before writing any implementation code. Use when building a new capability, automating a pipeline, or validating a migration. Use before starting any MOEX API migration run to define what \"correct migration\" means. Use after discovering that a feature \"works\" but no one can prove it works repeatably.", "type": "methodological", "category": "engineering", "tools": ["Read", "Write", "Bash", "Glob", "Grep", "Task", "TodoWrite"], "path": "skills/eval-driven-development/SKILL.md"}, {"kind": "skill", "name": "evaluate-contribution", "version": "1.1.0", "description": "Évalue une contribution (agent/skill/team) avant ajout à la marketplace — compare avec l'existant, vérifie la qualité, recommande le bon type.", "type": "methodological", "category": "governance", "tools": ["Read", "Glob", "Grep", "mcp__claude_ai__atlassian"], "path": "skills/evaluate-contribution/SKILL.md"}, {"kind": "skill", "name": "github-deploy", "version": "1.0.0", "description": "Author GitHub Actions deployment pipelines: workflow YAML and triggers, SHA-pinned actions, reusable workflows (`workflow_call`), matrix builds, GitHub Environments with protection rules and required reviewers, and OIDC federation to Azure (no stored service-principal secret). Builds on the shared /deploy methodology — does not re-document generic stages, Docker, SBOM, or quality gates. Use when the user says \"github actions\", \"workflow\", \".github/workflows\", \"reusable workflow\", \"github environment\", or \"actions OIDC\".", "type": "technological", "category": "devops-toolchain", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "TodoWrite", "WebSearch"], "path": "skills/github-deploy/SKILL.md"}, {"kind": "skill", "name": "gitlab-cicd", "version": "1.0.2", "description": "Author and structure GitLab CI/CD pipelines: `.gitlab-ci.yml` stages, `rules:`/`needs:` DAG scheduling, `include:`/`extends:` reuse, GROUP-vs-project CI/CD variables (masked/protected), GitLab Environments with manual approval gates, and container-registry auth via `CI_JOB_TOKEN`. Keeps a generic core; TCS specifics (git-scm.tcsgroup.ch, group tokens) are clearly-labelled examples. Use when the user says \"gitlab ci\", \".gitlab-ci.yml\", \"gitlab pipeline\", \"gitlab runner\", \"ci variables\", or \"gitlab environment\".", "type": "technological", "category": "devops-toolchain", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "TodoWrite", "WebSearch"], "path": "skills/gitlab-cicd/SKILL.md"}, {"kind": "skill", "name": "harness-engineering", "version": "1.0.0", "description": "Design and instrument an autonomous execution loop (harness) for a multi-step agent task. Use when a pipeline must iterate until a condition is met, when a task needs automatic rollback on failure, or when a multi-agent workflow must be interrupted safely. Produces a harness specification with locked success metrics, exit conditions, and a rollback path.", "type": "methodological", "category": "engineering", "tools": ["Read", "Write", "Bash", "Grep", "Glob", "Task", "TodoWrite"], "path": "skills/harness-engineering/SKILL.md"}, {"kind": "skill", "name": "incident-response", "version": "1.0.0", "description": "Manage a production incident from detection to blameless postmortem. Use when a production system is degraded or down, when an SLA is at risk, or when a critical alert fires and requires coordinated response. Use when drafting the postmortem after an incident is resolved.", "type": "methodological", "category": "operations", "tools": ["Read", "Write", "Bash", "Grep", "Glob", "Task", "TodoWrite"], "path": "skills/incident-response/SKILL.md"}, {"kind": "skill", "name": "integration-patterns", "version": "1.0.0", "description": "Identify, select, and document integration patterns for system-to-system communication. Covers messaging, routing, transformation, and reliability patterns aligned to EIP vocabulary. Use when designing how two or more systems exchange data, or when documenting an existing integration for review.", "type": "methodological", "category": "architecture", "tools": ["Read", "Write", "Edit", "Grep", "Glob", "WebSearch", "WebFetch", "TodoWrite"], "path": "skills/integration-patterns/SKILL.md"}, {"kind": "skill", "name": "knowledge-capture", "version": "1.0.0", "description": "After completing a non-trivial task, extract the patterns, decisions, and gotchas discovered during the session into a durable knowledge file. Use at the end of a migration session, a complex debugging session, or any work that uncovered non-obvious constraints. The goal is to make the NEXT session faster by eliminating re-discovery.", "type": "methodological", "category": "documentation", "tools": ["Read", "Write", "Grep", "Glob", "Task"], "path": "skills/knowledge-capture/SKILL.md"}, {"kind": "skill", "name": "observability-and-instrumentation", "version": "1.0.0", "description": "Instruments code so production behavior is visible and diagnosable. Use when adding logging, metrics, or tracing to an integration flow. Use when shipping any ACE/APIC flow to production. Use when an ELK alert fires and the root cause is not diagnosable from existing telemetry.", "type": "methodological", "category": "operations", "tools": ["Read", "Grep", "Bash", "WebSearch"], "path": "skills/observability-and-instrumentation/SKILL.md"}, {"kind": "skill", "name": "pattern-diagram-design", "version": "1.1.0", "description": "Generates TCS integration-pattern diagrams as Mermaid, aligned to the ARCHI catalog and Gregor Hohpe's Enterprise Integration Patterns (EIP) vocabulary. Use when the user wants to design, draw, document, or choose an integration pattern — sync/async APIs, proxies, channels, routing, file transfer (MFT/ETL/ELT), retry/replay, or a System-Process (SP) page — or names a backend (APIC/ACE/MQ, VTOM, Databricks) and asks how the integration should look. Mainly used by the architect (and the tester to derive test scenarios).", "type": "technological", "category": "architecture", "tools": ["Read", "Write", "Edit", "Grep", "Glob", "Task", "WebSearch", "WebFetch"], "path": "skills/pattern-diagram-design/SKILL.md"}, {"kind": "skill", "name": "postman-collection-generator", "version": "1.0.2", "description": "Generates a ready-to-import Postman collection (v2.1 JSON) for non-regression API testing in IBM integration environments (APIC, ACE, MQ). Use when the user wants to create, generate, or build a Postman collection — or supplies an OpenAPI/Swagger spec, payload examples, Kibana traces, or API code to test, migrate, or validate.", "type": "technological", "category": "engineering", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch", "WebFetch"], "path": "skills/postman-collection-generator/SKILL.md"}, {"kind": "skill", "name": "publish-confluence", "version": "1.1.1", "description": "Publish a repository's documentation or presentation to Confluence as a navigable, read-only page tree using native ADF (via the Atlassian MCP). Mirrors the source structure as subpages, puts emoji in section titles, stamps the bundle version on the root title plus a generated banner on every page, renders diagrams as Mermaid (or Lucid embeds), wires cross-links, and is idempotent. Use when the user says \"publish to Confluence\", \"update the wiki\", or \"publish the docs/presentation\".", "type": "technological", "category": "documentation", "tools": ["Read", "Grep", "Glob", "Task", "mcp__claude_ai_Atlassian__getAccessibleAtlassianResources", "mcp__claude_ai_Atlassian__getConfluenceSpaces", "mcp__claude_ai_Atlassian__getConfluencePage", "mcp__claude_ai_Atlassian__createConfluencePage", "mcp__claude_ai_Atlassian__updateConfluencePage", "mcp__claude_ai_Atlassian__searchConfluenceUsingCql", "mcp__claude_ai_Mermaid_Chart__validate_and_render_mermaid_diagram", "mcp__claude_ai_Lucid__lucid_create_diagram_from_specification", "mcp__claude_ai_Lucid__lucid_create_document_share_link"], "path": "skills/publish-confluence/SKILL.md"}, {"kind": "skill", "name": "publish-insights", "version": "1.0.0", "description": "Publie un insight anonymisé dans docs/INSIGHTS.md et ouvre optionnellement une Issue GitLab backlog si l'insight suggère une amélioration de la librairie.", "type": "methodological", "category": "documentation", "tools": ["Read", "Write", "Bash", "WebFetch"], "path": "skills/publish-insights/SKILL.md"}, {"kind": "skill", "name": "quality-gates", "version": "1.0.0", "description": "Wire and graduate CI quality gates for code, infrastructure-as-code, and docs. Covers self-hosted SonarQube (standalone sonar-scanner-cli + provisioned project key), Bicep build/lint, Checkov, and markdownlint, plus a non-blocking→blocking graduation path. Use when the user says \"quality gate\", \"sonar\", \"sonarqube\", \"checkov\", \"bicep lint\", or \"code coverage gate\".", "type": "methodological", "category": "quality-assurance", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "TodoWrite", "WebSearch"], "path": "skills/quality-gates/SKILL.md"}, {"kind": "skill", "name": "requirements-analysis", "version": "1.0.0", "description": "Elicit, analyse, document, and validate software requirements. Produces a Requirements Specification (BRD/FRS) with uniquely identified, traceable, testable requirements. Use when starting a new feature, clarifying scope, or formalising stakeholder needs before architecture or development begins.", "type": "methodological", "category": "business-analysis", "tools": ["Read", "Write", "Edit", "Grep", "Glob", "WebSearch", "WebFetch", "TodoWrite", "AskUserQuestion", "mcp__claude_ai_Atlassian__*"], "path": "skills/requirements-analysis/SKILL.md"}, {"kind": "skill", "name": "review", "version": "1.3.0", "description": "Review code for correctness, security, performance, and adherence to project standards. Checks for SOLID violations, OWASP vulnerabilities, architectural consistency, and IBM APIC/ACE integration patterns. Use when the user says \"review\", \"check code\", \"code quality\", or before merging a PR.", "type": "methodological", "category": "engineering", "tools": ["Read", "Grep", "Glob", "Task", "Bash", "TodoWrite"], "path": "skills/review/SKILL.md"}, {"kind": "skill", "name": "runbook", "version": "1.0.0", "description": "Write or execute an operational runbook for a specific system or procedure. Use when documenting a recurring operation (restart, failover, deployment rollback, queue drain). Use before executing a risky procedure to ensure every step has a verification check and rollback path. Use when onboarding a new team member to an operational procedure.", "type": "methodological", "category": "operations", "tools": ["Read", "Write", "Bash", "Grep", "Glob", "Task"], "path": "skills/runbook/SKILL.md"}, {"kind": "skill", "name": "security-audit", "version": "1.3.0", "description": "Dedicated security audit covering OWASP Top 10, secret scanning, dependency CVEs, authentication/authorization, cryptography, and IBM integration security (APIC/ACE). More thorough than the security section in /review. Use when the user says \"security audit\", \"pentest\", \"vulnerability scan\", \"OWASP\", or before a production release.", "type": "methodological", "category": "security", "tools": ["Read", "Grep", "Glob", "Bash", "Task", "TodoWrite", "WebSearch"], "path": "skills/security-audit/SKILL.md"}, {"kind": "skill", "name": "security-by-design", "version": "1.0.0", "description": "Apply security-by-design principles during architecture and development: threat modelling, secure defaults, least privilege, defence in depth. Use when designing a new component, reviewing an existing design for security gaps, or producing a security section for an ADR or HLD.", "type": "methodological", "category": "security", "tools": ["Read", "Write", "Edit", "Grep", "Glob", "WebSearch", "WebFetch", "TodoWrite"], "path": "skills/security-by-design/SKILL.md"}, {"kind": "skill", "name": "source-driven-development", "version": "1.0.0", "description": "Grounds every implementation in official documentation before writing code. Use when working with any IBM API (APIC, ACE, MQ, DataPower), OpenAPI specs, or any framework where version-specific correctness matters. Use when reviewing integration patterns for deprecated or unofficial patterns.", "type": "methodological", "category": "engineering", "tools": ["Read", "Glob", "WebFetch", "Bash"], "path": "skills/source-driven-development/SKILL.md"}, {"kind": "skill", "name": "spec-review-with-rules", "version": "1.0.0", "description": "Review an IBM APIC API spec (YAML/JSON) with path-specific rules before cutover. Use after migrating an API spec, after adding a new endpoint, or before promoting to production. Applies rules at four severity levels (critical, high, medium, low) and blocks deployment on critical findings.", "type": "methodological", "category": "architecture", "tools": ["Read", "Grep", "Glob", "Task"], "path": "skills/spec-review-with-rules/SKILL.md"}, {"kind": "skill", "name": "systematic-debugging", "version": "1.0.0", "description": "Debug a failing system by following four ordered phases: root-cause investigation, pattern analysis, hypothesis testing, and implementation with a failing test first. Use when a bug is not immediately obvious, when a previous fix attempt failed, or when the same type of error reappears in different places.", "type": "methodological", "category": "engineering", "tools": ["Read", "Grep", "Bash", "Glob", "Edit", "Task", "TodoWrite"], "path": "skills/systematic-debugging/SKILL.md"}, {"kind": "skill", "name": "test", "version": "1.1.1", "description": "Run tests, analyze results, write missing tests, and report quality metrics. Checks infrastructure requirements, runs the suite, identifies coverage gaps, and optionally runs mutation testing. Use after /develop completes, or when the user says \"test\", \"run tests\", \"validate\", \"coverage\", or \"check quality\".", "type": "methodological", "category": "engineering", "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "TodoWrite"], "path": "skills/test/SKILL.md"}, {"kind": "skill", "name": "use-case-modeling", "version": "1.0.0", "description": "Identify actors and use cases, write use case specifications, and express acceptance criteria in Gherkin BDD format. Use when the system scope is being defined, or when test coverage needs to trace back to actor goals.", "type": "methodological", "category": "business-analysis", "tools": ["Read", "Write", "Edit", "Glob", "WebSearch", "WebFetch", "TodoWrite"], "path": "skills/use-case-modeling/SKILL.md"}], "teams": [{"kind": "team", "name": "claude-agents-maintainers", "version": "1.2.0", "description": "Product-owner-assistant (lead) + Library-maintainer + Architect + DevOps — the only team that may modify this library.", "path": "teams/claude-agents-maintainers/TEAM.md"}, {"kind": "team", "name": "community-team", "version": "1.0.0", "description": "Community-manager + Adoption-assistant + Best-practices — drive Claude Code adoption across TCS.", "path": "teams/community-team/TEAM.md"}, {"kind": "team", "name": "feature-team", "version": "1.1.0", "description": "Developer + Tester + Documentarian — implement a feature end-to-end.", "path": "teams/feature-team/TEAM.md"}, {"kind": "team", "name": "full-team", "version": "1.1.1", "description": "All agents — major features, bootstrapping, migrations.", "path": "teams/full-team/TEAM.md"}, {"kind": "team", "name": "moex-team", "version": "1.0.0", "description": "Architect + Developer + Tester + Documentarian — IBM integration migrations (APIC, ACE, MQ).", "path": "teams/moex-team/TEAM.md"}, {"kind": "team", "name": "release-team", "version": "1.1.1", "description": "DevOps + Tester + Documentarian — prepare and validate a release.", "path": "teams/release-team/TEAM.md"}], "hooks": [{"id": "agent-pipeline", "event": "SubagentStop", "description": "Full agent pipeline: signals the orchestrator when each agent finishes so the next one in the chain starts. Covers all 6 agents.", "install": "Merge the 'hooks.SubagentStop' array below into your .claude/settings.json"}, {"id": "auto-format", "event": "PostToolUse", "description": "Auto-format Python files with black and ruff after every write or edit.", "install": "Merge the 'hooks.PostToolUse' array below into your .claude/settings.json"}, {"id": "auto-test", "event": "PostToolUse", "description": "Run pytest automatically after every file write or edit. Keeps the agent honest — it sees test failures immediately rather than at commit time.", "install": "Merge the 'hooks.PostToolUse' array below into your .claude/settings.json"}, {"id": "commit-guard", "event": "PreToolUse", "description": "PreToolUse guard: warns before dangerous git commands execute.", "install": "Merge the 'hooks.PreToolUse' array below into your .claude/settings.json"}, {"id": "confluence-publish", "event": "PostToolUse", "description": "Publish docs/presentation/index.html to Confluence automatically after every edit. Requires CONFLUENCE_* variables in the environment or a .env file at the repo root.", "install": "Merge the 'hooks.PostToolUse' array below into your .claude/settings.json"}, {"id": "evaluate-contribution", "event": "UserPromptSubmit", "description": "Auto-detect AGENT.md / SKILL.md files in the project that are not part of the claude-agents library. Fires on every user message. Prints a reminder for Claude to run the evaluate-contribution agent when unknown contributions are found. Never blocks — informational only.", "install": ["1. Copy templates/hooks/scripts/detect_unknown_agents.py to .claude/hooks/detect_unknown_agents.py", "2. Merge the 'hooks.UserPromptSubmit' block below into your .claude/settings.json", "3. Keep LIBRARY_AGENTS and LIBRARY_SKILLS in the script in sync with the claude-agents library"]}, {"id": "notify-on-stop", "event": "Stop", "description": "Desktop notification when Claude finishes a task. Linux: notify-send, macOS: osascript, Windows: msg.", "install": "Merge the 'hooks.Stop' entry below into your .claude/settings.json"}, {"id": "pii-guard", "event": "UserPromptSubmit", "description": "Block user prompts containing personal data (PII). Fires on every user message before it reaches Claude. Exit code 2 cancels the submission. Covers: AVS/AHV, IBAN, credit card, Swiss phone, e-mail, CHE company ID, passport/ID mentions, dates of birth, postal addresses, long numeric IDs.", "install": ["1. Copy templates/hooks/scripts/pii_check.py to your project (e.g. .claude/hooks/pii_check.py)", "2. Merge the 'hooks.UserPromptSubmit' block below into your .claude/settings.json", "3. Adjust the path in 'command' to match where you placed pii_check.py"]}, {"id": "security-scan", "event": "PostToolUse", "description": "Run bandit security scan after every Python file edit.", "install": "Merge the 'hooks.PostToolUse' array below into your .claude/settings.json"}], "workflows": [{"kind": "workflow", "name": "create-agent", "version": "1.1.0", "description": "Designs, writes, validates and opens a Merge Request for a new agent in the Agentic-Claude library. Use when a new specialized AI role is needed that has a distinct tool set, domain expertise, or strict boundary rules not covered by existing agents. Spawns: architect → developer → evaluate-contribution → library-maintainer.", "steps": ["architect", "developer", "evaluate-contribution", "library-maintainer"], "path": "workflows/create-agent/WORKFLOW.md"}, {"kind": "workflow", "name": "create-skill", "version": "1.1.0", "description": "Writes, validates and opens a Merge Request for a new skill (slash command) in the Agentic-Claude library. Use when a repeatable workflow should be invocable as /skill-name in any Claude Code session. Spawns: developer → evaluate-contribution → library-maintainer.", "steps": ["developer", "evaluate-contribution", "library-maintainer"], "path": "workflows/create-skill/WORKFLOW.md"}, {"kind": "workflow", "name": "feature-release", "version": "1.0.0", "description": "End-to-end pipeline: feature-team implements and tests a feature, then release-team validates, packages and delivers it. Two teams run sequentially, orchestrated by product-owner-assistant. Use when a feature is ready to ship in the same session.", "steps": ["product-owner-assistant"], "path": "workflows/feature-release/WORKFLOW.md"}, {"kind": "workflow", "name": "onboard-project", "version": "1.0.0", "description": "Analyzes an existing project and produces a tailored Claude Code adoption plan. Installs the right agents, skills, and teams, then configures CLAUDE.md with project-specific context. Spawns: adoption-assistant → architect → documentarian.", "steps": ["adoption-assistant", "architect", "documentarian"], "path": "workflows/onboard-project/WORKFLOW.md"}, {"kind": "workflow", "name": "release", "version": "1.0.0", "description": "Prepares and publishes a new library release: updates documentation, bumps the version, syncs Confluence and the interactive installer. Use after a significant batch of agents, skills or teams has been merged and stabilized. Spawns: documentarian → devops → library-maintainer.", "steps": ["documentarian", "devops", "library-maintainer"], "path": "workflows/release/WORKFLOW.md"}]}</script>
+<div class="app">
+
+  <!-- Hero (left column) -->
+  <div class="hero">
+    <div class="hero-title">La librairie<br>d'agents pour<br><span class="hl">Claude Code</span><br>au TCS.</div>
+
+    <div class="hero-cfg">
+      <select class="cfg-select" id="source-select" aria-label="Source du repo">
+        <option value="gitlab">GitLab TCS</option>
+        <option value="github">GitHub</option>
+      </select>
+      <input class="cfg-input" type="text" id="project-path" value="." placeholder="Chemin projet (ex: C:\Mon\Projet)" aria-label="Chemin du projet cible"/>
+    </div>
+
+    <button class="gen-btn" onclick="generateCommand()" id="gen-btn" disabled>⚡ Générer la commande</button>
+
+    <div class="cmd-box" id="command-box">
+      <div class="cmd-hdr">
+        <span>PowerShell</span>
+        <button class="cmd-copy-btn" id="copy-btn" onclick="copyCommand()">Copier</button>
+      </div>
+      <div class="cmd-text" id="command-text"></div>
+    </div>
+  </div>
+
+  <!-- Right column -->
+  <div class="right">
+    <div class="panels">
+      <div class="panel" id="teams-panel"></div>
+      <div class="panel" id="agents-panel"></div>
+      <div class="panel" id="skills-panel"></div>
+      <div class="panel" id="hooks-panel"></div>
+    </div>
+
+    <div class="ctx-wrap"><div id="ctx-panel"></div></div>
+  </div>
+
+</div>
+
+<div class="bottombar">
+  <div class="bb-item"><span class="bb-accent" id="bb-sel-agents">0</span><span class="bb-label">agents sél.</span></div>
+  <div class="bb-item"><span class="bb-accent" id="bb-sel-skills">0</span><span class="bb-label">skills sél.</span></div>
+  <div class="bb-item"><span class="bb-label">13 AGENTS</span></div>
+  <div class="bb-item"><span class="bb-label">44 SKILLS</span></div>
+  <div class="bb-item"><span class="bb-label">5 ÉQUIPES</span></div>
+  <div class="bb-item"><span class="bb-label">5 WORKFLOWS</span></div>
+  <div class="bb-item"><span class="bb-label">MIT</span></div>
+  <div class="bb-item"><span class="bb-label">GitLab TCS</span></div>
+</div>
+
 <script>
-// ── Inline catalog injected at build time for standalone mode ──────────────
-// catalog-json script tag contains either null or the full catalog object
-const _rawCatalog = document.getElementById('catalog-json').textContent.trim();
-const INLINE_CATALOG = (_rawCatalog === 'null') ? null : JSON.parse(_rawCatalog);
-
-// ── Display metadata per agent (icon + display name) ──────────────────────
-const AGENT_META = {
-  'developer':               { icon: '👨‍💻', name: 'Developer' },
-  'tester':                  { icon: '🧪', name: 'Tester' },
-  'architect':               { icon: '🏗️', name: 'Architect' },
-  'devops':                  { icon: '⚙️', name: 'DevOps' },
-  'documentarian':           { icon: '📝', name: 'Documentarian' },
-  'product-owner-assistant': { icon: '🎯', name: 'Product Owner Assistant' },
-  'adoption-assistant':      { icon: '📊', name: 'Adoption Assistant' },
-  'community-manager':       { icon: '📣', name: 'Community Manager' },
-  'best-practices':          { icon: '✅', name: 'Best Practices' },
-  'archimate-architect':     { icon: '🏛️', name: 'ArchiMate Architect' },
-  'business-analyst':        { icon: '📋', name: 'Business Analyst' },
-  'library-maintainer':      { icon: '📦', name: 'Library Maintainer' },
-  'evaluate-contribution':   { icon: '🔍', name: 'Evaluate Contribution' },
-};
-
-const AGENT_GROUPS = [
-  { label: 'Engineering',           icon: '💻', color: '#6c8fff',
-    agents: ['developer', 'tester', 'devops', 'documentarian'] },
-  { label: 'Architecture & Design', icon: '🏗️', color: '#f59e0b',
-    agents: ['architect', 'archimate-architect', 'business-analyst'] },
-  { label: 'Product & Adoption',    icon: '📣', color: '#a78bfa',
-    agents: ['product-owner-assistant', 'adoption-assistant', 'community-manager', 'best-practices'] },
-  { label: 'Library',               icon: '📦', color: '#64748b',
-    agents: ['library-maintainer', 'evaluate-contribution'] },
+const AGENTS = [
+  { id: 'adoption-assistant',       icon: '🤝', name: 'Adoption Assistant',       version: '1.1.0', desc: 'Analyse l\'usage de Claude Code et produit des recommandations d\'adoption personnalisées. Lecture seule.',                                         tools: ['Read','Glob','Grep'] },
+  { id: 'archimate-architect',      icon: '🗺️', name: 'ArchiMate Architect',      version: '1.3.0', desc: 'Génère des fichiers .archimate depuis Lucidchart ou manifests YAML. Invoque le générateur Python via Bash.',                                      tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','WebFetch','mcp__claude_ai_Lucid__*'] },
+  { id: 'architect',                icon: '🏗️', name: 'Architect',                version: '1.2.0', desc: 'Analyse les architectures d\'intégration (APIC/ACE/MQ), cartographie les dépendances et documente les patterns.',                                  tools: ['Read','Write','Edit','Grep','Glob','Task','WebSearch','WebFetch','TodoWrite'] },
+  { id: 'best-practices',           icon: '💡', name: 'Best Practices',           version: '1.0.0', desc: 'Extrait les patterns et anti-patterns des projets consommateurs. Publie des insights anonymisés dans la librairie.',                               tools: ['Read','Glob','Grep','Write','Bash'] },
+  { id: 'business-analyst',         icon: '📊', name: 'Business Analyst',         version: '1.0.0', desc: 'Formalise les exigences (user stories, spécs fonctionnelles, BPMN). Pont entre PO et Architect. Ne code pas.',                                      tools: ['Read','Write','Edit','Grep','Glob','Task','WebSearch','WebFetch','TodoWrite','AskUserQuestion','mcp__claude_ai_Atlassian__*'] },
+  { id: 'community-manager',        icon: '💬', name: 'Community Manager',        version: '1.0.0', desc: 'Produit daily tips, weekly focus, reports mensuels pour promouvoir claude-agents en interne TCS. Ne code pas.',                                    tools: ['Read','Write','Glob','mcp__claude_ai__atlassian'] },
+  { id: 'developer',                icon: '💻', name: 'Developer',                version: '1.1.0', desc: 'Implémente les features et corrige les bugs en suivant SOLID/Clean Code. Ne génère pas de tests ni de docs.',                                       tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','WebFetch','NotebookEdit'] },
+  { id: 'devops',                   icon: '⚙️', name: 'DevOps',                   version: '1.2.0', desc: 'Gère les pipelines CI/CD, Docker, GitHub Actions, Azure. Pas de code applicatif.',                                                                 tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','WebFetch'] },
+  { id: 'documentarian',            icon: '📄', name: 'Documentarian',            version: '1.2.0', desc: 'Maintient CLAUDE.md, ADRs et la doc. Consolide les findings d\'équipe. Ne code pas.',                                                              tools: ['Read','Write','Edit','Grep','Glob','Task','WebSearch','mcp__claude_ai_Atlassian__*','mcp__claude_ai_Mermaid_Chart__validate_and_render_mermaid_diagram'] },
+  { id: 'evaluate-contribution', category: 'governance',    icon: '✅', name: 'Evaluate Contribution',    version: '1.0.0', desc: 'Gouvernance : évalue les contributions (agents/skills/teams) avant ajout à la librairie. Détecte les doublons.',                                  tools: ['Read','Glob','Grep'] },
+  { id: 'library-maintainer',       icon: '📦', name: 'Library Maintainer',       version: '1.1.0', desc: 'Maintient la librairie Agentic-Claude (registry, docs, scripts, hooks, installer). Réservé aux mainteneurs.',                                     tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','WebFetch'] },
+  { id: 'product-owner-assistant',  icon: '🎯', name: 'Product Owner Assistant',  version: '1.3.0', desc: 'Coordonne les agents, gère le backlog, écrit les handoffs de session. Ne code jamais.',                                                            tools: ['Read','Grep','Glob','Task','WebSearch','WebFetch','TodoWrite','AskUserQuestion','mcp__claude_ai_Atlassian__*'] },
+  { id: 'tester',                   icon: '🧪', name: 'Tester',                   version: '1.1.0', desc: 'Crée et exécute les tests (ISTQB/pytest). Valide les implémentations. Ne touche pas au code de prod.',                                             tools: ['Read','Write','Edit','Bash','Grep','Glob','Task'] },
 ];
 
-const SKILL_CATEGORIES = [
-  { id: 'Engineering',       icon: '⚙️',  color: '#6c8fff' },
-  { id: 'Architecture',      icon: '🏗️',  color: '#f59e0b' },
-  { id: 'Operations',        icon: '🔧',  color: '#34d399' },
-  { id: 'Business Analysis', icon: '📋',  color: '#a78bfa' },
-  { id: 'Publishing',        icon: '📤',  color: '#f87171' },
-  { id: 'Governance',        icon: '🛡️',  color: '#64748b' },
+const SKILLS = [
+  { id: 'agentic-claude-framework', category: 'governance',          icon: '⚙️', name: '/agentic-claude-framework',          version: '1.1.0', desc: 'Gouvernance du framework Agentic-Claude : ajouter/modifier agents, skills, teams, semver, registry.',                          tools: ['Read','Write','Edit','Grep','Glob','Bash','TodoWrite'] },
+  { id: 'agile-user-stories', category: 'business-analysis',                icon: '📋', name: '/agile-user-stories',                version: '1.0.0', desc: 'Rédige, découpe et affine les user stories agiles (Connextra, INVEST, MoSCoW).',                                                tools: ['Read','Write','Edit','Grep','Glob','TodoWrite','AskUserQuestion','mcp__claude_ai_Atlassian__*'] },
+  { id: 'analyze-adoption', category: 'documentation',                  icon: '⚡', name: '/analyze-adoption',                  version: '1.0.0', desc: 'Analyse l\'état d\'adoption de claude-agents dans un workspace et génère un rapport de recommandations.',                        tools: ['Read','Glob','Grep','Write'] },
+  { id: 'api-and-interface-design', category: 'architecture',          icon: '🔗', name: '/api-and-interface-design',          version: '1.0.0', desc: 'Conception contract-first d\'APIs REST : spec OpenAPI 3.x, versioning, règles de compatibilité ascendante.',                    tools: ['Read','Write','Grep','Glob','Task','TodoWrite'] },
+  { id: 'arch-c4', category: 'architecture',                           icon: '🏗️', name: '/arch-c4',                           version: '1.0.0', desc: 'Génère des diagrammes C4 (Context, Container, Component, Deployment, Runtime) via Structurizr DSL.',                          tools: ['Read','Write','Edit','Bash','Grep','Glob','Task'] },
+  { id: 'archimate-generation', category: 'architecture',              icon: '🗺️', name: '/archimate-generation',              version: '1.0.0', desc: 'Génère target-architecture.yaml depuis Lucidchart/YAML et produit le .archimate pour Archi.',                                   tools: ['Read','Write','Edit','Bash','Glob','WebSearch','mcp__claude_ai_Lucid__*'] },
+  { id: 'architecture-decision-records', category: 'architecture',     icon: '🏗️', name: '/architecture-decision-records',     version: '1.1.0', desc: 'Rédige, révise et maintient les ADRs (format Nygard) dans docs/architecture/decisions/.',                                       tools: ['Read','Write','Edit','Grep','Glob','TodoWrite'] },
+  { id: 'azure-archimate', category: 'architecture',                   icon: '🗺️', name: '/azure-archimate',                   version: '1.0.0', desc: 'Représente un tenant Azure (MG, subscriptions, resource groups, ressources) en vues ArchiMate.',                               tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','mcp__claude_ai_Lucid__*'] },
+  { id: 'azure-deploy', category: 'operations',                       icon: '☁️', name: '/azure-deploy',                       version: '1.0.0', desc: 'Deploy to Azure : Bicep IaC, Container Apps, App Service, Key Vault, slot swap. Pair avec /gitlab-cicd pour le pipeline.',                tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite','WebSearch'] },
+  { id: 'azure-naming', category: 'architecture',                      icon: '☁️', name: '/azure-naming',                      version: '1.0.0', desc: 'Applique la convention de nommage TCS Azure (IAM POL Naming Convention Cloud Services).',                                        tools: ['Read','Grep','Glob','Task','WebSearch','WebFetch'] },
+  { id: 'business-process-modeling', category: 'business-analysis',         icon: '📋', name: '/business-process-modeling',         version: '1.0.0', desc: 'Modélise les processus métier en BPMN 2.0 (AS-IS / TO-BE) pour automatisation et analyse.',                                     tools: ['Read','Write','Edit','Glob','WebSearch','WebFetch','TodoWrite'] },
+  { id: 'change-request', category: 'operations',                    icon: '🔧', name: '/change-request',                    version: '1.0.0', desc: 'Rédige, valide et suit un RFC à travers le processus CAB (impact, rollback, MOEX).',                                             tools: ['Read','Write','Grep','Glob','Task','TodoWrite'] },
+  { id: 'context-window-management', category: 'engineering',         icon: '⚙️', name: '/context-window-management',         version: '1.0.0', desc: 'Gère la santé du contexte dans les sessions longues et pipelines multi-agents.',                                                 tools: ['Read','Write','Bash','Glob','Task','TodoWrite'] },
+  { id: 'deploy', category: 'engineering',                            icon: '⚙️', name: '/deploy',                            version: '1.1.0', desc: 'CI/CD et déploiement : évalue l\'infra, implémente les pipelines, valide les configs.',                                          tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite','WebSearch'] },
+  { id: 'deprecation-and-migration', category: 'architecture',         icon: '🔗', name: '/deprecation-and-migration',         version: '1.0.0', desc: 'Migre une API (auth, protocole, topologie) sans casser les consommateurs. Guide + coexistence.',                                 tools: ['Read','Write','Grep','Glob','Bash','Task','TodoWrite'] },
+  { id: 'develop', category: 'engineering',                           icon: '💻', name: '/develop',                           version: '1.4.0', desc: 'Workflow complet d\'implémentation feature : explore → planifie → implémente → rapporte.',                                        tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite'] },
+  { id: 'document', category: 'documentation',                          icon: '📄', name: '/document',                          version: '1.2.0', desc: 'Sync documentation : détecte les changements, met à jour CLAUDE.md, crée des ADRs.',                                             tools: ['Read','Write','Edit','Grep','Glob','Task','Bash','TodoWrite'] },
+  { id: 'documentation-build-order', category: 'documentation',         icon: '📄', name: '/documentation-build-order',         version: '1.0.0', desc: 'Séquence les artefacts documentaires dans le bon ordre de dépendance (greenfield, brownfield…).',                               tools: ['Read','Grep','Glob','TodoWrite','Task'] },
+  { id: 'draft-content', category: 'documentation',                     icon: '⚡', name: '/draft-content',                     version: '1.0.0', desc: 'Génère du contenu de communication interne TCS (daily tip, weekly focus, hackathon brief).',                                     tools: ['Read','Write','Glob'] },
+  { id: 'enterprise-architecture-framework', category: 'architecture', icon: '🏗️', name: '/enterprise-architecture-framework', version: '1.0.0', desc: 'Architecture d\'entreprise : domaines Business/Application/Data/Technology, vues ArchiMate, gouvernance.',                      tools: ['Read','Write','Edit','Grep','Glob','WebSearch','WebFetch','TodoWrite'] },
+  { id: 'eval-driven-development', category: 'engineering',           icon: '💻', name: '/eval-driven-development',           version: '1.0.0', desc: 'Définit critères d\'évaluation et métriques de succès avant toute implémentation.',                                              tools: ['Read','Write','Bash','Glob','Grep','Task','TodoWrite'] },
+  { id: 'evaluate-contribution', category: 'governance',             icon: '✅', name: '/evaluate-contribution',             version: '1.1.0', desc: 'Évalue une contribution (agent/skill/team) avant ajout à la marketplace. Compare avec l\'existant.',                             tools: ['Read','Glob','Grep','mcp__claude_ai__atlassian'] },
+  { id: 'github-deploy', category: 'operations',                      icon: '🐙', name: '/github-deploy',                       version: '1.0.0', desc: 'Author GitHub Actions : workflow YAML, actions SHA-pinned, reusable workflows, GitHub Environments, OIDC federation Azure.',    tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite','WebSearch'] },
+  { id: 'gitlab-cicd', category: 'operations',                        icon: '🦊', name: '/gitlab-cicd',                          version: '1.0.1', desc: 'Author GitLab CI/CD : .gitlab-ci.yml, rules/needs DAG, include/extends, variables masquées/protégées, Environments.',            tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite','WebSearch'] },
+  { id: 'harness-engineering', category: 'engineering',               icon: '🤖', name: '/harness-engineering',               version: '1.0.0', desc: 'Conçoit une boucle d\'exécution autonome (harness) avec conditions de sortie et rollback.',                                      tools: ['Read','Write','Bash','Grep','Glob','Task','TodoWrite'] },
+  { id: 'incident-response', category: 'operations',                 icon: '🔧', name: '/incident-response',                 version: '1.0.0', desc: 'Gère un incident de production de la détection au postmortem sans blame.',                                                        tools: ['Read','Write','Bash','Grep','Glob','Task','TodoWrite'] },
+  { id: 'integration-patterns', category: 'architecture',              icon: '🏗️', name: '/integration-patterns',              version: '1.0.0', desc: 'Identifie, sélectionne et documente les patterns EIP (messaging, routing, transformation).',                                     tools: ['Read','Write','Edit','Grep','Glob','WebSearch','WebFetch','TodoWrite'] },
+  { id: 'knowledge-capture', category: 'documentation',                 icon: '📚', name: '/knowledge-capture',                 version: '1.0.0', desc: 'Extrait les patterns, décisions et pièges découverts en session dans un fichier de connaissance durable.',                       tools: ['Read','Write','Grep','Glob','Task'] },
+  { id: 'observability-and-instrumentation', category: 'operations', icon: '👁️', name: '/observability-and-instrumentation', version: '1.0.0', desc: 'Instrumente le code (logs, métriques, traces ELK) pour rendre le comportement prod visible.',                                    tools: ['Read','Grep','Bash','WebSearch'] },
+  { id: 'pattern-diagram-design', category: 'architecture',            icon: '🔗', name: '/pattern-diagram-design',            version: '1.1.0', desc: 'Génère des diagrammes Mermaid pour les patterns d\'intégration TCS (ARCHI/EIP).',                                                 tools: ['Read','Write','Edit','Grep','Glob','Task','WebSearch','WebFetch'] },
+  { id: 'postman-collection-generator', category: 'engineering',      icon: '🧪', name: '/postman-collection-generator',      version: '1.0.1', desc: 'Génère des collections Postman v2.1 pour les tests non-régression (APIC/ACE/MQ).',                                               tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','WebSearch','WebFetch'] },
+  { id: 'publish-confluence', category: 'documentation',                icon: '📄', name: '/publish-confluence',                version: '1.1.1', desc: 'Publie la doc HTML sur Confluence en arbre de pages avec conversion automatique.',                                               tools: ['Read','Grep','Glob','Task','mcp__claude_ai_Atlassian__*','mcp__claude_ai_Mermaid_Chart__validate_and_render_mermaid_diagram','mcp__claude_ai_Lucid__*'] },
+  { id: 'publish-insights', category: 'documentation',                  icon: '⚡', name: '/publish-insights',                  version: '1.0.0', desc: 'Publie un insight anonymisé dans docs/INSIGHTS.md et ouvre optionnellement une Issue GitLab.',                                   tools: ['Read','Write','Bash','WebFetch'] },
+  { id: 'quality-gates', category: 'engineering',                     icon: '🎯', name: '/quality-gates',                      version: '1.0.0', desc: 'Wire les quality gates CI : SonarQube, Bicep lint, Checkov, markdownlint. Graduation non-bloquant → bloquant.',               tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite','WebSearch'] },
+  { id: 'requirements-analysis', category: 'business-analysis',             icon: '📋', name: '/requirements-analysis',             version: '1.0.0', desc: 'Élicite, analyse et valide les exigences logicielles (BRD/FRS) avec traçabilité.',                                              tools: ['Read','Write','Edit','Grep','Glob','WebSearch','WebFetch','TodoWrite','AskUserQuestion','mcp__claude_ai_Atlassian__*'] },
+  { id: 'review', category: 'engineering',                            icon: '💻', name: '/review',                            version: '1.3.0', desc: 'Code review : architecture, qualité, sécurité, patterns APIC/ACE, SOLID/OWASP.',                                                  tools: ['Read','Grep','Glob','Task','Bash','TodoWrite'] },
+  { id: 'runbook', category: 'operations',                           icon: '🔧', name: '/runbook',                           version: '1.0.0', desc: 'Rédige ou exécute un runbook opérationnel avec vérifications et plan de rollback.',                                               tools: ['Read','Write','Bash','Grep','Glob','Task'] },
+  { id: 'security-audit', category: 'security',                    icon: '🔒', name: '/security-audit',                    version: '1.3.0', desc: 'Audit sécurité complet : OWASP, CVE, secrets, permissions, dépendances.',                                                         tools: ['Read','Grep','Glob','Bash','Task','TodoWrite','WebSearch'] },
+  { id: 'security-by-design', category: 'security',                icon: '🔒', name: '/security-by-design',                version: '1.0.0', desc: 'Applique la sécurité by design : threat modelling, moindre privilège, défense en profondeur.',                                    tools: ['Read','Write','Edit','Grep','Glob','WebSearch','WebFetch','TodoWrite'] },
+  { id: 'source-driven-development', category: 'engineering',         icon: '💻', name: '/source-driven-development',         version: '1.0.0', desc: 'Ancre chaque implémentation dans la doc officielle avant de coder (IBM APIC, ACE, MQ, OpenAPI).',                                 tools: ['Read','Glob','WebFetch','Bash'] },
+  { id: 'spec-review-with-rules', category: 'architecture',            icon: '🔗', name: '/spec-review-with-rules',            version: '1.0.0', desc: 'Révise une spec IBM APIC (YAML/JSON) avec règles path-specific avant cutover (critical→bloquant).',                              tools: ['Read','Grep','Glob','Task'] },
+  { id: 'systematic-debugging', category: 'engineering',              icon: '💻', name: '/systematic-debugging',              version: '1.0.0', desc: 'Débogue en 4 phases : root cause, analyse patterns, hypothèses, implémentation avec test en premier.',                            tools: ['Read','Grep','Bash','Glob','Edit','Task','TodoWrite'] },
+  { id: 'test', category: 'engineering',                              icon: '🧪', name: '/test',                              version: '1.1.0', desc: 'Exécute et valide les tests : lance, analyse les échecs, écrit les tests manquants.',                                              tools: ['Read','Write','Edit','Bash','Grep','Glob','Task','TodoWrite'] },
+  { id: 'use-case-modeling', category: 'business-analysis',                 icon: '📋', name: '/use-case-modeling',                 version: '1.0.0', desc: 'Identifie acteurs/use cases, rédige les spécs et exprime les critères d\'acceptation en Gherkin BDD.',                            tools: ['Read','Write','Edit','Glob','WebSearch','WebFetch','TodoWrite'] },
 ];
 
-const HOOK_META = {
-  'pii-guard':          { icon: '🔒', name: 'PII Guard' },
-  'auto-test':          { icon: '🧪', name: 'Auto Test' },
-  'auto-format':        { icon: '✨', name: 'Auto Format' },
-  'security-scan':      { icon: '🛡️', name: 'Security Scan' },
-  'agent-pipeline':     { icon: '🔗', name: 'Agent Pipeline' },
-  'confluence-publish': { icon: '📤', name: 'Confluence Publish' },
-  'commit-guard':       { icon: '⚠️', name: 'Commit Guard' },
-  'notify-on-stop':     { icon: '🔔', name: 'Notify on Stop' },
-};
+const HOOKS = [
+  { id: 'pii-guard',          icon: '🔒', name: 'PII Guard',            event: 'UserPromptSubmit', desc: 'Bloque les prompts avec données personnelles (LPD/RGPD TCS).' },
+  { id: 'auto-test',          icon: '🧪', name: 'Auto Test',            event: 'PostToolUse',      desc: 'Lance pytest automatiquement après chaque Write/Edit.' },
+  { id: 'auto-format',        icon: '✨', name: 'Auto Format',          event: 'PostToolUse',      desc: 'Lance black + ruff sur les fichiers Python modifiés.' },
+  { id: 'security-scan',      icon: '🛡️', name: 'Security Scan',       event: 'PostToolUse',      desc: 'Lance bandit sur les fichiers Python modifiés.' },
+  { id: 'agent-pipeline',     icon: '🔗', name: 'Agent Pipeline',       event: 'SubagentStop',     desc: 'Chaîne automatiquement les 6 agents en séquence.' },
+  { id: 'confluence-publish', icon: '📤', name: 'Confluence Publish',   event: 'PostToolUse',      desc: 'Publie index.html sur Confluence à chaque sauvegarde.' },
+  { id: 'commit-guard',       icon: '⚠️', name: 'Commit Guard',        event: 'PreToolUse',       desc: 'Avertit avant les git push --force, reset --hard, rm -rf.' },
+  { id: 'notify-on-stop',     icon: '🔔', name: 'Notify on Stop',      event: 'Stop',             desc: 'Notification desktop quand Claude a terminé sa tâche.' },
+];
+
+const TEAMS = [
+  {
+    id: 'feature-team', icon: '🔵', name: 'feature-team', version: '1.2.0', color: '#6c8fff',
+    desc: 'Implémenter une feature de bout en bout — du code à la doc.',
+    agents: [
+      { id: 'developer',     icon: '💻', name: 'developer' },
+      { id: 'tester',        icon: '🧪', name: 'tester' },
+      { id: 'devops',        icon: '⚙️', name: 'devops' },
+      { id: 'documentarian', icon: '📄', name: 'documentarian' },
+    ],
+  },
+  {
+    id: 'full-team', icon: '⭐', name: 'full-team', version: '1.1.0', color: '#fbbf24',
+    desc: 'Tous les agents — features majeures, bootstrapping, migrations complètes.',
+    agents: [
+      { id: 'product-owner-assistant', icon: '🎯', name: 'product-owner-assistant' },
+      { id: 'architect',               icon: '🏗️', name: 'architect' },
+      { id: 'developer',               icon: '💻', name: 'developer' },
+      { id: 'tester',                  icon: '🧪', name: 'tester' },
+      { id: 'devops',                  icon: '⚙️', name: 'devops' },
+      { id: 'documentarian',           icon: '📄', name: 'documentarian' },
+      { id: 'business-analyst',        icon: '📊', name: 'business-analyst' },
+      { id: 'archimate-architect',     icon: '🗺️', name: 'archimate-architect' },
+      { id: 'adoption-assistant',      icon: '🤝', name: 'adoption-assistant' },
+      { id: 'best-practices',          icon: '💡', name: 'best-practices' },
+      { id: 'community-manager',       icon: '💬', name: 'community-manager' },
+      { id: 'evaluate-contribution',   icon: '✅', name: 'evaluate-contribution' },
+      { id: 'library-maintainer',      icon: '📦', name: 'library-maintainer' },
+    ],
+  },
+  {
+    id: 'moex-team', icon: '🏗️', name: 'moex-team', version: '1.0.0', color: '#f0a868',
+    desc: 'Migrations IBM — APIC, ACE, MQ — contexte MOEX TCS.',
+    agents: [
+      { id: 'architect',     icon: '🏗️', name: 'architect' },
+      { id: 'developer',     icon: '💻', name: 'developer' },
+      { id: 'tester',        icon: '🧪', name: 'tester' },
+      { id: 'documentarian', icon: '📄', name: 'documentarian' },
+    ],
+  },
+  {
+    id: 'community-team', icon: '💚', name: 'community-team', version: '1.0.0', color: '#34d399',
+    desc: 'Adoption Claude Code et communication interne TCS.',
+    agents: [
+      { id: 'community-manager',  icon: '💬', name: 'community-manager' },
+      { id: 'adoption-assistant', icon: '🤝', name: 'adoption-assistant' },
+      { id: 'best-practices',     icon: '💡', name: 'best-practices' },
+    ],
+  },
+  {
+    id: 'claude-agents-maintainers', icon: '⚙️', name: 'claude-agents-maintainers', version: '1.2.0', color: '#94a3b8',
+    desc: 'Gouvernance et maintenance de la librairie Agentic-Claude.',
+    agents: [
+      { id: 'product-owner-assistant', icon: '🎯', name: 'product-owner-assistant' },
+      { id: 'library-maintainer',      icon: '📦', name: 'library-maintainer' },
+      { id: 'architect',               icon: '🏗️', name: 'architect' },
+      { id: 'devops',                  icon: '⚙️', name: 'devops' },
+    ],
+  },
+];
 
 const PRESETS = {
-  feature:     { agents: ['developer','tester','documentarian'],                                    skills: ['develop','test','document'],                                                              hooks: ['auto-test'],                                    workflows: ['onboard-project'] },
-  release:     { agents: ['devops','tester','documentarian'],                                       skills: ['deploy','test','document'],                                                               hooks: ['auto-test','commit-guard'],                     workflows: ['release'] },
-  full:        { agents: 'ALL', skills: 'ALL',                                                      hooks: ['pii-guard','auto-test','commit-guard','agent-pipeline'],                                  workflows: 'ALL' },
-  moex:        { agents: ['architect','developer','tester','documentarian'],                         skills: ['develop','test','review','postman-collection-generator','pattern-diagram-design'],        hooks: ['pii-guard','auto-test','commit-guard'],          workflows: ['onboard-project'] },
-  community:   { agents: ['community-manager','adoption-assistant','best-practices'],               skills: ['draft-content','publish-confluence','publish-insights','analyze-adoption'],               hooks: ['confluence-publish'],                            workflows: [] },
-  repoimprove: { agents: ['product-owner-assistant','library-maintainer','architect','devops'],     skills: ['agentic-claude-framework','evaluate-contribution','publish-confluence'],                  hooks: ['commit-guard','pii-guard'],                     workflows: ['create-agent','create-skill'] },
-  none:        { agents: [], skills: [], hooks: [], workflows: [] },
+  feature: { skills: ['develop','test','document'],                                                                              teams: ['feature-team'],          hooks: ['auto-test'] },
+  release: { skills: ['deploy','test','document'],                                                                              teams: ['feature-team'],          hooks: ['auto-test','commit-guard'] },
+  full:    { skills: SKILLS.map(s=>s.id),                                                                                      teams: TEAMS.map(t=>t.id),        hooks: ['pii-guard','auto-test','commit-guard','agent-pipeline'] },
+  moex:    { skills: ['develop','test','review','postman-collection-generator','pattern-diagram-design'],                       teams: ['moex-team'],             hooks: ['pii-guard','auto-test','commit-guard'] },
+  none:    { skills: [], teams: [], hooks: [] },
 };
+
+const AGENT_SKILLS = {
+  'developer':               ['develop','review','systematic-debugging','eval-driven-development','source-driven-development','harness-engineering','context-window-management'],
+  'tester':                  ['test','postman-collection-generator','quality-gates'],
+  'devops':                  ['deploy','azure-deploy','github-deploy','gitlab-cicd','runbook','incident-response','observability-and-instrumentation'],
+  'documentarian':           ['document','publish-confluence','knowledge-capture','documentation-build-order'],
+  'architect':               ['arch-c4','api-and-interface-design','architecture-decision-records','integration-patterns','deprecation-and-migration','spec-review-with-rules','security-by-design'],
+  'business-analyst':        ['agile-user-stories','requirements-analysis','business-process-modeling','use-case-modeling','change-request'],
+  'archimate-architect':     ['archimate-generation','azure-archimate','azure-naming'],
+  'adoption-assistant':      ['analyze-adoption'],
+  'best-practices':          ['publish-insights','knowledge-capture'],
+  'community-manager':       ['draft-content'],
+  'evaluate-contribution':   ['evaluate-contribution','agentic-claude-framework'],
+  'library-maintainer':      ['agentic-claude-framework'],
+  'product-owner-assistant': [],
+};
+
+function resolveAgentsFromTeams(teamSet) {
+  const ids = new Set();
+  TEAMS.filter(t => teamSet.has(t.id)).forEach(t => (t.agents || []).forEach(a => ids.add(a.id)));
+  if (teamSet.has('__custom__') && customTeam) customTeam.agents.forEach(id => ids.add(id));
+  return ids;
+}
+
+function resolveSkillsFromAgents(agentSet) {
+  const ids = new Set();
+  agentSet.forEach(agentId => (AGENT_SKILLS[agentId] || []).forEach(s => ids.add(s)));
+  return ids;
+}
 
 const SOURCES = {
   gitlab: 'git@git-scm.tcsgroup.ch:tcs/it/artificial-intelligence/enterprise-architecture/claudeai/claude-agents.git',
   github: 'https://github.com/Aletheia-Thomas/Claude-Agents.git',
 };
 
-// ── State ──────────────────────────────────────────────────────────────────
-let AGENTS = [], SKILLS = [], HOOKS = [], WORKFLOWS = [];
-let selected = { agents: new Set(), skills: new Set(), hooks: new Set(), workflows: new Set() };
-let searchQuery = '';
+let selected      = { agents: new Set(), skills: new Set(), teams: new Set(), hooks: new Set() };
+let manualSkills  = new Set();
+let activeTeam    = null;
+let teamBuilderOpen = false;
+let customTeam    = null; // { name: string, agents: Set<agentId> }
 
-// ── Bootstrap ──────────────────────────────────────────────────────────────
-async function init() {
-  let cat;
-  if (INLINE_CATALOG !== null) {
-    cat = INLINE_CATALOG;
-  } else {
-    try {
-      const res = await fetch('./catalog.json');
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      cat = await res.json();
-    } catch (e) {
-      document.getElementById('header-sub').textContent =
-        'Erreur catalogue : ' + e.message + ' — ouvrez via un serveur HTTP ou utilisez la version standalone';
-      cat = { agents: [], skills: [], teams: [], hooks: [] };
-    }
-  }
+const CATEGORY_ORDER  = ['engineering','architecture','security','business-analysis','operations','documentation','governance'];
+const CATEGORY_LABELS = {
+  'engineering':       '⚙️ Engineering',
+  'architecture':      '🏗️ Architecture',
+  'security':          '🔒 Security',
+  'business-analysis': '📋 Business Analysis',
+  'operations':        '🔧 Operations',
+  'documentation':     '📄 Documentation',
+  'governance':        '⚖️ Governance',
+};
 
-  AGENTS = cat.agents.map(a => {
-    const m = AGENT_META[a.name] || {};
-    return { id: a.name, icon: m.icon || '🤖', name: m.name || a.name, version: a.version, desc: a.description };
-  });
-
-  SKILLS = cat.skills.map(s => ({
-    id: s.name, icon: '⚡', name: '/' + s.name, desc: s.description,
-    category: s.category || 'Other'
-  }));
-
-  HOOKS = (cat.hooks || []).map(h => {
-    const m = HOOK_META[h.id] || {};
-    return { id: h.id, icon: m.icon || '⚙️', name: m.name || h.id, event: h.event, desc: h.description };
-  });
-
-  WORKFLOWS = (cat.workflows || []).map(w => ({
-    id: w.name, icon: '🔄', name: '/' + w.name, steps: (w.steps || []).join(' → '), desc: w.description
-  }));
-
-  const date = cat.generated_at ? new Date(cat.generated_at).toLocaleDateString('fr-CH') : '';
-  document.getElementById('header-sub').textContent =
-    AGENTS.length + ' agents · ' + SKILLS.length + ' skills · ' +
-    HOOKS.length + ' hooks · ' + WORKFLOWS.length + ' workflows' +
-    (date ? ' · mis à jour le ' + date : '');
-  document.getElementById('header-badge').textContent =
-    'v' + (cat.agents[0]?.version?.split('.').slice(0,2).join('.') || '1.x');
-
-  renderCards();
-}
-
-// ── Render ──────────────────────────────────────────────────────────────────
-function matches(text) {
-  if (!searchQuery) return true;
-  return text.toLowerCase().includes(searchQuery);
-}
-
-const catCollapsed = {};
-
-function renderCategorySection(container, label, icon, color, items, type, renderFn) {
-  const visible = items.filter(i => matches(i.name + ' ' + (i.desc || '')));
-  if (visible.length === 0) return;
-  const display  = searchQuery ? visible : items;
-  const allSel   = display.every(i => selected[type].has(i.id));
-  const selCount = display.filter(i => selected[type].has(i.id)).length;
-  const collapsed = catCollapsed[label] || false;
-
-  const section = document.createElement('div');
-  section.className = 'cat-section' + (collapsed ? ' collapsed' : '');
-  section.innerHTML = `
-    <div class="cat-header" onclick="toggleCat(event,'${label}')">
-      <span class="cat-dot" style="background:${color}"></span>
-      <span style="font-size:15px">${icon}</span>
-      <span class="cat-name">${label}</span>
-      <span class="cat-count-pill">${selCount ? selCount + ' / ' : ''}${display.length}</span>
-      <button class="cat-select-all" onclick="selectAllInCat(event,'${type}','${label}')">
-        ${allSel ? 'Tout décocher' : 'Tout cocher'}
-      </button>
-      <span class="cat-chevron">▼</span>
-    </div>
-    <div class="cat-cards">
-      ${display.map(i => renderFn(i)).join('')}
-    </div>`;
-  container.appendChild(section);
-}
-
-function toggleCat(e, label) {
-  catCollapsed[label] = !catCollapsed[label];
-  const section = e.currentTarget.parentElement;
-  section.classList.toggle('collapsed', catCollapsed[label]);
-}
-
-function selectAllInCat(e, type, label) {
-  e.stopPropagation();
-  let pool = type === 'agents'
-    ? AGENTS.filter(a => (AGENT_GROUPS.find(g => g.label === label) || {agents:[]}).agents.includes(a.id))
-    : SKILLS.filter(s => s.category === label);
-  if (searchQuery) pool = pool.filter(i => matches(i.name + ' ' + (i.desc || '')));
-  const allSel = pool.every(i => selected[type].has(i.id));
-  pool.forEach(i => { if (allSel) selected[type].delete(i.id); else selected[type].add(i.id); });
-  renderCards();
-  document.getElementById('gen-btn').disabled =
-    (selected.agents.size + selected.skills.size + selected.workflows.size) === 0;
-  document.getElementById('command-box').classList.remove('visible');
-}
-
-function agentCard(a) {
-  return `<div class="card ${selected.agents.has(a.id) ? 'selected' : ''}" onclick="toggle('agents','${a.id}')" id="agent-${a.id}">
-    <div class="card-header">
-      <span class="card-icon">${a.icon}</span>
-      <span class="card-name">${a.name}</span>
-      <span class="card-version">v${a.version}</span>
-    </div>
-    <div class="card-desc">${a.desc}</div>
-    <div class="card-check">${selected.agents.has(a.id) ? '✓' : ''}</div>
-  </div>`;
-}
-
-function skillCard(s) {
-  return `<div class="card ${selected.skills.has(s.id) ? 'selected' : ''}" onclick="toggle('skills','${s.id}')" id="skill-${s.id}">
-    <div class="card-header">
-      <span class="card-icon">${s.icon}</span>
-      <span class="card-name">${s.name}</span>
-    </div>
-    <div class="card-desc">${s.desc}</div>
-    <div class="card-check">${selected.skills.has(s.id) ? '✓' : ''}</div>
-  </div>`;
+function panelHdr(name, count) {
+  return `<div class="panel-hdr"><span class="ph-dot">●</span><span class="ph-name">${name}</span><span class="ph-count">${count}</span></div>`;
 }
 
 function renderCards() {
-  // Agents by group
-  const agentContainer = document.getElementById('agent-cards');
-  agentContainer.innerHTML = '';
-  AGENT_GROUPS.forEach(grp => {
-    const grpItems = AGENTS.filter(a => grp.agents.includes(a.id));
-    if (grpItems.length) renderCategorySection(agentContainer, grp.label, grp.icon, grp.color, grpItems, 'agents', agentCard);
+  // Teams
+  const customCount = customTeam ? customTeam.agents.size : 0;
+  const totalTeams = TEAMS.length + (customTeam ? 1 : 0);
+  let teamsHtml = panelHdr('ÉQUIPES', totalTeams) + '<div class="item-list">';
+  teamsHtml += TEAMS.map(t => {
+    const sel = selected.teams.has(t.id);
+    return `<div class="list-item${sel?' sel':''}" onclick="toggle('teams','${t.id}')" id="team-${t.id}"><span class="li-dot" style="--dot:${t.color}">●</span><span class="li-info"><span class="li-name">${t.name}</span><span class="li-desc">${t.desc}</span></span><span class="li-right">${t.agents.length}a</span></div>`;
+  }).join('');
+  if (customTeam) {
+    const csel = selected.teams.has('__custom__');
+    teamsHtml += `<div class="list-item list-custom-team${csel?' sel':''}" onclick="toggle('teams','__custom__')" id="team-__custom__"><span class="li-dot" style="--dot:#a78bfa">●</span><span class="li-info"><span class="li-name">✨ ${customTeam.name}</span><span class="li-desc">Équipe personnalisée</span></span><span class="li-right">${customCount}a</span></div>`;
+  }
+  teamsHtml += `<div class="list-item list-create-team" onclick="openTeamBuilder()"><span class="li-icon">＋</span><span class="li-name">${customTeam ? 'Modifier mon équipe' : 'Créer mon équipe'}</span></div>`;
+  teamsHtml += '</div>';
+  document.getElementById('teams-panel').innerHTML = teamsHtml;
+
+  // Agents
+  const sortedAgents = [...AGENTS].sort((a, b) => {
+    const as = selected.agents.has(a.id) ? 0 : 1;
+    const bs = selected.agents.has(b.id) ? 0 : 1;
+    return as - bs || a.id.localeCompare(b.id);
   });
+  document.getElementById('agents-panel').innerHTML =
+    panelHdr('AGENTS', AGENTS.length) +
+    '<div class="item-list">' +
+    sortedAgents.map(a => {
+      const sel    = selected.agents.has(a.id);
+      const skills = AGENT_SKILLS[a.id] || [];
+      const badge  = skills.length ? `<span class="li-right">${skills.length}s</span>` : '';
+      const sub    = sel && skills.length
+        ? `<div class="agent-skills">${skills.join(' · ')}</div>`
+        : '';
+      return `<div class="list-item${sel?' sel':''}" onclick="toggle('agents','${a.id}')" id="agent-${a.id}"><span class="li-icon">${a.icon}</span><span class="li-name">${a.id}</span>${badge}</div>${sub}`;
+    }).join('') + '</div>';
 
   // Skills by category
-  const skillContainer = document.getElementById('skill-cards');
-  skillContainer.innerHTML = '';
-  SKILL_CATEGORIES.forEach(cat => {
-    const catItems = SKILLS.filter(s => s.category === cat.id);
-    if (catItems.length) renderCategorySection(skillContainer, cat.id, cat.icon, cat.color, catItems, 'skills', skillCard);
+  let sh = panelHdr('SKILLS', SKILLS.length) + '<div class="item-list">';
+  const selectedSkills = SKILLS.filter(s => selected.skills.has(s.id));
+  if (selectedSkills.length) {
+    sh += `<div class="list-cat">▪ SÉLECTIONNÉS</div>`;
+    selectedSkills.forEach(s => {
+      sh += `<div class="list-item sel" onclick="toggle('skills','${s.id}')" id="skill-${s.id}"><span class="li-name">${s.id}</span></div>`;
+    });
+  }
+  CATEGORY_ORDER.forEach(cat => {
+    const catSkills = SKILLS.filter(s => s.category === cat && !selected.skills.has(s.id));
+    if (!catSkills.length) return;
+    sh += `<div class="list-cat">${CATEGORY_LABELS[cat]}</div>`;
+    catSkills.forEach(s => {
+      sh += `<div class="list-item" onclick="toggle('skills','${s.id}')" id="skill-${s.id}"><span class="li-name">${s.id}</span></div>`;
+    });
   });
-  // Uncategorised fallback
-  const uncatSkills = SKILLS.filter(s => !SKILL_CATEGORIES.some(c => c.id === s.category));
-  if (uncatSkills.length) renderCategorySection(skillContainer, 'Other', '📎', '#64748b', uncatSkills, 'skills', skillCard);
+  sh += '</div>';
+  document.getElementById('skills-panel').innerHTML = sh;
 
-  // Hooks
-  document.getElementById('hook-list').innerHTML = HOOKS.map(h => `
-    <div class="hook-item ${selected.hooks.has(h.id) ? 'selected' : ''} ${matches(h.name + ' ' + h.desc) ? '' : 'hidden'}"
-         onclick="toggle('hooks','${h.id}')" id="hook-${h.id}">
-      <span class="hook-icon">${h.icon}</span>
-      <div class="hook-info">
-        <div class="hook-name">${h.name}</div>
-        <div class="hook-desc">${h.desc.substring(0, 120)}${h.desc.length > 120 ? '…' : ''}</div>
-      </div>
-      <span class="hook-event">${h.event}</span>
-      <div class="hook-toggle">${selected.hooks.has(h.id) ? '✓' : ''}</div>
-    </div>`).join('');
+  // Hooks panel
+  document.getElementById('hooks-panel').innerHTML =
+    panelHdr('HOOKS', HOOKS.length) +
+    '<div class="item-list">' +
+    HOOKS.map(h => {
+      const sel = selected.hooks.has(h.id);
+      return `<div class="list-item${sel?' sel':''}" onclick="toggle('hooks','${h.id}')" id="hook-${h.id}"><span class="li-icon">${h.icon}</span><span class="li-info"><span class="li-name">${h.id}</span><span class="li-desc">${h.event} · ${h.desc}</span></span></div>`;
+    }).join('') + '</div>';
 
-  // Workflows
-  document.getElementById('workflow-cards').innerHTML = WORKFLOWS.map(w => `
-    <div class="card ${selected.workflows.has(w.id) ? 'selected' : ''} ${matches(w.name + ' ' + w.desc) ? '' : 'hidden'}"
-         onclick="toggle('workflows','${w.id}')" id="workflow-${w.id}">
-      <div class="card-header">
-        <span class="card-icon">${w.icon}</span>
-        <span class="card-name">${w.name}</span>
-      </div>
-      <div class="card-desc">${w.desc}</div>
-      <div style="font-size:10px;color:var(--dim);margin-top:4px">${w.steps}</div>
-      <div class="card-check">${selected.workflows.has(w.id) ? '✓' : ''}</div>
-    </div>`).join('');
-
-  document.getElementById('agent-count').textContent    = selected.agents.size;
-  document.getElementById('skill-count').textContent    = selected.skills.size;
-  document.getElementById('hook-count').textContent     = selected.hooks.size;
-  document.getElementById('workflow-count').textContent = selected.workflows.size;
-
-  updateSummary();
+  updateBottomBar();
+  renderContextPanel();
 }
 
-function applySearch() {
-  searchQuery = document.getElementById('search').value.trim().toLowerCase();
-  renderCards();
+function updateBottomBar() {
+  document.getElementById('bb-sel-agents').textContent = selected.agents.size;
+  document.getElementById('bb-sel-skills').textContent = selected.skills.size;
 }
 
-// ── Selection ───────────────────────────────────────────────────────────────
 function toggle(type, id) {
-  if (selected[type].has(id)) selected[type].delete(id);
+  const wasSelected = selected[type].has(id);
+  if (wasSelected) selected[type].delete(id);
   else selected[type].add(id);
-  renderCards();
-  document.getElementById('gen-btn').disabled =
-    (selected.agents.size + selected.skills.size + selected.workflows.size) === 0;
-  document.getElementById('command-box').classList.remove('visible');
-}
-
-function applyPreset(name) {
-  const p = PRESETS[name];
-  selected.agents    = p.agents    === 'ALL' ? new Set(AGENTS.map(a    => a.id)) : new Set(p.agents);
-  selected.skills    = p.skills    === 'ALL' ? new Set(SKILLS.map(s    => s.id)) : new Set(p.skills);
-  selected.workflows = p.workflows === 'ALL' ? new Set(WORKFLOWS.map(w => w.id)) : new Set(p.workflows || []);
-  selected.hooks     = new Set(p.hooks);
-  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('preset-' + name).classList.add('active');
+  if (type === 'teams') {
+    activeTeam = id;
+    teamBuilderOpen = false;
+    selected.agents = resolveAgentsFromTeams(selected.teams);
+    selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
+  } else if (type === 'agents') {
+    selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
+  } else if (type === 'skills') {
+    if (wasSelected) manualSkills.delete(id); else manualSkills.add(id);
+  }
   renderCards();
   document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
   document.getElementById('command-box').classList.remove('visible');
 }
 
-function updateSummary() {
-  const s = document.getElementById('summary');
-  const total = selected.agents.size + selected.skills.size + selected.hooks.size + selected.workflows.size;
-  if (total === 0) {
-    s.innerHTML = '<div class="summary-empty">Aucun élément sélectionné.<br>Choisis un preset ou coche manuellement.</div>';
-    return;
-  }
-  let html = '';
-  if (selected.agents.size) {
-    html += '<div class="summary-group"><div class="summary-group-label">Agents</div>';
-    AGENTS.filter(a => selected.agents.has(a.id)).forEach(a => {
-      html += '<div class="summary-item">' + a.icon + ' ' + a.name + '</div>';
-    });
-    html += '</div>';
-  }
-  if (selected.skills.size) {
-    html += '<div class="summary-group"><div class="summary-group-label">Skills</div>';
-    SKILLS.filter(s => selected.skills.has(s.id)).forEach(s => {
-      html += '<div class="summary-item">' + s.icon + ' ' + s.name + '</div>';
-    });
-    html += '</div>';
-  }
-  if (selected.workflows.size) {
-    html += '<div class="summary-group"><div class="summary-group-label">Workflows</div>';
-    WORKFLOWS.filter(w => selected.workflows.has(w.id)).forEach(w => {
-      html += '<div class="summary-item">' + w.icon + ' ' + w.name + '</div>';
-    });
-    html += '</div>';
-  }
-  if (selected.hooks.size) {
-    html += '<div class="summary-group"><div class="summary-group-label">Hooks</div>';
-    HOOKS.filter(h => selected.hooks.has(h.id)).forEach(h => {
-      html += '<div class="summary-item">' + h.icon + ' ' + h.name + '</div>';
-    });
-    html += '</div>';
-  }
-  s.innerHTML = html;
+function openTeamBuilder() {
+  teamBuilderOpen = true;
+  activeTeam = null;
+  renderContextPanel();
 }
 
-// ── Command generation ──────────────────────────────────────────────────────
+function toggleBuilderAgent(agentId) {
+  if (!customTeam) customTeam = { name: '', agents: new Set() };
+  const nameEl = document.getElementById('tb-name');
+  if (nameEl) customTeam.name = nameEl.value;
+  if (customTeam.agents.has(agentId)) customTeam.agents.delete(agentId);
+  else customTeam.agents.add(agentId);
+  renderContextPanel();
+}
+
+function createCustomTeam() {
+  const nameEl = document.getElementById('tb-name');
+  const name = nameEl ? nameEl.value.trim() : '';
+  if (!name) { if (nameEl) { nameEl.style.borderColor = 'var(--accent)'; nameEl.focus(); } return; }
+  if (!customTeam || customTeam.agents.size === 0) {
+    const grid = document.querySelector('.tb-agents-grid');
+    if (grid) grid.style.outline = '1px solid var(--accent)';
+    return;
+  }
+  customTeam.name = name;
+  teamBuilderOpen = false;
+  selected.teams.add('__custom__');
+  activeTeam = '__custom__';
+  selected.agents = resolveAgentsFromTeams(selected.teams);
+  selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
+  renderCards();
+  document.getElementById('gen-btn').disabled = false;
+  document.getElementById('command-box').classList.remove('visible');
+}
+
+function clearCustomTeam() {
+  customTeam = null;
+  teamBuilderOpen = false;
+  selected.teams.delete('__custom__');
+  if (activeTeam === '__custom__') activeTeam = null;
+  selected.agents = resolveAgentsFromTeams(selected.teams);
+  selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
+  renderCards();
+  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
+}
+
+function applyPreset(name) {
+  const p = PRESETS[name];
+  manualSkills    = new Set(p.skills);
+  selected.teams  = new Set(p.teams || []);
+  selected.hooks  = new Set(p.hooks);
+  selected.agents = resolveAgentsFromTeams(selected.teams);
+  selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('preset-'+name).classList.add('active');
+  renderCards();
+  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
+  document.getElementById('command-box').classList.remove('visible');
+}
+
 function generateCommand() {
   const path    = document.getElementById('project-path').value.trim() || '.';
   const source  = document.getElementById('source-select').value;
   const repoUrl = SOURCES[source];
-  const agents    = [...selected.agents].join(',');
-  const skills    = [...selected.skills].join(',');
-  const hooks     = [...selected.hooks];
-  const workflows = [...selected.workflows];
+  const agents  = [...selected.agents].join(',');
+  const skills  = [...selected.skills].join(',');
+  const teams   = [...selected.teams];
+  const hooks   = [...selected.hooks];
 
-  let cmd = '# 1. Cloner la librairie Agentic-Claude (si pas déjà fait)\n';
-  cmd += 'git clone ' + repoUrl + ' "C:\\ClaudeAgents"\n\n';
-  cmd += '# 2. Installer dans ton projet\n';
-  cmd += 'powershell -ExecutionPolicy Bypass -File "C:\\ClaudeAgents\\templates\\setup.ps1" `\n';
-  cmd += '  -ProjectPath "' + path + '"';
-  if (agents) cmd += ' `\n  -Agents "' + agents + '"';
-  if (skills) cmd += ' `\n  -Skills "' + skills + '"';
-  cmd += '\n';
-  if (workflows.length) {
-    cmd += '\n# 3. Copier les workflows sélectionnés\n';
-    workflows.forEach(w => {
-      cmd += String.raw`New-Item -ItemType Directory -Force "${path}\workflows\${w}" | Out-Null` + '\n'; // NOSONAR
-      cmd += String.raw`Copy-Item "C:\ClaudeAgents\workflows\${w}\WORKFLOW.md" "${path}\workflows\${w}\" -Force` + '\n'; // NOSONAR
+  let step = 1;
+  let cmd = `# ${step++}. Cloner la librairie Agentic-Claude (si pas déjà fait)\n`;
+  cmd += `git clone ${repoUrl} "C:\\ClaudeAgents"\n\n`;
+  cmd += `# ${step++}. Installer agents et skills\n`;
+  cmd += `powershell -ExecutionPolicy Bypass -File "C:\\ClaudeAgents\\templates\\install.ps1" \`\n`;
+  cmd += `  -ProjectPath "${path}"`;
+  if (agents) cmd += ` \`\n  -Agents "${agents}"`;
+  if (skills) cmd += ` \`\n  -Skills "${skills}"`;
+  if (hooks.length) cmd += ` \`\n  -IncludeHooks`;
+  cmd += `\n`;
+  const stdTeams = teams.filter(t => t !== '__custom__');
+  if (stdTeams.length) {
+    cmd += `\n# ${step++}. Installer les équipes\n`;
+    cmd += `$null = New-Item -ItemType Directory -Force "${path}\\.claude\\teams"\n`;
+    stdTeams.forEach(t => {
+      cmd += `New-Item -ItemType Junction -Force -Path "${path}\\.claude\\teams\\${t}" -Target "C:\\ClaudeAgents\\teams\\${t}" | Out-Null\n`;
     });
   }
   if (hooks.length) {
-    cmd += '\n# ' + (workflows.length ? '4' : '3') + '. Copier les hooks sélectionnés\n';
+    cmd += `\n# ${step++}. Copier les hooks sélectionnés\n`;
     hooks.forEach(h => {
-      cmd += String.raw`Copy-Item "C:\ClaudeAgents\templates\hooks\${h}.json" "${path}\.claude\hooks\" -Force` + '\n'; // NOSONAR
+      cmd += `Copy-Item "C:\\ClaudeAgents\\templates\\hooks\\${h}.json" "${path}\\.claude\\hooks\\" -Force\n`;
       if (h === 'pii-guard') {
-        cmd += String.raw`Copy-Item "C:\ClaudeAgents\templates\hooks\scripts\pii_check.py" "${path}\.claude\hooks\" -Force` + '\n'; // NOSONAR
+        cmd += `Copy-Item "C:\\ClaudeAgents\\templates\\hooks\\scripts\\pii_check.py" "${path}\\.claude\\hooks\\" -Force\n`;
       }
     });
   }
@@ -667,8 +691,285 @@ function copyCommand() {
   });
 }
 
-// ── Start ───────────────────────────────────────────────────────────────────
-init();
+// ── Context panel ─────────────────────────────────────────────────────────
+const TEAM_WORKFLOWS = {
+  'feature-team':              ['feature-release'],
+  'moex-team':                 ['feature-release', 'onboard-project'],
+  'community-team':            ['onboard-project'],
+  'claude-agents-maintainers': ['create-agent', 'create-skill', 'release'],
+  'full-team':                 ['feature-release', 'create-agent', 'create-skill', 'onboard-project', 'release'],
+};
+
+function renderContextPanel() {
+  const el = document.getElementById('ctx-panel');
+
+  if (teamBuilderOpen) {
+    const ct = customTeam || { name: '', agents: new Set() };
+    const agentChips = AGENTS.map(a => {
+      const sel = ct.agents.has(a.id);
+      return `<div class="tb-agent-chip${sel?' sel':''}" onclick="toggleBuilderAgent('${a.id}')"><span>${a.icon}</span><span>${a.id}</span></div>`;
+    }).join('');
+    const selCount = ct.agents.size;
+    el.innerHTML = `
+      <div class="ctx-hdr">
+        <div class="ctx-team-row"><span class="ctx-team-icon">✨</span><span class="ctx-team-name">Créer mon équipe</span></div>
+        <div class="ctx-team-desc">Nommez votre équipe et sélectionnez les agents qui la composent.</div>
+      </div>
+      <div class="team-builder">
+        <div>
+          <div class="tb-section-label">Nom de l'équipe</div>
+          <input class="cfg-input" type="text" id="tb-name" value="${ct.name}" placeholder="Ex: mon-équipe-data" aria-label="Nom de l'équipe personnalisée" style="margin-bottom:0"/>
+        </div>
+        <div>
+          <div class="tb-section-label">Agents <span class="tb-count">${selCount} sélectionné${selCount>1?'s':''}</span></div>
+          <div class="tb-agents-grid">${agentChips}</div>
+        </div>
+        <div class="tb-actions">
+          <button class="gen-btn" style="flex:1;margin:0" onclick="createCustomTeam()">✓ Créer l'équipe</button>
+          ${customTeam ? `<button class="tb-clear-btn" onclick="clearCustomTeam()">✕ Supprimer</button>` : ''}
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (!activeTeam) {
+    el.innerHTML = `<div class="ctx-empty"><span class="ctx-empty-icon">⬡</span><span>Cliquer sur une équipe pour voir sa définition</span></div>`;
+    return;
+  }
+
+  // Custom team detail view
+  if (activeTeam === '__custom__' && customTeam) {
+    const agentItems = [...customTeam.agents].map(aid => {
+      const agentData = AGENTS.find(ag => ag.id === aid);
+      return `<div class="ctx-item"><span class="ctx-item-icon">${agentData?.icon||'🤖'}</span><div><span class="ctx-item-name">${aid}</span><span class="ctx-item-desc">${agentData?.desc||''}</span></div></div>`;
+    }).join('');
+    const skillIdSet = new Set();
+    customTeam.agents.forEach(aid => (AGENT_SKILLS[aid]||[]).forEach(sid => skillIdSet.add(sid)));
+    const skillItems = [...skillIdSet].map(sid => {
+      const sd = SKILLS.find(s => s.id === sid);
+      return `<div class="ctx-item"><span class="ctx-item-icon">${sd?.icon||'⚙️'}</span><div><span class="ctx-item-name">${sid}</span><span class="ctx-item-desc">${sd?.desc||''}</span></div></div>`;
+    }).join('');
+    el.innerHTML = `
+      <div class="ctx-hdr">
+        <div class="ctx-team-row"><span class="ctx-team-icon">✨</span><span class="ctx-team-name">${customTeam.name}</span><button class="tb-clear-btn" style="margin-left:auto;padding:3px 10px;font-size:10px" onclick="openTeamBuilder()">Modifier</button></div>
+        <div class="ctx-team-desc">Équipe personnalisée — ${customTeam.agents.size} agents, ${skillIdSet.size} skills</div>
+      </div>
+      <div class="ctx-body">
+        <div class="ctx-col"><div class="ctx-col-hdr">Agents</div>${agentItems}</div>
+        <div class="ctx-col"><div class="ctx-col-hdr">Skills</div>${skillItems}</div>
+        <div class="ctx-col"><div class="ctx-col-hdr">Workflows</div><div class="ctx-item"><span class="ctx-item-desc" style="padding:8px 0">Aucun workflow prédéfini pour les équipes personnalisées.</span></div></div>
+      </div>`;
+    return;
+  }
+
+  const team = TEAMS.find(t => t.id === activeTeam);
+  if (!team) { el.innerHTML = ''; return; }
+
+  // Agents column
+  const agentItems = team.agents.map(a => {
+    const agentData = AGENTS.find(ag => ag.id === a.id) || a;
+    return `<div class="ctx-item"><span class="ctx-item-icon">${agentData.icon || ''}</span><div><span class="ctx-item-name">${a.id}</span><span class="ctx-item-desc">${agentData.desc || ''}</span></div></div>`;
+  }).join('');
+
+  // Skills column — unique skills from AGENT_SKILLS for the team's agents
+  const skillIdSet = new Set();
+  team.agents.forEach(a => (AGENT_SKILLS[a.id] || []).forEach(sid => skillIdSet.add(sid)));
+  const skillItems = [...skillIdSet].map(sid => {
+    const skillData = SKILLS.find(s => s.id === sid);
+    return `<div class="ctx-item"><span class="ctx-item-icon">${skillData ? skillData.icon : '⚙️'}</span><div><span class="ctx-item-name">${sid}</span><span class="ctx-item-desc">${skillData ? skillData.desc : ''}</span></div></div>`;
+  }).join('');
+
+  // Workflows column
+  const wfIds = TEAM_WORKFLOWS[activeTeam] || [];
+  const wfItems = wfIds.map(wid => {
+    const wf = WORKFLOWS.find(w => w.id === wid);
+    if (!wf) return '';
+    return `<div class="ctx-item"><span class="ctx-item-icon">${wf.icon}</span><div style="flex:1;min-width:0"><span class="ctx-item-name">${wf.id}</span><span class="ctx-item-desc">${wf.desc}</span>${wf.svg ? `<div class="ctx-wf-diagram">${wf.svg}</div>` : ''}</div></div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="ctx-hdr">
+      <div class="ctx-team-row">
+        <span class="ctx-team-icon">${team.icon}</span>
+        <span class="ctx-team-name">${team.name}</span>
+        <span class="ctx-team-v">v${team.version}</span>
+      </div>
+      <div class="ctx-team-desc">${team.desc}</div>
+    </div>
+    <div class="ctx-body">
+      <div class="ctx-col">
+        <div class="ctx-col-hdr">Agents</div>
+        ${agentItems}
+      </div>
+      <div class="ctx-col">
+        <div class="ctx-col-hdr">Skills</div>
+        ${skillItems}
+      </div>
+      <div class="ctx-col">
+        <div class="ctx-col-hdr">Workflows</div>
+        ${wfItems}
+      </div>
+    </div>`;
+}
+
+// ── Workflow definitions ───────────────────────────────────────────────────
+const WORKFLOWS = [
+  {
+    id: 'create-agent',
+    icon: '🤖',
+    name: 'create-agent',
+    version: '1.1.0',
+    desc: 'Crée, valide et ouvre une MR GitLab pour un nouvel agent. Boucle de correction si REJECT.',
+    cmd: 'python scripts/run_workflow.py create-agent --var NAME=mon-agent --var ROLE="Description du rôle"',
+    svg: `<svg viewBox="0 0 625 175" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:625px;display:block;margin:0 auto" font-family="Segoe UI,system-ui,sans-serif">
+  <defs>
+    <marker id="ca-ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#6c8fff"/></marker>
+    <marker id="ca-ag" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#34d399"/></marker>
+    <marker id="ca-ar" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#f87171"/></marker>
+  </defs>
+  <rect x="10" y="52" width="110" height="52" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="65" y="74" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">🏗️ architect</text>
+  <text x="65" y="92" fill="#64748b" font-size="10" text-anchor="middle">Design spec</text>
+  <line x1="120" y1="78" x2="161" y2="78" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#ca-ab)"/>
+  <rect x="164" y="52" width="110" height="52" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="219" y="74" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">💻 developer</text>
+  <text x="219" y="92" fill="#64748b" font-size="10" text-anchor="middle">Write AGENT.md</text>
+  <line x1="274" y1="78" x2="300" y2="78" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#ca-ab)"/>
+  <polygon points="368,36 435,78 368,120 301,78" fill="#f0a86818" stroke="#f0a868" stroke-width="1.5"/>
+  <text x="368" y="71" fill="#e2e8f0" font-size="10.5" font-weight="600" text-anchor="middle">✅ evaluate</text>
+  <text x="368" y="84" fill="#e2e8f0" font-size="10" text-anchor="middle">contribution</text>
+  <text x="368" y="98" fill="#64748b" font-size="9" text-anchor="middle">APPROVE?</text>
+  <line x1="435" y1="78" x2="466" y2="78" stroke="#34d399" stroke-width="1.5" marker-end="url(#ca-ag)"/>
+  <text x="450" y="71" fill="#34d399" font-size="9" text-anchor="middle">APPROVE</text>
+  <rect x="469" y="52" width="132" height="52" rx="11" fill="#a78bfa18" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="535" y="74" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">📦 library</text>
+  <text x="535" y="92" fill="#64748b" font-size="10" text-anchor="middle">maintainer · MR</text>
+  <path d="M 301,78 Q 256,152 222,104" stroke="#f87171" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#ca-ar)"/>
+  <text x="253" y="163" fill="#f87171" font-size="9.5" text-anchor="middle">↩ REJECT + feedback</text>
+</svg>`,
+  },
+  {
+    id: 'create-skill',
+    icon: '⚡',
+    name: 'create-skill',
+    version: '1.1.0',
+    desc: 'Crée, valide et ouvre une MR GitLab pour une nouvelle skill (slash command). Boucle de correction si REJECT.',
+    cmd: 'python scripts/run_workflow.py create-skill --var NAME=mon-skill --var DESCRIPTION="Ce que fait le skill"',
+    svg: `<svg viewBox="0 0 494 175" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:494px;display:block;margin:0 auto" font-family="Segoe UI,system-ui,sans-serif">
+  <defs>
+    <marker id="cs-ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#6c8fff"/></marker>
+    <marker id="cs-ag" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#34d399"/></marker>
+    <marker id="cs-ar" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#f87171"/></marker>
+  </defs>
+  <rect x="10" y="52" width="110" height="52" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="65" y="74" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">💻 developer</text>
+  <text x="65" y="92" fill="#64748b" font-size="10" text-anchor="middle">Write SKILL.md</text>
+  <line x1="120" y1="78" x2="173" y2="78" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#cs-ab)"/>
+  <polygon points="242,36 309,78 242,120 175,78" fill="#f0a86818" stroke="#f0a868" stroke-width="1.5"/>
+  <text x="242" y="71" fill="#e2e8f0" font-size="10.5" font-weight="600" text-anchor="middle">✅ evaluate</text>
+  <text x="242" y="84" fill="#e2e8f0" font-size="10" text-anchor="middle">contribution</text>
+  <text x="242" y="98" fill="#64748b" font-size="9" text-anchor="middle">APPROVE?</text>
+  <line x1="309" y1="78" x2="346" y2="78" stroke="#34d399" stroke-width="1.5" marker-end="url(#cs-ag)"/>
+  <text x="327" y="71" fill="#34d399" font-size="9" text-anchor="middle">APPROVE</text>
+  <rect x="349" y="52" width="132" height="52" rx="11" fill="#a78bfa18" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="415" y="74" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">📦 library</text>
+  <text x="415" y="92" fill="#64748b" font-size="10" text-anchor="middle">maintainer · MR</text>
+  <path d="M 175,78 Q 118,152 68,104" stroke="#f87171" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#cs-ar)"/>
+  <text x="111" y="163" fill="#f87171" font-size="9.5" text-anchor="middle">↩ REJECT + feedback</text>
+</svg>`,
+  },
+  {
+    id: 'feature-release',
+    icon: '🚀',
+    name: 'feature-release',
+    version: '1.1.0',
+    desc: 'Pipeline feature-team : developer implémente, tester valide, devops déploie, documentarian documente. Orchestré par product-owner-assistant.',
+    cmd: '# Dans Claude Code avec product-owner-assistant installé :\n# "Exécute feature-team pour implémenter [X] et livrer en production."',
+    svg: `<svg viewBox="0 0 620 244" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:620px;display:block;margin:0 auto" font-family="Segoe UI,system-ui,sans-serif">
+  <defs>
+    <marker id="fr-ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#6c8fff"/></marker>
+    <marker id="fr-ag" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#34d399"/></marker>
+  </defs>
+  <rect x="208" y="10" width="184" height="48" rx="11" fill="#f0a86818" stroke="#f0a868" stroke-width="1.5"/>
+  <text x="300" y="31" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">🎯 orchestrateur</text>
+  <text x="300" y="48" fill="#64748b" font-size="10" text-anchor="middle">product-owner-assistant</text>
+  <line x1="300" y1="58" x2="300" y2="93" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#fr-ab)"/>
+  <rect x="18" y="96" width="564" height="92" rx="13" fill="#6c8fff0b" stroke="#6c8fff" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="34" y="114" fill="#6c8fff" font-size="11" font-weight="700">feature-team — v1.2.0</text>
+  <rect x="30" y="122" width="108" height="50" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="84" y="143" fill="#e2e8f0" font-size="11.5" font-weight="600" text-anchor="middle">💻 developer</text>
+  <text x="84" y="160" fill="#64748b" font-size="10" text-anchor="middle">Implémentation</text>
+  <line x1="138" y1="147" x2="153" y2="147" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#fr-ab)"/>
+  <rect x="156" y="122" width="90" height="50" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="201" y="143" fill="#e2e8f0" font-size="11.5" font-weight="600" text-anchor="middle">🧪 tester</text>
+  <text x="201" y="160" fill="#64748b" font-size="10" text-anchor="middle">Tests</text>
+  <line x1="246" y1="147" x2="261" y2="147" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#fr-ab)"/>
+  <rect x="264" y="122" width="90" height="50" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="309" y="143" fill="#e2e8f0" font-size="11.5" font-weight="600" text-anchor="middle">⚙️ devops</text>
+  <text x="309" y="160" fill="#64748b" font-size="10" text-anchor="middle">CI/CD</text>
+  <line x1="354" y1="147" x2="369" y2="147" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#fr-ab)"/>
+  <rect x="372" y="122" width="130" height="50" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="437" y="143" fill="#e2e8f0" font-size="11.5" font-weight="600" text-anchor="middle">📄 documentarian</text>
+  <text x="437" y="160" fill="#64748b" font-size="10" text-anchor="middle">Docs + release notes</text>
+  <line x1="300" y1="188" x2="300" y2="202" stroke="#34d399" stroke-width="1.5" marker-end="url(#fr-ag)"/>
+  <ellipse cx="300" cy="220" rx="114" ry="20" fill="#34d39918" stroke="#34d399" stroke-width="1.5"/>
+  <text x="300" y="225" fill="#34d399" font-size="13" font-weight="700" text-anchor="middle">✅ Feature livrée</text>
+</svg>`,
+  },
+  {
+    id: 'onboard-project',
+    icon: '🗺️',
+    name: 'onboard-project',
+    version: '1.0.0',
+    desc: 'Analyse un projet existant et produit un plan d\'adoption Claude Code. Configure CLAUDE.md avec le contexte projet.',
+    cmd: 'python scripts/run_workflow.py onboard-project',
+    svg: `<svg viewBox="0 0 500 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;display:block;margin:0 auto" font-family="Segoe UI,system-ui,sans-serif">
+  <defs>
+    <marker id="op-ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#6c8fff"/></marker>
+  </defs>
+  <rect x="8" y="40" width="148" height="52" rx="11" fill="#34d39918" stroke="#34d399" stroke-width="1.5"/>
+  <text x="82" y="60" fill="#e2e8f0" font-size="11" font-weight="600" text-anchor="middle">🤝 adoption</text>
+  <text x="82" y="74" fill="#e2e8f0" font-size="11" font-weight="600" text-anchor="middle">assistant</text>
+  <text x="82" y="89" fill="#64748b" font-size="9.5" text-anchor="middle">Analyse projet</text>
+  <line x1="156" y1="66" x2="188" y2="66" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#op-ab)"/>
+  <rect x="191" y="40" width="110" height="52" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="246" y="62" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">🏗️ architect</text>
+  <text x="246" y="80" fill="#64748b" font-size="10" text-anchor="middle">Plan adoption</text>
+  <line x1="301" y1="66" x2="333" y2="66" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#op-ab)"/>
+  <rect x="336" y="40" width="148" height="52" rx="11" fill="#a78bfa18" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="410" y="62" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">📄 documentarian</text>
+  <text x="410" y="80" fill="#64748b" font-size="10" text-anchor="middle">CLAUDE.md</text>
+</svg>`,
+  },
+  {
+    id: 'release',
+    icon: '🏷️',
+    name: 'release',
+    version: '1.0.0',
+    desc: 'Prépare et publie une nouvelle version de la librairie : release notes, version bump, sync Confluence et installer.',
+    cmd: 'python scripts/run_workflow.py release',
+    svg: `<svg viewBox="0 0 490 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:490px;display:block;margin:0 auto" font-family="Segoe UI,system-ui,sans-serif">
+  <defs>
+    <marker id="rel-ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#6c8fff"/></marker>
+  </defs>
+  <rect x="8" y="40" width="140" height="52" rx="11" fill="#a78bfa18" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="78" y="62" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">📄 documentarian</text>
+  <text x="78" y="80" fill="#64748b" font-size="10" text-anchor="middle">Release notes</text>
+  <line x1="148" y1="66" x2="183" y2="66" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#rel-ab)"/>
+  <rect x="186" y="40" width="100" height="52" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
+  <text x="236" y="62" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">⚙️ devops</text>
+  <text x="236" y="80" fill="#64748b" font-size="10" text-anchor="middle">Version + CI</text>
+  <line x1="286" y1="66" x2="321" y2="66" stroke="#6c8fff" stroke-width="1.5" marker-end="url(#rel-ab)"/>
+  <rect x="324" y="40" width="152" height="52" rx="11" fill="#a78bfa18" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="400" y="62" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">📦 library</text>
+  <text x="400" y="76" fill="#e2e8f0" font-size="12" font-weight="600" text-anchor="middle">maintainer</text>
+  <text x="400" y="91" fill="#64748b" font-size="10" text-anchor="middle">MR + publish</text>
+</svg>`,
+  },
+];
+
+// Init
+renderCards();
 </script>
 </body>
 </html>
