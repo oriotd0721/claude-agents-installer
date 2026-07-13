@@ -277,6 +277,9 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .tb-actions { display: flex; gap: 8px; align-items: center; padding-top: 4px; }
 .tb-clear-btn { padding: 9px 14px; background: transparent; color: var(--dim2); border: 1px solid var(--border); border-radius: 3px; font-size: 12px; cursor: pointer; font-family: var(--mono); transition: border-color 0.15s, color 0.15s; }
 .tb-clear-btn:hover { border-color: #f87171; color: #f87171; }
+.doc-wf-add-btn { margin-top: 8px; padding: 6px 12px; background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; font-size: 11px; font-family: var(--mono); cursor: pointer; transition: background 0.15s, color 0.15s; }
+.doc-wf-add-btn:hover { background: rgba(200,96,16,0.1); }
+.doc-wf-add-btn.added { background: var(--accent); color: var(--sel-text); border-color: var(--accent); font-weight: 700; }
 .tb-count { font-family: var(--mono); font-size: 10px; color: var(--dim2); margin-left: auto; }
 </style>
 </head>
@@ -341,6 +344,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 <div class="bottombar">
   <div class="bb-item"><span class="bb-accent" id="bb-sel-agents">0</span><span class="bb-label">agents sél.</span></div>
   <div class="bb-item"><span class="bb-accent" id="bb-sel-skills">0</span><span class="bb-label">skills sél.</span></div>
+  <div class="bb-item"><span class="bb-accent" id="bb-sel-workflows">0</span><span class="bb-label">workflows sél.</span></div>
   <div class="bb-item"><span class="bb-label" id="bb-total-agents">13 AGENTS</span></div>
   <div class="bb-item"><span class="bb-label" id="bb-total-skills">44 SKILLS</span></div>
   <div class="bb-item"><span class="bb-label" id="bb-total-teams">5 ÉQUIPES</span></div>
@@ -533,7 +537,7 @@ const SOURCES = {
   github: 'https://github.com/Aletheia-Thomas/Claude-Agents.git',
 };
 
-let selected      = { agents: new Set(), skills: new Set(), teams: new Set(), hooks: new Set() };
+let selected      = { agents: new Set(), skills: new Set(), teams: new Set(), hooks: new Set(), workflows: new Set() };
 let manualSkills  = new Set();
 let activeTeam    = null;
 let activeItem    = null; // { kind: 'agent'|'skill'|'hook', id: string }
@@ -627,6 +631,7 @@ function renderCards() {
 function updateBottomBar() {
   document.getElementById('bb-sel-agents').textContent = selected.agents.size;
   document.getElementById('bb-sel-skills').textContent = selected.skills.size;
+  document.getElementById('bb-sel-workflows').textContent = selected.workflows.size;
   document.getElementById('bb-total-agents').textContent    = `${AGENTS.length} AGENTS`;
   document.getElementById('bb-total-skills').textContent    = `${SKILLS.length} SKILLS`;
   document.getElementById('bb-total-teams').textContent     = `${TEAMS.length} ÉQUIPES`;
@@ -654,7 +659,16 @@ function toggle(type, id) {
     }
   }
   renderCards();
-  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
+  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size + selected.workflows.size) === 0;
+  document.getElementById('command-box').classList.remove('visible');
+}
+
+function toggleWorkflow(id) {
+  if (selected.workflows.has(id)) selected.workflows.delete(id);
+  else selected.workflows.add(id);
+  renderContextPanel();
+  updateBottomBar();
+  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size + selected.workflows.size) === 0;
   document.getElementById('command-box').classList.remove('visible');
 }
 
@@ -691,7 +705,7 @@ function createCustomTeam() {
   selected.agents = resolveAgentsFromTeams(selected.teams);
   selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
   renderCards();
-  document.getElementById('gen-btn').disabled = false;
+  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size + selected.workflows.size) === 0;
   document.getElementById('command-box').classList.remove('visible');
 }
 
@@ -704,7 +718,7 @@ function clearCustomTeam() {
   selected.agents = resolveAgentsFromTeams(selected.teams);
   selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
   renderCards();
-  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
+  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size + selected.workflows.size) === 0;
 }
 
 function applyPreset(name) {
@@ -717,7 +731,7 @@ function applyPreset(name) {
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('preset-'+name).classList.add('active');
   renderCards();
-  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size) === 0;
+  document.getElementById('gen-btn').disabled = (selected.agents.size + selected.skills.size + selected.workflows.size) === 0;
   document.getElementById('command-box').classList.remove('visible');
 }
 
@@ -729,6 +743,7 @@ function generateCommand() {
   const skills  = [...selected.skills].join(',');
   const teams   = [...selected.teams];
   const hooks   = [...selected.hooks];
+  const workflows = [...selected.workflows];
 
   let step = 1;
   let cmd = `# ${step++}. Cloner la librairie Agentic-Claude (si pas déjà fait)\n`;
@@ -755,6 +770,13 @@ function generateCommand() {
       if (h === 'pii-guard') {
         cmd += `Copy-Item "C:\\ClaudeAgents\\templates\\hooks\\scripts\\pii_check.py" "${path}\\.claude\\hooks\\" -Force\n`;
       }
+    });
+  }
+  if (workflows.length) {
+    cmd += `\n# ${step++}. Copier les workflows sélectionnés\n`;
+    workflows.forEach(w => {
+      cmd += `New-Item -ItemType Directory -Force "${path}\\workflows\\${w}" | Out-Null\n`;
+      cmd += `Copy-Item "C:\\ClaudeAgents\\workflows\\${w}\\WORKFLOW.md" "${path}\\workflows\\${w}\\" -Force\n`;
     });
   }
 
@@ -902,6 +924,7 @@ function renderDocDetail(el, icon, name, version, content, workflows) {
           <div class="doc-wf-name">${w.icon} ${w.name}</div>
           <div class="doc-wf-desc">${w.desc}</div>
           <div class="doc-wf-diagram">${w.svg}</div>
+          <button class="doc-wf-add-btn${selected.workflows.has(w.id) ? ' added' : ''}" onclick="toggleWorkflow('${w.id}')">${selected.workflows.has(w.id) ? '✓ Ajouté' : '+ Ajouter ce workflow'}</button>
         </div>`).join('')}
     </div>` : '';
   el.innerHTML = `
