@@ -11,105 +11,211 @@
 <style>
 /* ── Design tokens ── single source of truth for color/spacing values; every
    component below reads through these custom properties, never a raw hex. ──
-   Reskinned toward the skydio.com "premium tech/aerospace" look: neutral
-   near-black darks (not warm), a single confident signal-blue accent in
-   place of the former amber/orange, Inter for UI/display type, and one
-   shared --ease curve threaded through every transition below. ── */
+   TCS yellow and black, laid out with the editorial structure borrowed from
+   ooternaud.ch (hairline rules, numbered sections, tightly-tracked display type,
+   tracked mono micro-labels). Light-first: paper is the default and black is the
+   alternate, which is why the theme blocks below are inverted from the usual
+   order. Shared --ease threaded through every transition.
+
+   THE ONE RULE THAT SHAPES EVERYTHING BELOW: TCS yellow (#ffed02, taken from
+   the logo itself) is 1.17:1 against a light canvas — it cannot carry text or
+   draw a hairline there. But black on that yellow is 16.4:1. So on the light
+   theme yellow is only ever a SURFACE, with black set on top; ink carries the
+   structure. On black, yellow inverts to 16.4:1 and may carry text, which is
+   what --accent-ink resolves per theme. ── */
 :root {
-  --bg:       #0d0f12;
-  --panel:    #12151a;
-  --panel2:   #181c22;
-  --border:   #262b33;
-  --accent:   #c99361;
-  --accent-h: #dcab7d;
-  --accent-h-glow: #dcab7d33;
-  --accent-rgb: 201,147,97;
-  --accent-tint:      #dcab7d20;
-  --accent-tint-weak: #dcab7d10;
-  --shadow:     0 1px 3px rgba(0,0,0,.4);
-  --shadow-btn: 0 2px 8px var(--accent-h-glow);
-  --sel-text: #0c0c0c;
-  --text:     #e2e2e2;
-  --dim:      #484848;
-  --dim2:     #868686;
-  --green:    #34d399;
-  --diagram-ink:     #e8edf3;
-  --diagram-ink-dim: #94a3b8;
+  --bg:       #fbfbf9;  /* paper */
+  --panel:    #fbfbf9;  /* panels sit on the same paper; rules separate them */
+  --panel2:   #f2f1ec;  /* surface */
+  --border:   #dcdad2;  /* rule */
+  --accent:      #ffed02;  /* TCS yellow — fills and marks only on light */
+  --on-accent:   #0a0a0a;  /* what you set on top of a yellow fill (16.4:1) */
+  /* The colour accent must take when it has to BE small text: ink on light,
+     yellow on black. Never raw --accent, which would vanish on paper. */
+  --accent-ink:  #0a0a0a;
+  --accent-h-glow: #ffed0259;
+  --accent-tint:      #ffed0245;  /* highlighter wash behind a selected row */
+  --accent-tint-weak: #ffed021f;
+  --text:     #0a0a0a;  /* ink */
+  --dim:      #77746c;
+  --dim2:     #5c5a54;  /* ink-soft */
+  --ok:       #0d7a52;
+  --warn:     #8a5000;
+  --danger:   #c81e1e;
+  --terminal: #0a0a0a;
+  /* On paper the terminal card is its own edge; on the black palette it needs a
+     rule or it dissolves into the page. */
+  --terminal-edge: #0a0a0a;
+  --grid-line:      #0a0a0a12;
+  --diagram-ink:     #0a0a0a;
+  --diagram-ink-dim: #5c5a54;
   --mono:     'JetBrains Mono','Cascadia Code','Consolas','Courier New',monospace;
   --sans:     'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
   --ease:     cubic-bezier(0.16, 1, 0.3, 1);
 }
-@media (prefers-color-scheme: light) {
+
+/* Theme-invariant scales. Radii are near-flat on purpose: the reference uses
+   hairline rectangles, so a "card" is a rule, not a rounded pill. */
+:root {
+  --radius-sm:   2px;
+  --radius-full: 9999px;
+  --dur:      0.18s;
+  --dur-slow: 0.3s;
+  /* The terminal card is black in both themes, so what sits on it does not vary
+     with the theme either — hence these two live with the invariant scales. */
+  --on-terminal:     #f5f5f0;
+  --on-terminal-dim: #9a978e;
+  /* Grid cell of the reference's blueprint background. */
+  --grid-cell: 108px;
+  /* Display type is set tight, the way the reference sets its headlines. */
+  --track-display: -0.035em;
+  --track-label:    0.18em;
+  /* Two-layer ring: a bg-coloured spacer so the accent halo reads against any
+     surface. Keyboard-only (:focus-visible) — pointer clicks stay unringed. */
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-h-glow);
+}
+@media (prefers-color-scheme: dark) {
   :root {
-    --bg:       #f4f5f7;
-    --panel:    #ffffff;
-    --panel2:   #eceef2;
-    --border:   #dadde3;
-    --accent:   #96551f;
-    --accent-h: #7a4419;
-    --accent-h-glow: #7a441933;
-    --accent-rgb: 150,85,31;
-    --accent-tint:      #7a441918;
-    --accent-tint-weak: #7a44190c;
-    --shadow:     0 1px 3px rgba(0,0,0,.08);
-    --shadow-btn: 0 2px 8px var(--accent-h-glow);
-    --sel-text: #fffaf5;
-    --text:     #20242a;
-    --dim:      #8a9099;
-    --dim2:     #5b6270;
-    --green:    #0d9467;
+    --bg:       #0a0a0a;  /* black */
+    --panel:    #0a0a0a;
+    --panel2:   #141412;
+    --border:   #2a2a28;
+    --accent:      #ffed02;
+    --on-accent:   #0a0a0a;
+    --accent-ink:  #ffed02;  /* 16.4:1 on black — here yellow may be text */
+    --accent-h-glow: #ffed0240;
+    --accent-tint:      #ffed021c;
+    --accent-tint-weak: #ffed020d;
+    --text:     #f5f5f0;
+    --dim:      #77746c;
+    --dim2:     #9a978e;
+    --ok:       #34d399;
+    --warn:     #fbbf24;
+    --danger:   #f87171;
+    --terminal: #050505;
+    --terminal-edge: #2a2a28;
+    --grid-line:      #f5f5f00f;
+    --diagram-ink:     #f5f5f0;
+    --diagram-ink-dim: #9a978e;
   }
 }
-:root[data-theme="dark"] {
-  --bg: #0d0f12; --panel: #12151a; --panel2: #181c22; --border: #262b33;
-  --accent: #c99361; --accent-h: #dcab7d; --accent-h-glow: #dcab7d33; --accent-rgb: 201,147,97;
-  --accent-tint: #dcab7d20; --accent-tint-weak: #dcab7d10;
-  --shadow: 0 1px 3px rgba(0,0,0,.4); --shadow-btn: 0 2px 8px var(--accent-h-glow);
-  --sel-text: #0c0c0c; --text: #e2e2e2;
-  --dim: #484848; --dim2: #868686; --green: #34d399;
-}
 :root[data-theme="light"] {
-  --bg: #f4f5f7; --panel: #ffffff; --panel2: #eceef2; --border: #dadde3;
-  --accent: #96551f; --accent-h: #7a4419; --accent-h-glow: #7a441933; --accent-rgb: 150,85,31;
-  --accent-tint: #7a441918; --accent-tint-weak: #7a44190c;
-  --shadow: 0 1px 3px rgba(0,0,0,.08); --shadow-btn: 0 2px 8px var(--accent-h-glow);
-  --sel-text: #fffaf5; --text: #20242a;
-  --dim: #8a9099; --dim2: #5b6270; --green: #0d9467;
+  --bg: #fbfbf9; --panel: #fbfbf9; --panel2: #f2f1ec; --border: #dcdad2;
+  --accent: #ffed02; --on-accent: #0a0a0a; --accent-ink: #0a0a0a;
+  --accent-h-glow: #ffed0259;
+  --accent-tint: #ffed0245; --accent-tint-weak: #ffed021f;
+  --text: #0a0a0a;
+  --dim: #77746c; --dim2: #5c5a54;
+  --ok: #0d7a52; --warn: #8a5000; --danger: #c81e1e;
+  --terminal: #0a0a0a; --terminal-edge: #0a0a0a; --grid-line: #0a0a0a12;
+  --diagram-ink: #0a0a0a; --diagram-ink-dim: #5c5a54;
+}
+:root[data-theme="dark"] {
+  --bg: #0a0a0a; --panel: #0a0a0a; --panel2: #141412; --border: #2a2a28;
+  --accent: #ffed02; --on-accent: #0a0a0a; --accent-ink: #ffed02;
+  --accent-h-glow: #ffed0240;
+  --accent-tint: #ffed021c; --accent-tint-weak: #ffed020d;
+  --text: #f5f5f0;
+  --dim: #77746c; --dim2: #9a978e;
+  --ok: #34d399; --warn: #fbbf24; --danger: #f87171;
+  --terminal: #050505; --terminal-edge: #2a2a28; --grid-line: #f5f5f00f;
+  --diagram-ink: #f5f5f0; --diagram-ink-dim: #9a978e;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--sans); transition: background-color 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease); }
 
-/* ── Topbar ── */
+/* Links outside the rendered .md body had no rule at all, so they fell back to
+   the browser's default blue — unreadable on the void palette. Same underline
+   treatment as the doc body, driven by the AA-safe accent. */
+a { color: var(--accent-ink); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--accent); }
+
+/* Keyboard focus was previously invisible everywhere (no :focus-visible rule at
+   all), so tabbing through the mode switcher or the item lists left no trace.
+   One ring, applied through the token, so every control agrees. */
+:where(button, select, input, textarea, a[href], [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Topbar ── an editorial masthead: wordmark left, typographic nav right,
+   one hairline rule underneath. No filled bars, no pill container. ── */
 .topbar {
-  height: 48px;
+  height: 60px;
   background: var(--panel);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  padding: 0 20px;
-  gap: 12px;
+  padding: 0 32px;
+  gap: 16px;
   flex-shrink: 0;
 }
-.tb-logo  { font-size: 20px; color: var(--accent); }
-.tb-title { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: 0.3px; }
-.tb-pill  { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--dim2); background: var(--panel2); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; }
+/* The mark replaces the placeholder ⬡ glyph the masthead used to carry. */
+.tb-logo  { width: 26px; height: 26px; }
+.tb-title { font-size: 14px; font-weight: 500; color: var(--text); letter-spacing: -0.01em; }
 
-/* ── Mode toggle (Catalogue read-only vs. Importer une équipe) ── */
-.mode-toggle { display: flex; background: var(--panel2); border: 1px solid var(--border); border-radius: 5px; padding: 2px; gap: 2px; margin-left: 14px; }
-.mode-btn { padding: 6px 12px; border: none; background: transparent; color: var(--dim2); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.5px; border-radius: 3px; cursor: pointer; transition: all 0.2s var(--ease); white-space: nowrap; }
-.mode-btn:hover:not(.active) { color: var(--text); }
-.mode-btn.active { background: var(--accent); color: var(--sel-text); }
+/* Micro-label: mono, uppercase, widely tracked — the reference uses this same
+   treatment for its coordinates line and its tag row. Reused throughout. */
+.micro {
+  font-family: var(--mono); font-size: 9.5px; text-transform: uppercase;
+  letter-spacing: var(--track-label); color: var(--dim2);
+}
 
-/* ── Theme toggle (light/dark) ── */
+/* Readiness indicator. A yellow dot would disappear against paper, so the state
+   is carried by the block itself: hairline while idle, solid yellow with black
+   on it once the selection can be generated. Legible in both themes, and the
+   brand colour lands on the one element that reports progress. */
+.tb-status {
+  margin-left: auto; display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 9.5px; text-transform: uppercase;
+  letter-spacing: var(--track-label); color: var(--dim2);
+  border: 1px solid var(--border); padding: 6px 12px;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.tb-dot {
+  width: 5px; height: 5px; border-radius: var(--radius-full);
+  background: currentColor;
+  flex-shrink: 0;
+}
+.tb-status--ok {
+  background: var(--accent); border-color: var(--accent); color: var(--on-accent);
+}
+.tb-status--ok .tb-status-txt, .tb-status--ok .tb-sep { color: var(--on-accent); }
+.tb-status-txt { color: var(--text); }
+.tb-sep { color: var(--dim); }
+
+/* ── Mode nav — plain text links with an accent underline on the active one,
+   the way the reference marks its current section. ── */
+.mode-toggle { display: flex; gap: 24px; margin-left: 36px; }
+.mode-btn {
+  position: relative; padding: 4px 0; border: none; background: transparent;
+  color: var(--dim2); font-family: var(--sans); font-size: 13px; font-weight: 400;
+  letter-spacing: -0.005em; cursor: pointer; transition: color var(--dur) var(--ease);
+  white-space: nowrap;
+}
+/* 3px, not the 1px hairline the magenta version could get away with: a 1px
+   yellow rule is invisible on paper. */
+.mode-btn::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -3px; height: 3px;
+  background: var(--accent); transform: scaleX(0); transform-origin: left;
+  transition: transform var(--dur) var(--ease);
+}
+.mode-btn:hover { color: var(--text); }
+.mode-btn.active { color: var(--text); font-weight: 500; }
+.mode-btn.active::after { transform: scaleX(1); }
+
+/* ── Theme toggle — a bordered square, same family as .tb-status ── */
 .theme-toggle {
-  margin-left: 10px; width: 30px; height: 28px; display: flex; align-items: center; justify-content: center;
-  background: var(--panel2); border: 1px solid var(--border); border-radius: 5px;
-  font-size: 14px; cursor: pointer; transition: all 0.2s var(--ease);
+  margin-left: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid var(--border); border-radius: 0;
+  font-size: 13px; cursor: pointer; transition: border-color var(--dur) var(--ease);
 }
 .theme-toggle:hover { border-color: var(--accent); }
 
-/* ── Page (one of the two toggled full-height views) ── */
-.page { display: none; height: calc(100vh - 88px); overflow: hidden; }
+/* ── Page (one of the two toggled full-height views) ──
+   Height budget: 60px masthead + 40px status strip. */
+.page { display: none; height: calc(100vh - 100px); overflow: hidden; }
 .page.active { display: flex; flex-direction: column; }
 
 /* ── Config / generate panel (bottom, beside the context pane) ── */
@@ -120,31 +226,66 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
   font-size: 12px; font-family: var(--mono); outline: none;
   transition: border-color 0.2s var(--ease); margin-bottom: 10px;
 }
-.cfg-input:focus { border-color: var(--accent); }
-.gp-source { font-family: var(--mono); font-size: 11px; color: var(--dim2); margin-bottom: 12px; }
-.gp-source strong { color: var(--text); }
+.cfg-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-h-glow); }
 .gp-hint { font-size: 11px; color: var(--dim2); line-height: 1.4; margin-bottom: 6px; }
-.gp-example { font-family: var(--mono); font-size: 10px; color: var(--dim); margin-bottom: 8px; }
-.gp-example code { background: var(--panel2); padding: 1px 5px; border-radius: 3px; color: #7dd3fc; }
 
-.gen-btn {
-  width: 100%; padding: 10px 14px; background: var(--accent);
-  color: var(--sel-text); border: none; border-radius: 7px;
-  font-size: 13px; font-weight: 700; cursor: pointer;
-  transition: background 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease); font-family: var(--mono); letter-spacing: 0.5px;
-  box-shadow: var(--shadow-btn);
+/* ── Readiness checks ("doctor") ──
+   Modelled on `openclaw doctor`: instead of greying the action out and hiding
+   the reason in a title tooltip (unreachable by keyboard and on touch), every
+   check states its own status, and anything unmet carries its own "Fix:" line
+   naming the exact control to use. The button below is then never a mystery. */
+.doctor { border-left: 1px solid var(--border); padding-left: 16px; margin: 2px 0 18px; display: flex; flex-direction: column; gap: 10px; }
+.doc-row { display: flex; gap: 10px; font-size: 12px; line-height: 1.5; }
+.doc-mark { font-family: var(--mono); font-size: 10px; color: var(--tone, var(--dim2)); flex-shrink: 0; }
+.doc-body { min-width: 0; }
+.doc-txt  { color: var(--dim2); }
+.doc-txt strong { color: var(--tone, var(--text)); font-weight: 500; }
+.doc-fix  { display: block; margin-top: 4px; font-family: var(--mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: var(--track-label); color: var(--dim); }
+.doc-fix::before { content: '→ Fix — '; color: var(--tone, var(--dim)); }
+.doc-row--ok   { --tone: var(--ok); }
+/* The only row that ever asks the user to act, so it is the only one marked —
+   and it gets the yellow highlighter, with everything on it forced to black.
+   A yellow rail would have been invisible here; a yellow block cannot be. */
+.doc-row--warn {
+  --tone: var(--on-accent); background: var(--accent); color: var(--on-accent);
+  margin: -4px -10px; padding: 6px 10px;
 }
-.gen-btn:hover    { background: var(--accent-h); transform: translateY(-1px); box-shadow: 0 3px 12px var(--accent-h-glow); }
-.gen-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-.gen-btn-disabled { opacity: 0.3; cursor: not-allowed; }
+.doc-row--warn .doc-txt, .doc-row--warn .doc-fix { color: var(--on-accent); }
+.doc-row--info { --tone: var(--dim2); }
 
-.cmd-box { display: none; margin-top: 10px; background: #080808; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; box-shadow: var(--shadow); }
+/* Primary action: a hairline box that fills with accent on hover — the
+   reference's bordered "CV ↓" affordance, not a candy button. */
+.gen-btn {
+  width: 100%; padding: 13px 16px; background: transparent;
+  color: var(--text); border: 1px solid var(--text); border-radius: 0;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease), opacity var(--dur) var(--ease);
+  font-family: var(--mono); text-transform: uppercase; letter-spacing: var(--track-label);
+}
+.gen-btn:hover    { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.gen-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+/* Blocked state reads as "not yet", not as broken: the box keeps its shape and
+   the doctor row above says what is missing. */
+.gen-btn-disabled { color: var(--dim); border-color: var(--border); cursor: not-allowed; }
+.gen-btn-disabled:hover { background: transparent; color: var(--dim); border-color: var(--border); }
+
+/* Command surface: the one deliberately dark object on the page — the
+   reference's --color-void, used here to say "this is a terminal". */
+.cmd-box { display: none; margin-top: 14px; background: var(--terminal); border: 1px solid var(--terminal-edge); border-radius: 0; overflow: hidden; }
 .cmd-box.visible { display: block; }
-.cmd-hdr  { padding: 6px 12px; background: var(--panel2); display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--dim2); }
-.cmd-copy-btn { background: var(--accent); color: var(--sel-text); border: none; border-radius: 2px; padding: 2px 8px; font-size: 10px; cursor: pointer; font-weight: 700; font-family: var(--mono); transition: background 0.2s var(--ease), transform 0.2s var(--ease); }
-.cmd-copy-btn:hover { background: var(--accent-h); transform: translateY(-1px); }
-.cmd-copy-btn.copied { background: var(--green); }
-.cmd-text { padding: 12px; font-family: var(--mono); font-size: 11px; color: #7dd3fc; white-space: pre-wrap; word-break: break-all; line-height: 1.6; max-height: 160px; overflow-y: auto; }
+/* The two alpha-whites below are hairlines on a surface that is black in both
+   themes — they have no theme-varying counterpart to tokenise. */
+.cmd-hdr  { padding: 9px 14px; background: transparent; border-bottom: 1px solid #ffffff14; display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: 9px; text-transform: uppercase; color: var(--on-terminal-dim); letter-spacing: var(--track-label); }
+.cmd-copy-btn { background: transparent; color: var(--on-terminal); border: 1px solid #ffffff2e; border-radius: 0; padding: 4px 11px; font-size: 9px; cursor: pointer; font-weight: 400; text-transform: uppercase; letter-spacing: var(--track-label); font-family: var(--mono); transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease); }
+/* Black on the yellow, never white: white on TCS yellow is 1.21:1. */
+.cmd-copy-btn:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.cmd-copy-btn.copied { background: var(--ok); border-color: var(--ok); color: var(--terminal); }
+.cmd-text { padding: 16px 16px 16px 34px; font-family: var(--mono); font-size: 11px; color: var(--on-terminal); white-space: pre-wrap; word-break: break-all; line-height: 1.75; max-height: 190px; overflow-y: auto; position: relative; }
+.cmd-text::before { content: '❯'; position: absolute; left: 16px; top: 16px; color: var(--accent); }
+/* The contribute scaffold is a commented multi-line script, not a single
+   command — a prompt glyph on the first line would misread it as one. */
+#gitscaffold-text { padding-left: 12px; }
+#gitscaffold-text::before { content: none; }
 
 #cmd-instructions { display: none; }
 #cmd-instructions.visible { display: block; }
@@ -169,58 +310,77 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 }
 .panel { background: var(--panel); display: flex; flex-direction: column; overflow: hidden; }
 
-.panel-hdr { display: flex; align-items: center; gap: 8px; padding: 12px 14px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-.ph-dot   { color: var(--accent); font-size: 10px; }
-.ph-name  { font-family: var(--sans); font-size: 11px; font-weight: 500; letter-spacing: 0.2px; color: var(--text); flex: 1; }
-.ph-count { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--text); }
+/* Column head: tracked uppercase name against an oversized, tightly-tracked
+   count — the reference's pairing of a small mono label with big display type. */
+.panel-hdr { display: flex; align-items: baseline; gap: 9px; padding: 18px 18px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+/* A yellow mark this small vanishes against paper, so it is squared off and
+   outlined in ink — the same figure/ground trick the logo uses. */
+.ph-dot   { width: 7px; height: 7px; border-radius: 0; background: var(--accent); border: 1px solid var(--text); flex-shrink: 0; align-self: center; }
+.ph-name  { font-family: var(--mono); font-size: 9.5px; font-weight: 400; text-transform: uppercase; letter-spacing: var(--track-label); color: var(--dim2); flex: 1; }
+.ph-count { font-family: var(--sans); font-size: 30px; font-weight: 600; letter-spacing: var(--track-display); color: var(--text); line-height: 1; }
 
 .item-list { overflow-y: auto; flex: 1; }
 .item-list::-webkit-scrollbar       { width: 3px; }
 .item-list::-webkit-scrollbar-track { background: transparent; }
 .item-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-.list-item { display: flex; align-items: center; gap: 8px; padding: 6px 14px; font-family: var(--mono); font-size: 12px; color: var(--dim2); cursor: pointer; transition: background 0.08s var(--ease); }
-.list-item:hover  { background: var(--accent-tint-weak); }
-.list-item.sel    { background: var(--accent-tint); color: var(--accent); font-weight: 700; border: 1.5px solid var(--accent); }
-.list-item.previewing { box-shadow: inset 0 0 0 1px var(--accent); }
-.list-item.linked { background: var(--accent-h-glow); border-left: 3px solid var(--accent-h); padding-left: 11px; }
+.list-item { display: flex; align-items: center; gap: 9px; padding: 7px 18px; font-family: var(--sans); font-size: 12.5px; color: var(--dim2); cursor: pointer; transition: background 0.08s var(--ease), color 0.08s var(--ease); }
+.list-item:hover  { background: var(--accent-tint-weak); color: var(--text); }
+/* Selection is a 2px accent rail down the left edge, drawn as an inset shadow
+   so it costs no layout (a real border shifted every row below it). No fill:
+   with a full team selected, tinting every row turned whole columns pink, and
+   the reference spends its accent one mark at a time. Text goes to ink, not
+   accent — 12.5px magenta on paper is 3.76:1, under AA. */
+.list-item.sel    { background: transparent; color: var(--text); font-weight: 500; box-shadow: inset 2px 0 0 var(--accent); }
+/* Previewing is the weaker state of the two, so it gets the neutral rail. */
+.list-item.previewing { background: var(--panel2); box-shadow: inset 2px 0 0 var(--dim); }
+.list-item.sel.previewing { background: var(--panel2); box-shadow: inset 2px 0 0 var(--accent); }
+.list-item.linked { background: transparent; box-shadow: inset 2px 0 0 var(--border); }
 
 .li-dot   { color: var(--dot); flex-shrink: 0; }
 .li-icon  { flex-shrink: 0; font-size: 13px; }
 .li-name  { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.li-right { font-size: 10px; color: var(--dim); flex-shrink: 0; }
-.list-item.sel .li-right { color: var(--accent); opacity: 0.75; }
+.li-right { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.06em; color: var(--dim); flex-shrink: 0; }
+.list-item.sel .li-right { color: var(--accent-ink); }
 
-.list-cat { padding: 8px 14px 3px; font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); }
+.list-cat { padding: 16px 18px 5px; font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: var(--track-label); color: var(--dim); }
 
+/* The skills a selected agent drags in. Set in ink-soft, not accent: this block
+   repeats under every selected agent, so accent here floods the column. */
 .agent-skills {
   font-family: var(--mono);
   font-size: 10px;
-  color: var(--accent);
-  padding: 4px 14px 6px 36px;
-  background: rgba(var(--accent-rgb),0.08);
-  border-left: 2px solid var(--accent);
-  line-height: 1.6;
+  color: var(--dim2);
+  padding: 5px 18px 8px 40px;
+  background: transparent;
+  border-left: 1px solid var(--border);
+  margin-left: 18px;
+  line-height: 1.7;
   word-break: break-all;
   cursor: default;
 }
 
-.agent-mcp { padding: 3px 14px 6px 36px; display: flex; flex-wrap: wrap; gap: 4px; cursor: default; }
+.agent-mcp { padding: 4px 18px 8px 40px; display: flex; flex-wrap: wrap; gap: 5px; cursor: default; }
+/* Tag: hairline rectangle, mono uppercase, widely tracked — the reference's
+   "AI INTERN @ TCS" / "CS · UNIGE" row. Square, never a pill. */
 .mcp-chip {
-  display: inline-flex; align-items: center; gap: 3px;
-  font-family: var(--mono); font-size: 9.5px; color: var(--dim2);
-  background: var(--panel2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 1px 7px; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--mono); font-size: 9px; text-transform: uppercase;
+  letter-spacing: var(--track-label); color: var(--dim2);
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 0; padding: 3px 8px; white-space: nowrap;
 }
 .ctx-mcp-box {
-  padding: 8px 16px;
+  padding: 10px 18px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
   color: var(--dim2);
-  background: var(--panel2);
+  background: transparent;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
 
 /* ── Bottom bar ── */
@@ -236,66 +396,73 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
   flex-shrink: 0;
   overflow: hidden;
 }
-.bb-item   { padding: 0 16px; border-right: 1px solid var(--border); height: 100%; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-.bb-accent { color: var(--accent); font-weight: 700; font-size: 13px; }
-.bb-label  { color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+.bb-item   { padding: 0 20px; border-right: 1px solid var(--border); height: 100%; display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+.bb-accent { color: var(--accent-ink); font-weight: 500; font-size: 13px; letter-spacing: 0; }
+.bb-label  { color: var(--dim); text-transform: uppercase; letter-spacing: var(--track-label); font-size: 9px; }
 .li-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-.li-desc { font-family: var(--mono); font-size: 9px; color: var(--dim2); white-space: normal; line-height: 1.3; margin-top: 2px; }
+.li-desc { font-family: var(--sans); font-size: 10.5px; color: var(--dim); white-space: normal; line-height: 1.45; margin-top: 3px; }
 
 /* ── Toast: shown when trying to remove something a selected team requires ── */
 .toast {
   position: fixed; left: 50%; bottom: 56px; transform: translateX(-50%) translateY(10px);
-  background: #2a1408; border: 1px solid #f87171; color: #f87171;
-  font-family: var(--mono); font-size: 12px; padding: 10px 18px; border-radius: 4px;
+  background: var(--panel2); border: 1px solid var(--tone, var(--danger));
+  border-left-width: 3px; color: var(--tone, var(--danger));
+  font-family: var(--mono); font-size: 12px; padding: 10px 18px; border-radius: var(--radius-sm);
   max-width: 80vw; text-align: center; opacity: 0; pointer-events: none;
-  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease); z-index: 999;
+  transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease); z-index: 999;
 }
 .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast--ok     { --tone: var(--ok); }
+.toast--warn   { --tone: var(--warn); }
+.toast--danger { --tone: var(--danger); }
 .list-item.sel .li-desc { color: var(--dim2); }
 
 /* Bottom row: context/details panel (left) + generate panel (right, beside it) */
 .bottom-row { flex: 1 1 auto; overflow: hidden; border-top: 1px solid var(--border); display: flex; min-height: 100px; }
 
 /* Draggable handle between the 4 panels and the bottom context bar */
-.resizer { height: 6px; flex-shrink: 0; cursor: row-resize; background: var(--border); position: relative; transition: background 0.2s var(--ease); }
-.resizer:hover, .resizer.dragging { background: var(--accent); }
-.resizer::after { content: ''; position: absolute; left: 50%; top: 50%; width: 40px; height: 3px; border-radius: 2px; background: var(--dim2); transform: translate(-50%, -50%); }
+/* A hairline that thickens to the accent only while grabbed. */
+.resizer { height: 5px; flex-shrink: 0; cursor: row-resize; background: transparent; border-bottom: 1px solid var(--border); position: relative; transition: border-color var(--dur) var(--ease); }
+.resizer:hover, .resizer.dragging { border-bottom-color: var(--accent); }
+.resizer::after { content: ''; position: absolute; left: 50%; bottom: -1px; width: 40px; height: 1px; background: var(--dim); transform: translateX(-50%); }
 /* Import mode splits the bottom row 50/50 with .generate-panel below — the two
    bases must add up to 100% or the (flex-shrink: 0) generate panel overflows
    .bottom-row's overflow:hidden and gets clipped off-screen. */
 #ctx-panel { flex: 1 1 50%; overflow-y: auto; display: flex; flex-direction: column; min-width: 0; }
 #ctx-panel-ro { flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-width: 0; }
-.ctx-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--dim); font-family: var(--mono); font-size: 11px; gap: 10px; }
-.ctx-empty-icon { font-size: 28px; }
-.ctx-hdr { padding: 12px 16px 10px; border-bottom: 1px solid var(--border); background: var(--panel2); flex-shrink: 0; }
-.ctx-team-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-.ctx-team-icon { font-size: 18px; }
-.ctx-team-name { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text); }
-.ctx-team-v { font-family: var(--mono); font-size: 10px; color: var(--dim2); margin-left: 6px; }
-.ctx-team-desc { font-size: 12px; color: var(--dim2); line-height: 1.5; }
+.ctx-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--dim); font-family: var(--mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: var(--track-label); gap: 14px; }
+.ctx-empty-icon { font-size: 22px; opacity: 0.5; }
+.ctx-hdr { padding: 20px 26px 18px; border-bottom: 1px solid var(--border); background: transparent; flex-shrink: 0; }
+.ctx-team-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 7px; }
+.ctx-team-icon { font-size: 16px; }
+.ctx-team-name { font-family: var(--sans); font-size: 20px; font-weight: 600; letter-spacing: var(--track-display); color: var(--text); }
+.ctx-team-v { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: var(--track-label); color: var(--dim); margin-left: 4px; }
+.ctx-team-desc { font-size: 12.5px; color: var(--dim2); line-height: 1.6; }
 
 /* Rendered .md documentation body for the previewed team/agent/skill/hook —
    capped line length and roomier type so long AGENT.md/SKILL.md bodies stay
-   easy to read instead of stretching edge-to-edge across a wide panel. */
-.ctx-doc { padding: 20px 26px; overflow-y: auto; flex: 1; min-height: 0; }
-.ctx-doc-inner { max-width: 760px; font-size: 13px; line-height: 1.75; color: var(--text); }
-.ctx-doc-inner h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 4px 0 14px; color: var(--text); text-wrap: balance; }
-.ctx-doc-inner h2 { font-size: 15px; margin: 22px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); color: var(--text); }
-.ctx-doc-inner h3 { font-size: 13px; margin: 16px 0 6px; color: var(--accent); }
-.ctx-doc-inner h4 { font-size: 11px; margin: 12px 0 5px; color: var(--accent-h); text-transform: uppercase; letter-spacing: 0.6px; }
-.ctx-doc-inner p { margin: 8px 0; }
-.ctx-doc-inner ul, .ctx-doc-inner ol { margin: 8px 0 10px 22px; }
-.ctx-doc-inner li { margin-bottom: 4px; }
-.ctx-doc-inner code { background: var(--panel2); padding: 1px 6px; border-radius: 3px; font-family: var(--mono); font-size: 12px; color: #7dd3fc; }
-.ctx-doc-inner pre { background: #080808; border: 1px solid var(--border); border-radius: 4px; padding: 14px; overflow-x: auto; margin: 10px 0; }
-.ctx-doc-inner pre code { background: none; padding: 0; color: #e2e8f0; font-size: 12px; line-height: 1.6; }
-.ctx-doc-inner blockquote { border-left: 3px solid var(--accent); margin: 10px 0; padding: 5px 14px; color: var(--dim2); background: var(--panel2); }
-.ctx-doc-inner .table-wrap { overflow-x: auto; margin: 10px 0; }
-.ctx-doc-inner table { border-collapse: collapse; width: 100%; font-size: 12px; }
-.ctx-doc-inner th, .ctx-doc-inner td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; }
-.ctx-doc-inner th { background: var(--panel2); }
-.ctx-doc-inner a { color: var(--accent); }
-.ctx-doc-inner hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+   easy to read instead of stretching edge-to-edge across a wide panel. Headings
+   are set tight and unadorned; the accent stays out of running text. */
+.ctx-doc { padding: 26px 32px; overflow-y: auto; flex: 1; min-height: 0; }
+.ctx-doc-inner { max-width: 680px; font-size: 13.5px; line-height: 1.75; color: var(--text); }
+.ctx-doc-inner h1 { font-size: 30px; font-weight: 600; letter-spacing: var(--track-display); line-height: 1.08; margin: 4px 0 18px; color: var(--text); text-wrap: balance; }
+.ctx-doc-inner h2 { font-size: 19px; font-weight: 600; letter-spacing: var(--track-display); margin: 32px 0 12px; padding-bottom: 9px; border-bottom: 1px solid var(--border); color: var(--text); }
+.ctx-doc-inner h3 { font-size: 15px; font-weight: 600; letter-spacing: var(--track-display); margin: 22px 0 8px; color: var(--text); }
+.ctx-doc-inner h4 { font-family: var(--mono); font-size: 9.5px; margin: 18px 0 6px; color: var(--accent-ink); text-transform: uppercase; letter-spacing: var(--track-label); }
+.ctx-doc-inner p { margin: 10px 0; }
+.ctx-doc-inner ul, .ctx-doc-inner ol { margin: 10px 0 12px 22px; }
+.ctx-doc-inner li { margin-bottom: 5px; }
+.ctx-doc-inner code { background: var(--panel2); padding: 1px 6px; border-radius: 0; font-family: var(--mono); font-size: 12px; color: var(--accent-ink); }
+.ctx-doc-inner pre { background: var(--terminal); border: 1px solid var(--terminal-edge); border-radius: 0; padding: 18px; overflow-x: auto; margin: 14px 0; }
+.ctx-doc-inner pre code { background: none; padding: 0; color: var(--on-terminal); font-size: 12px; line-height: 1.7; }
+.ctx-doc-inner blockquote { border-left: 2px solid var(--accent); margin: 14px 0; padding: 4px 18px; color: var(--dim2); background: transparent; }
+.ctx-doc-inner .table-wrap { overflow-x: auto; margin: 14px 0; }
+.ctx-doc-inner table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+.ctx-doc-inner th, .ctx-doc-inner td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+.ctx-doc-inner th { background: transparent; font-family: var(--mono); font-size: 9px; font-weight: 400; text-transform: uppercase; letter-spacing: var(--track-label); color: var(--dim2); }
+.ctx-doc-inner a { color: var(--accent-ink); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; }
+.ctx-doc-inner a:hover { text-decoration-color: var(--accent); }
+.ctx-doc-inner hr { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
 
 /* .wf-section/.wf-card* below are NOT workflow-panel-specific despite the name —
    they're the shared "card list" look, reused by the Onboarding métier
@@ -306,17 +473,22 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
    (see renderContextPanel's kind === 'teams' branch): one .wf-card-main for the
    team's main workflow, then a lighter/indented .wf-card-sub per sub-workflow it calls. */
 .wf-section { padding: 16px; }
-.wf-section-hdr { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); margin-bottom: 10px; }
-.wf-card { background: var(--panel2); border: 1px solid var(--border); border-radius: 7px; padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow); }
+/* The inset top highlight is what stops a flat card from reading as a plain
+   rectangle — one hairline of light along the top edge, tinted per theme. */
+/* Cards are hairline rectangles on paper — no fill, no shadow, no rounding.
+   The reference separates content with rules, so that is what carries here. */
+.wf-card { background: transparent; border: 1px solid var(--border); border-radius: 0; padding: 18px 20px; margin-bottom: 12px; }
 .wf-card:last-child { margin-bottom: 0; }
 .wf-card-hdr { display: flex; align-items: center; gap: 8px; }
 .wf-card-icon { font-size: 15px; }
-.wf-card-name { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--text); flex: 1; }
-.wf-card-desc { font-size: 11px; color: var(--dim2); line-height: 1.5; margin: 6px 0 0; }
-.wf-card-main { background: rgba(200,96,16,0.07); border-left: 3px solid var(--accent); padding-left: 12px; }
-.wf-card-main .wf-card-name { font-size: 13px; }
-.wf-card-sub { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--accent); margin-top: 1px; }
-.ctx-wf-diagram { background: #080808; border: 1px solid var(--border); padding: 10px; overflow-x: auto; margin-top: 10px; border-radius: 2px; }
+/* Card titles are display type, not mono: sans, weight 600, tracked tight —
+   the reference's project headings. */
+.wf-card-name { font-family: var(--sans); font-size: 16px; font-weight: 600; letter-spacing: var(--track-display); color: var(--text); flex: 1; }
+.wf-card-desc { font-size: 12.5px; color: var(--dim2); line-height: 1.6; margin: 8px 0 0; }
+.wf-card-main { background: transparent; border-left: 2px solid var(--accent); padding-left: 18px; }
+.wf-card-main .wf-card-name { font-size: 18px; }
+.wf-card-sub { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: var(--track-label); color: var(--accent-ink); margin-top: 1px; }
+.ctx-wf-diagram { background: var(--panel2); border: 1px solid var(--border); padding: 12px; overflow-x: auto; margin-top: 12px; border-radius: 0; }
 .ctx-wf-empty { font-size: 13px; color: var(--dim2); font-style: italic; }
 /* Main vs. sub-workflow distinction, both rendered inline in the team doc */
 .wf-card-main { border-color: var(--accent); }
@@ -331,59 +503,178 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
    Takes exactly half the bottom row (the other half is #ctx-panel). */
 .generate-panel {
   flex: 0 0 50%; min-width: 0; overflow-y: auto;
-  border-left: 1px solid var(--border); background: var(--panel2);
-  padding: 16px; display: flex; flex-direction: column; gap: 4px;
-  box-shadow: var(--shadow);
+  border-left: 1px solid var(--border); background: var(--panel);
+  padding: 22px 26px; display: flex; flex-direction: column; gap: 4px;
+  counter-reset: section;
 }
 /* The panel is a column flex box, so its children default to flex-shrink: 1 and
    get crushed (the generated .cmd-box collapsed to a sliver) instead of letting
    the panel scroll. Keep every child at its natural height and scroll instead. */
 .generate-panel > * { flex-shrink: 0; }
-.gp-label { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); margin-bottom: 10px; }
+/* Section header, after the reference's numbered sections (01 / 02 / 03 …): a
+   mono accent index, the title in tracked uppercase, then a hairline rule that
+   runs to the edge. The index is a CSS counter, so sections renumber themselves
+   when one is added or removed — nothing to keep in sync by hand. The counter
+   is reset per scroll container (see .generate-panel / .onboarding-scroll). */
+.gp-label, .wf-section-hdr, .tb-section-label {
+  display: flex; align-items: baseline; gap: 10px;
+  font-family: var(--mono); font-size: 9.5px; text-transform: uppercase;
+  letter-spacing: var(--track-label); color: var(--text); margin-bottom: 14px;
+}
+/* The index sits in a small yellow tile with black on it — the only way to spend
+   the brand colour on something this small without losing it against paper. */
+.gp-label::before, .wf-section-hdr::before, .tb-section-label::before {
+  counter-increment: section;
+  content: counter(section, decimal-leading-zero);
+  background: var(--accent); color: var(--on-accent);
+  padding: 3px 6px; letter-spacing: 0.06em; flex-shrink: 0;
+}
+.gp-label::after, .wf-section-hdr::after, .tb-section-label::after {
+  content: ''; flex: 1; height: 1px; min-width: 16px;
+  background: var(--border);
+  /* Baseline-aligned flex items would drop the rule to the text baseline. */
+  align-self: center;
+}
 
-/* ── Intro modal — shown once, first time the tool is opened ── */
+/* ── Intro — shown once, first time the tool is opened. Not a dialog box but a
+   poster: the whole panel is a TCS yellow block sitting on gridded paper, with
+   everything on it set in black. This is where the brand colour belongs at full
+   strength, and it is the one screen that can afford to be all yellow. ── */
 .intro-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
-  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+  position: fixed; inset: 0; background: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-cell) var(--grid-cell);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 40px;
+  overflow-y: auto;
 }
 .intro-overlay.hidden { display: none; }
-.intro-modal { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; max-width: 560px; width: 100%; padding: 32px; text-align: center; box-shadow: var(--shadow); }
-.intro-icon { font-size: 40px; color: var(--accent); margin-bottom: 12px; }
-.intro-title { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); margin-bottom: 12px; }
-.intro-text { font-size: 13px; color: var(--dim2); line-height: 1.6; margin-bottom: 24px; }
-.intro-modes { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 26px; text-align: left; }
-.intro-mode { flex: 1 1 140px; background: var(--panel2); border: 1px solid var(--border); border-radius: 6px; padding: 14px; }
-.intro-mode-icon { font-size: 20px; margin-bottom: 6px; }
-.intro-mode-name { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-.intro-mode-desc { font-size: 11px; color: var(--dim2); line-height: 1.5; }
-.intro-close-btn { padding: 10px 24px; background: var(--accent); color: var(--sel-text); border: none; border-radius: 4px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--mono); transition: background 0.2s var(--ease), transform 0.2s var(--ease); }
-.intro-close-btn:hover { background: var(--accent-h); transform: translateY(-1px); }
+.intro-modal { background: var(--accent); border: none; border-radius: 0; max-width: 880px; width: 100%; padding: 48px 52px 52px; text-align: left; }
+/* The TCS mark, declared once here and shared by the masthead and the hero so
+   the base64 payload is not repeated in the markup. */
+.tcs-mark {
+  background-image: url(data:image/png;base64,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);
+  background-size: contain; background-repeat: no-repeat; background-position: center;
+  flex-shrink: 0;
+}
+.intro-icon { width: 52px; height: 52px; margin-bottom: 28px; display: block; }
+.intro-eyebrow { margin-bottom: 18px; color: var(--on-accent); opacity: 0.7; }
+.intro-title {
+  font-size: clamp(34px, 5.2vw, 62px); font-weight: 600; line-height: 1;
+  letter-spacing: var(--track-display); color: var(--on-accent); margin-bottom: 0;
+  text-wrap: balance;
+}
+/* Inverted second line: black block, yellow type. On a yellow panel this is the
+   only emphasis available — white on yellow is 1.21:1, and a paler yellow is
+   still yellow. It also mirrors the logo's own figure/ground flip. */
+.intro-title em {
+  font-style: normal; display: table; margin-top: 6px;
+  background: var(--on-accent); color: var(--accent); padding: 2px 12px 5px;
+}
+.intro-rule { width: 56px; height: 3px; background: var(--on-accent); margin: 28px 0 24px; }
+.intro-text { font-size: 15px; color: var(--on-accent); opacity: 0.78; line-height: 1.65; margin-bottom: 34px; max-width: 46ch; }
+.intro-modes {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0; margin-bottom: 34px; text-align: left;
+  border-top: 1px solid var(--on-accent);
+}
+/* Modes are grid cells divided by rules, not four floating boxes. On the yellow
+   panel the rules are black, so they read at full strength. */
+.intro-mode { background: transparent; border: none; border-bottom: 1px solid var(--on-accent); border-right: 1px solid var(--on-accent); border-radius: 0; padding: 20px 22px 22px; }
+.intro-mode:last-child { border-right: none; }
+.intro-mode-name { font-family: var(--sans); font-size: 14px; font-weight: 600; letter-spacing: var(--track-display); color: var(--on-accent); margin-bottom: 8px; }
+.intro-mode-desc { font-size: 11.5px; color: var(--on-accent); opacity: 0.75; line-height: 1.6; }
+/* On the yellow panel the button inverts: solid black, yellow label. */
+.intro-close-btn {
+  padding: 15px 32px; background: var(--on-accent); color: var(--accent);
+  border: 1px solid var(--on-accent); border-radius: 0; font-size: 12px; font-weight: 500;
+  cursor: pointer; font-family: var(--mono); text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.intro-close-btn:hover { background: transparent; color: var(--on-accent); }
 
 /* ── Team builder ── */
-.list-create-team { border-top: 1px solid var(--border); color: var(--accent); }
-.list-create-team:hover { background: rgba(var(--accent-rgb),0.09); }
+.list-create-team { border-top: 1px solid var(--border); color: var(--accent-ink); }
+.list-create-team:hover { background: var(--accent-tint-weak); }
 .list-custom-team { border-top: 1px solid var(--border); color: var(--dim2); }
-.list-custom-team.sel { background: var(--accent-tint); color: var(--accent); }
+.list-custom-team.sel { background: var(--accent-tint); color: var(--text); }
 
-.team-builder { padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; flex: 1; }
-.tb-section-label { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); margin-bottom: 6px; }
+.team-builder { padding: 22px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; flex: 1; counter-reset: section; }
 .tb-agents-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-.tb-agent-chip { display: flex; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 3px; font-family: var(--mono); font-size: 11px; color: var(--dim2); cursor: pointer; background: var(--panel2); transition: border-color 0.2s var(--ease), color 0.2s var(--ease), background 0.2s var(--ease); user-select: none; }
+/* Same tag vocabulary as .mcp-chip; selection inverts to ink rather than accent
+   so the label keeps its contrast. */
+.tb-agent-chip { display: flex; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 0; font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: var(--track-label); color: var(--dim2); cursor: pointer; background: transparent; transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease), background var(--dur) var(--ease); -webkit-user-select: none; user-select: none; }
 .tb-agent-chip:hover { border-color: var(--accent); color: var(--text); }
-.tb-agent-chip.sel { background: var(--accent); color: var(--sel-text); border-color: var(--accent); font-weight: 700; }
-.tb-actions { display: flex; gap: 8px; align-items: center; padding-top: 4px; }
-.tb-clear-btn { padding: 9px 14px; background: transparent; color: var(--dim2); border: 1px solid var(--border); border-radius: 3px; font-size: 12px; cursor: pointer; font-family: var(--mono); transition: border-color 0.2s var(--ease), color 0.2s var(--ease); }
-.tb-clear-btn:hover { border-color: #f87171; color: #f87171; }
-.tb-count { font-family: var(--mono); font-size: 10px; color: var(--dim2); margin-left: auto; }
+.tb-agent-chip.sel { background: var(--text); color: var(--bg); border-color: var(--text); }
+.tb-actions { display: flex; gap: 10px; align-items: center; padding-top: 6px; }
+.tb-clear-btn { padding: 11px 16px; background: transparent; color: var(--dim2); border: 1px solid var(--border); border-radius: 0; font-size: 11px; text-transform: uppercase; letter-spacing: var(--track-label); cursor: pointer; font-family: var(--mono); transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease); }
+.tb-clear-btn:hover { border-color: var(--danger); color: var(--danger); }
+.tb-count { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: var(--track-label); color: var(--dim); margin-left: auto; }
+
+/* ── Download mode — a rules-separated register of skills, one row each, with
+   the action on the right. Rows, not cards: 52 bordered boxes would read as
+   noise, and the reference separates repeated items with hairlines. ── */
+.dl-toolbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; max-width: 960px; }
+.dl-search { flex: 1 1 280px; max-width: 460px; margin-bottom: 0; font-size: 12px; }
+.dl-count { white-space: nowrap; }
+
+/* Category headings are a sub-level here: 15 of them numbered 02…16 read as
+   noise, so they drop the counter and carry their own tally instead. */
+.wf-section-hdr--sub::before { content: none; counter-increment: none; }
+.dl-group-n { font-family: var(--mono); font-size: 9px; color: var(--dim); letter-spacing: 0.06em; }
+
+.dl-rows { max-width: 960px; border-top: 1px solid var(--border); }
+.dl-row {
+  display: flex; align-items: baseline; gap: 20px;
+  padding: 14px 4px; border-bottom: 1px solid var(--border);
+  transition: background var(--dur) var(--ease);
+}
+.dl-row:hover { background: var(--accent-tint-weak); }
+.dl-main { flex: 1; min-width: 0; }
+.dl-name { font-family: var(--sans); font-size: 14.5px; font-weight: 600; letter-spacing: var(--track-display); color: var(--text); }
+.dl-ver  { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: var(--track-label); color: var(--dim); margin-left: 9px; }
+.dl-desc { font-size: 12px; color: var(--dim2); line-height: 1.55; margin-top: 5px; max-width: 74ch; }
+.dl-path { font-family: var(--mono); font-size: 9.5px; color: var(--dim); margin-top: 6px; }
+.dl-actions { display: flex; gap: 8px; flex-shrink: 0; align-self: center; }
+
+/* Same hairline-fills-with-yellow affordance as .gen-btn, at row scale. */
+.dl-btn {
+  padding: 8px 14px; background: transparent; color: var(--text);
+  border: 1px solid var(--text); border-radius: 0;
+  font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: var(--track-label); cursor: pointer; white-space: nowrap;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.dl-btn:hover { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.dl-btn-ghost { border-color: var(--border); color: var(--dim2); }
+.dl-btn-ghost:hover { border-color: var(--accent); }
+.dl-btn-ghost.copied { background: var(--ok); border-color: var(--ok); color: var(--bg); }
+.dl-btn-bundle { margin-left: auto; }
+.dl-btn-disabled { color: var(--dim); border-color: var(--border); pointer-events: none; }
+/* Not .ctx-empty: that one is 9.5px tracked uppercase mono, which mangles a
+   sentence quoting whatever the user typed. */
+.dl-empty { padding: 48px 4px; font-size: 13px; color: var(--dim2); line-height: 1.6; }
 
 /* ── Onboarding (métier-based recommendation) — reuses .wf-card/.gp-* look;
-   only the grid layout below is new (no existing "grid of cards" component). ── */
-.onboarding-scroll { flex: 1; overflow-y: auto; padding: 24px 28px 40px; }
+   only the grid layout below is new (no existing "grid of cards" component). ──
+   The blueprint grid the reference lays under its whole canvas — same cell size,
+   drawn on the two full-bleed views (the only large uninterrupted surfaces). */
+.onboarding-scroll {
+  flex: 1; overflow-y: auto; padding: 40px 44px 56px;
+  counter-reset: section;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-cell) var(--grid-cell);
+}
 .onboarding-intro { max-width: 720px; margin-bottom: 20px; }
-.metier-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; max-width: 1100px; margin-bottom: 24px; }
-.metier-card { cursor: pointer; transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), transform 0.2s var(--ease); }
-.metier-card:hover { border-color: var(--accent); transform: translateY(-1px); }
-.metier-card.sel, .wf-card.sel { border-color: var(--accent-h); box-shadow: 0 0 0 2px var(--accent-h-glow); }
+.metier-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; max-width: 1100px; margin-bottom: 24px; }
+/* Hover is a rule change, not a lift: the reference never floats its cards. */
+.metier-card { cursor: pointer; transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease); }
+.metier-card:hover { border-color: var(--accent); }
+.metier-card.sel, .wf-card.sel { border-color: var(--accent); box-shadow: inset 2px 0 0 var(--accent); }
 .onboarding-reco { max-width: 720px; }
 
 </style>
@@ -392,28 +683,25 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 
 <div class="intro-overlay" id="intro-overlay">
   <div class="intro-modal">
-    <img class="intro-icon" src="data:image/png;base64,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" width="56" height="56" alt="TCS" />
-    <h2 class="intro-title">Bienvenue sur l'installeur Agentic-Claude</h2>
+    <div class="intro-icon tcs-mark" role="img" aria-label="TCS"></div>
+    <div class="intro-eyebrow micro">Agentic-Claude · TCS Enterprise · v1.2.14</div>
+    <h2 class="intro-title">Agents, skills et équipes<em>installés en une commande.</em></h2>
+    <div class="intro-rule"></div>
     <p class="intro-text">Cet outil vous aide à découvrir et installer les agents, skills, hooks et équipes de la librairie Agentic-Claude dans votre projet Claude Code.</p>
     <div class="intro-modes">
-      <div class="intro-mode">
-        <div class="intro-mode-icon">🧭</div>
-        <div class="intro-mode-name">Onboarding</div>
+      <div class="intro-mode">        <div class="intro-mode-name">Onboarding</div>
         <div class="intro-mode-desc">Répondez à quelques questions (métier, environnement) pour obtenir une recommandation personnalisée et démarrer du bon pied.</div>
       </div>
-      <div class="intro-mode">
-        <div class="intro-mode-icon">📖</div>
-        <div class="intro-mode-name">Catalogue</div>
+      <div class="intro-mode">        <div class="intro-mode-name">Catalogue</div>
         <div class="intro-mode-desc">Parcourez la documentation (.md) de chaque agent, skill, hook ou équipe — lecture seule, rien ne se sélectionne.</div>
       </div>
-      <div class="intro-mode">
-        <div class="intro-mode-icon">📥</div>
-        <div class="intro-mode-name">Importer une équipe</div>
+      <div class="intro-mode">        <div class="intro-mode-name">Importer une équipe</div>
         <div class="intro-mode-desc">Cochez une équipe pour importer ses agents/skills/hooks d'un coup, ajustez votre sélection, puis générez la commande d'installation.</div>
       </div>
-      <div class="intro-mode">
-        <div class="intro-mode-icon">🤝</div>
-        <div class="intro-mode-name">Contribuer</div>
+      <div class="intro-mode">        <div class="intro-mode-name">Télécharger un skill</div>
+        <div class="intro-mode-desc">Récupérez le <code>SKILL.md</code> d'un skill seul, sans rien installer — le fichier est construit dans votre navigateur.</div>
+      </div>
+      <div class="intro-mode">        <div class="intro-mode-name">Contribuer</div>
         <div class="intro-mode-desc">Vous voulez proposer un nouvel agent, skill ou équipe ? Suivez le circuit gouverné et générez un squelette de départ prêt à copier.</div>
       </div>
     </div>
@@ -437,16 +725,22 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 </script>
 
 <div class="topbar">
-  <span class="tb-logo">⬡</span>
+  <span class="tb-logo tcs-mark" role="img" aria-label="TCS"></span>
   <span class="tb-title">Agentic-Claude / TCS Enterprise</span>
   <div class="mode-toggle">
-    <button class="mode-btn active" id="mode-btn-onboarding" onclick="setMode('onboarding')">🧭 Onboarding</button>
-    <button class="mode-btn" id="mode-btn-readonly" onclick="setMode('readonly')">📖 Catalogue</button>
-    <button class="mode-btn" id="mode-btn-import" onclick="setMode('import')">📥 Importer une équipe</button>
-    <button class="mode-btn" id="mode-btn-contribute" onclick="setMode('contribute')">🤝 Contribuer</button>
+    <button class="mode-btn active" id="mode-btn-onboarding" onclick="setMode('onboarding')">Onboarding</button>
+    <button class="mode-btn" id="mode-btn-readonly" onclick="setMode('readonly')">Catalogue</button>
+    <button class="mode-btn" id="mode-btn-import" onclick="setMode('import')">Importer une équipe</button>
+    <button class="mode-btn" id="mode-btn-download" onclick="setMode('download')">Télécharger un skill</button>
+    <button class="mode-btn" id="mode-btn-contribute" onclick="setMode('contribute')">Contribuer</button>
   </div>
   <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Changer de thème clair/sombre">🌙</button>
-  <div class="tb-pill">● v1.2.14 · Jul 2026</div>
+  <div class="tb-status tb-status--idle" id="tb-status" role="status">
+    <span class="tb-dot"></span>
+    <span class="tb-status-txt" id="tb-status-txt">aucune sélection</span>
+    <span class="tb-sep">·</span>
+    <span>v1.2.14</span>
+  </div>
 </div>
 
 <!-- Read-only: browse and preview only, nothing selects -->
@@ -476,13 +770,11 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
     <div id="ctx-panel"></div>
 
     <div class="generate-panel">
-      <div class="gp-label">⚡ Générer</div>
-      <div class="gp-source">Source : <strong>GitLab TCS</strong></div>
+      <div class="gp-label">Options</div>
       <div class="gp-hint">Cette commande s'exécute depuis la racine de votre projet (dossier courant) — pas besoin de préciser de chemin.</div>
-      <div class="gp-hint">CLAUDE.md et les hooks sont inclus automatiquement (projet prêt à l'emploi).</div>
       <div class="gp-hint" style="margin-top:8px">
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
-          <input type="checkbox" id="lang-fr-toggle" style="margin:0"/>
+          <input type="checkbox" id="lang-fr-toggle" style="margin:0" onchange="refreshReadiness()"/>
           Générer CLAUDE.md / GETTING-STARTED.md en français
         </label>
       </div>
@@ -494,7 +786,9 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         </select>
         <div class="gp-hint" id="target-platform-hint" style="margin-top:6px">Installe les agents/skills dans <code>.claude/</code>, prêts à l'emploi avec Claude Code.</div>
       </div>
-      <button class="gen-btn gen-btn-disabled" onclick="generateCommand()" id="gen-btn" title="Sélectionnez au moins un agent ou un skill avant de générer la commande">⚡ Générer la commande</button>
+      <div class="gp-label" style="margin-top:14px">Vérifications</div>
+      <div class="doctor" id="doctor"></div>
+      <button class="gen-btn gen-btn-disabled" onclick="generateCommand()" id="gen-btn">↓ Générer la commande</button>
       <div class="cmd-box" id="command-box">
         <div class="cmd-hdr">
           <span>PowerShell</span>
@@ -503,7 +797,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         <div class="cmd-text" id="command-text"></div>
       </div>
       <div class="cmd-instructions" id="cmd-instructions">
-        <div class="gp-label" style="margin-top:14px">📋 Installation & utilisation</div>
+        <div class="gp-label" style="margin-top:14px">Prochaines étapes</div>
         <ol style="margin:6px 0 0 18px;padding:0;font-size:11px;color:var(--dim2);line-height:1.6">
           <li>Copiez la commande ci-dessus.</li>
           <li>Ouvrez PowerShell <strong>à la racine de votre projet</strong> (le dossier où vous voulez installer les agents/skills).</li>
@@ -520,6 +814,13 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
      recommendation, then land on Import with it pre-checked so you can still adjust it. -->
 <div class="page active" id="page-onboarding">
   <div class="onboarding-scroll" id="onboarding-scroll"></div>
+</div>
+
+<!-- Download: take a single skill's SKILL.md and nothing else. No selection, no
+     command, no install — the file is built client-side from the catalog already
+     embedded in this page (see renderDownloadPanel/downloadSkillMd). -->
+<div class="page" id="page-download">
+  <div class="onboarding-scroll" id="download-scroll"></div>
 </div>
 
 <!-- Contribute: explains the real, governed contribution path (this repo is only
@@ -1031,7 +1332,7 @@ let manualSkills  = new Set();
 let manualHooks   = new Set();
 let teamBuilderOpen = false;
 let customTeam    = null; // { name: string, agents: Set<agentId> }
-let mode          = 'onboarding'; // 'readonly' | 'import' | 'onboarding' | 'contribute'
+let mode          = 'onboarding'; // one of MODES (see setMode)
 let previewItem   = null;       // { kind: 'teams'|'agents'|'skills'|'hooks', id } — currently previewed doc
 let selectedMetier = null;      // currently chosen métier id in Onboarding mode (see METIER_MAP)
 try { selectedMetier = localStorage.getItem('agentic-claude-metier') || null; } catch (e) { /* storage unavailable */ }
@@ -1050,7 +1351,7 @@ const CATEGORY_LABELS = {
 };
 
 function panelHdr(name, count) {
-  return `<div class="panel-hdr"><span class="ph-dot">●</span><span class="ph-name">${name}</span><span class="ph-count">${count}</span></div>`;
+  return `<div class="panel-hdr"><span class="ph-dot"></span><span class="ph-name">${name}</span><span class="ph-count">${count}</span></div>`;
 }
 
 // An agent/skill/hook that a currently selected team requires cannot be
@@ -1077,11 +1378,12 @@ function teamsRequiring(type, id) {
 }
 
 let toastTimer = null;
-function showToast(msg) {
+function showToast(msg, tone = 'danger') {
   const el = document.getElementById('toast');
   if (!el) return;
   el.textContent = msg;
-  el.classList.add('visible');
+  el.classList.remove('toast--ok', 'toast--warn', 'toast--danger');
+  el.classList.add(`toast--${tone}`, 'visible');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('visible'), 4000);
 }
@@ -1093,17 +1395,16 @@ function lockMessage(type, id) {
   return `⚠ Impossible de retirer « ${id} » : ${TYPE_LABEL[type] || 'élément'} requis par ${teamsStr}. Décochez d'abord l'équipe pour le retirer.`;
 }
 
+const MODES = ['onboarding', 'readonly', 'import', 'download', 'contribute'];
+
 function setMode(m) {
   mode = m;
-  document.getElementById('page-readonly').classList.toggle('active', m === 'readonly');
-  document.getElementById('page-import').classList.toggle('active', m === 'import');
-  document.getElementById('page-onboarding').classList.toggle('active', m === 'onboarding');
-  document.getElementById('page-contribute').classList.toggle('active', m === 'contribute');
-  document.getElementById('mode-btn-readonly').classList.toggle('active', m === 'readonly');
-  document.getElementById('mode-btn-import').classList.toggle('active', m === 'import');
-  document.getElementById('mode-btn-onboarding').classList.toggle('active', m === 'onboarding');
-  document.getElementById('mode-btn-contribute').classList.toggle('active', m === 'contribute');
+  MODES.forEach(id => {
+    document.getElementById(`page-${id}`).classList.toggle('active', m === id);
+    document.getElementById(`mode-btn-${id}`).classList.toggle('active', m === id);
+  });
   if (m === 'onboarding') { renderOnboardingPanel(); return; }
+  if (m === 'download')   { renderDownloadPanel(); return; }
   if (m === 'contribute') { return; }
   renderContextPanel();
 }
@@ -1323,6 +1624,54 @@ function updateBottomBar() {
   document.getElementById('bb-sel-skills').textContent = selected.skills.size;
 }
 
+// ── Readiness ("doctor") ───────────────────────────────────────────────────
+// Single source of truth for "can we generate yet, and if not, why": renders
+// the check list, drives the button's enabled state, and tints the topbar
+// status light. Every caller that mutates the selection ends here, so the
+// three surfaces can never disagree — they used to, because each mutation site
+// re-derived the button state (and only the button state) on its own.
+function refreshReadiness() {
+  const nAgents = selected.agents.size;
+  const nSkills = selected.skills.size;
+  const nHooks  = selected.hooks.size;
+  const ready   = (nAgents + nSkills) > 0;
+
+  const generic = document.getElementById('target-platform-select').value === 'generic';
+  const french  = document.getElementById('lang-fr-toggle').checked;
+  const plural  = (n, word) => `${n} ${word}${n > 1 ? 's' : ''}`;
+
+  const rows = [
+    ready
+      ? { tone: 'ok', mark: '✓', txt: `Sélection : <strong>${plural(nAgents, 'agent')}</strong> · ${plural(nSkills, 'skill')} · ${plural(nHooks, 'hook')}` }
+      : { tone: 'warn', mark: '○', txt: 'Aucun agent ni skill sélectionné.',
+          fix: 'cochez une équipe dans la colonne « Équipes », ou un agent seul dans « Agents ».' },
+    { tone: 'info', mark: '·', txt: generic
+        ? 'Cible : <strong>Générique</strong> → <code>AGENTS.md</code>'
+        : 'Cible : <strong>Claude Code</strong> → <code>.claude/</code>' },
+    { tone: 'info', mark: '·', txt: `Docs : <strong>CLAUDE.md</strong> + GETTING-STARTED.md en ${french ? 'français' : 'anglais'} · hooks et workspace VS Code inclus` },
+    { tone: 'info', mark: '·', txt: 'Source : <strong>GitLab TCS</strong>' },
+  ];
+
+  document.getElementById('doctor').innerHTML = rows.map(r => `
+    <div class="doc-row doc-row--${r.tone}">
+      <span class="doc-mark">${r.mark}</span>
+      <span class="doc-body"><span class="doc-txt">${r.txt}</span>${r.fix ? `<span class="doc-fix">${r.fix}</span>` : ''}</span>
+    </div>`).join('');
+
+  const genBtn = document.getElementById('gen-btn');
+  genBtn.classList.toggle('gen-btn-disabled', !ready);
+  genBtn.setAttribute('aria-disabled', String(!ready));
+
+  const status = document.getElementById('tb-status');
+  status.classList.toggle('tb-status--ok', ready);
+  status.classList.toggle('tb-status--idle', !ready);
+  document.getElementById('tb-status-txt').textContent = ready
+    ? `${nAgents + nSkills} éléments prêts`
+    : 'aucune sélection';
+
+  return ready;
+}
+
 function toggle(type, id) {
   // Trying to remove something a selected team requires: block it and say why,
   // rather than silently doing nothing. Adding is always allowed.
@@ -1350,10 +1699,7 @@ function toggle(type, id) {
     if (wasSelected) manualHooks.delete(id); else manualHooks.add(id);
   }
   renderCards();
-  const genBtn = document.getElementById('gen-btn');
-  const genDisabled = (selected.agents.size + selected.skills.size) === 0;
-  genBtn.classList.toggle('gen-btn-disabled', genDisabled);
-  genBtn.title = genDisabled ? 'Sélectionnez au moins un agent ou un skill avant de générer la commande' : 'Générer la commande d\'installation';
+  refreshReadiness();
   document.getElementById('command-box').classList.remove('visible');
   document.getElementById('cmd-instructions').classList.remove('visible');
 }
@@ -1390,9 +1736,7 @@ function createCustomTeam() {
   selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
   selected.hooks  = new Set([...resolveHooksFromAgents(selected.agents, selected.skills), ...manualHooks]);
   renderCards();
-  const genBtn = document.getElementById('gen-btn');
-  genBtn.classList.remove('gen-btn-disabled');
-  genBtn.title = 'Générer la commande d\'installation';
+  refreshReadiness();
   document.getElementById('command-box').classList.remove('visible');
 }
 
@@ -1405,10 +1749,7 @@ function clearCustomTeam() {
   selected.skills = new Set([...resolveSkillsFromAgents(selected.agents), ...manualSkills]);
   selected.hooks  = new Set([...resolveHooksFromAgents(selected.agents, selected.skills), ...manualHooks]);
   renderCards();
-  const genBtn = document.getElementById('gen-btn');
-  const genDisabled = (selected.agents.size + selected.skills.size) === 0;
-  genBtn.classList.toggle('gen-btn-disabled', genDisabled);
-  genBtn.title = genDisabled ? 'Sélectionnez au moins un agent ou un skill avant de générer la commande' : 'Générer la commande d\'installation';
+  refreshReadiness();
 }
 
 // ── Onboarding mode: pick a métier, get a recommendation built from
@@ -1460,7 +1801,7 @@ function renderOnboardingPanel() {
           <div class="wf-card-hdr"><span class="wf-card-icon">⚡</span><span class="wf-card-name">Skills recommandés</span></div>
           <ul style="margin:8px 0 0 18px;padding:0;font-size:11px;color:var(--dim2);line-height:1.6">${skillList}</ul>
         </div>
-        <button class="gen-btn" style="margin-top:4px" onclick="applyMetierRecommendation()">📥 Pré-remplir ma sélection dans « Importer une équipe »</button>
+        <button class="gen-btn" style="margin-top:4px" onclick="applyMetierRecommendation()">↓ Pré-remplir ma sélection dans « Importer une équipe »</button>
       </div>`;
   }
 
@@ -1481,11 +1822,11 @@ function renderOnboardingPanel() {
         <div class="wf-card-hdr"><span class="wf-card-icon">🔌</span><span class="wf-card-name">Connecter les serveurs MCP et configurer l'accès</span></div>
         <div class="wf-card-desc">Trois serveurs MCP sont référencés par les agents de cette bibliothèque : <strong>Atlassian</strong> (Confluence — business-analyst, documentarian, product-owner-assistant, community-manager), <strong>Lucid</strong> (archimate-architect) et <strong>Mermaid Chart</strong> (documentarian).</div>
         <div class="wf-card-desc" style="margin-top:6px">L'autorisation MCP est <strong>interactive et par utilisateur</strong> — chacun doit l'exécuter soi-même via <code>claude mcp</code> (CLI) ou la commande <code>/mcp</code> en session Claude Code (ou les paramètres de connecteurs de son compte claude.ai). Un agent ne peut pas le faire à votre place.</div>
-        <div class="wf-card-desc" style="margin-top:6px;color:var(--accent)">⚠ Deux chemins d'accès coexistent dans la documentation de ce dépôt, sans avoir encore été réconciliés : GETTING-STARTED.md décrit une <strong>clé API</strong> (<code>ANTHROPIC_API_KEY</code> dans un <code>.env</code>), tandis que COPILOT-ONBOARDING.md affirme que Claude Code <strong>ne nécessite pas</strong> de clé API et s'utilise via <strong>abonnement OAuth</strong> (Pro/Max/Teams/Enterprise). Suivez la consigne de votre admin d'organisation Anthropic TCS en cas de doute ; ce point est à faire trancher par le PO / documentarian.</div>
+        <div class="wf-card-desc" style="margin-top:6px;color:var(--accent-ink)">⚠ Deux chemins d'accès coexistent dans la documentation de ce dépôt, sans avoir encore été réconciliés : GETTING-STARTED.md décrit une <strong>clé API</strong> (<code>ANTHROPIC_API_KEY</code> dans un <code>.env</code>), tandis que COPILOT-ONBOARDING.md affirme que Claude Code <strong>ne nécessite pas</strong> de clé API et s'utilise via <strong>abonnement OAuth</strong> (Pro/Max/Teams/Enterprise). Suivez la consigne de votre admin d'organisation Anthropic TCS en cas de doute ; ce point est à faire trancher par le PO / documentarian.</div>
       </div>
     </div>
     <div class="onboarding-intro">
-      <div class="gp-label" style="font-size:12px">🧭 Quel est votre métier ?</div>
+      <div class="gp-label" style="font-size:12px">Quel est votre métier ?</div>
       <div class="gp-hint" style="font-size:12px">Choisissez le profil le plus proche du vôtre. Nous vous recommandons l'équipe, le ou les agents et les skills les plus adaptés — ajustables ensuite dans « Importer une équipe ».</div>
     </div>
     <div class="metier-grid">${cards}</div>
@@ -1508,13 +1849,10 @@ function applyMetierRecommendation() {
   previewItem = { kind: 'teams', id: m.team };
   setMode('import');
   renderCards();
-  const genBtn = document.getElementById('gen-btn');
-  const genDisabled = (selected.agents.size + selected.skills.size) === 0;
-  genBtn.classList.toggle('gen-btn-disabled', genDisabled);
-  genBtn.title = genDisabled ? 'Sélectionnez au moins un agent ou un skill avant de générer la commande' : 'Générer la commande d\'installation';
+  refreshReadiness();
   document.getElementById('command-box').classList.remove('visible');
   document.getElementById('cmd-instructions').classList.remove('visible');
-  showToast(`✓ Sélection pré-remplie pour « ${m.label} » — ajustez si besoin puis générez la commande.`);
+  showToast(`✓ Sélection pré-remplie pour « ${m.label} » — ajustez si besoin puis générez la commande.`, 'ok');
 }
 
 // Staleness guard (design review): warn in the console — never block — when
@@ -1540,6 +1878,7 @@ function onTargetPlatformChange() {
   const val = document.getElementById('target-platform-select')?.value;
   const hint = document.getElementById('target-platform-hint');
   if (!hint) return;
+  refreshReadiness();
   hint.innerHTML = (val === 'generic')
     ? `Génère un <code>AGENTS.md</code> racine (un agent par section) + copie les <code>SKILL.md</code> sélectionnés, adaptés pour un runtime générique (hors Claude Code). Certains champs sont dégradés — voir les notes de portabilité dans le fichier généré.`
     : `Installe les agents/skills dans <code>.claude/</code>, prêts à l'emploi avec Claude Code.`;
@@ -1547,7 +1886,7 @@ function onTargetPlatformChange() {
 
 function generateCommand() {
   if (selected.agents.size + selected.skills.size === 0) {
-    showToast('⚠ Sélectionnez au moins un agent ou un skill avant de générer la commande.');
+    showToast('⚠ Sélectionnez au moins un agent ou un skill avant de générer la commande.', 'warn');
     return;
   }
   try {
@@ -1596,6 +1935,173 @@ function generateCommand() {
   } catch (err) {
     showToast(`❌ Erreur lors de la génération de la commande : ${err.message}. Vérifiez le chemin saisi et réessayez.`);
   }
+}
+
+// ── Download mode: grab a single skill's SKILL.md ─────────────────────────
+// Every skill in catalog.json carries its full .md body, so this needs no
+// backend and no archive library — the file is built from the catalog already
+// in memory and handed to the browser as a Blob. Nothing is uploaded anywhere.
+let downloadQuery = '';
+
+// Groups skills for display. Deliberately NOT the CATEGORY_ORDER-only loop the
+// four side panels use: that loop drops any skill whose category is missing from
+// the list (6 of 52 at the time of writing — adoption, community,
+// contribution-governance, integration, knowledge-sharing, onboarding), which is
+// survivable in a browse list but not here, where a skill you cannot see is a
+// skill you cannot download. Known categories keep their curated order, then
+// anything left over follows so the set is always complete.
+function skillGroups(skills) {
+  const groups = [];
+  const seen = new Set();
+  CATEGORY_ORDER.forEach(cat => {
+    const inCat = skills.filter(s => s.category === cat);
+    inCat.forEach(s => seen.add(s.id));
+    if (inCat.length) groups.push({ label: CATEGORY_LABELS[cat] || titleCaseFromId(cat), skills: inCat });
+  });
+  const leftovers = skills.filter(s => !seen.has(s.id));
+  const byCat = {};
+  leftovers.forEach(s => { (byCat[s.category] = byCat[s.category] || []).push(s); });
+  Object.keys(byCat).sort().forEach(cat => {
+    groups.push({ label: CATEGORY_LABELS[cat] || titleCaseFromId(cat), skills: byCat[cat] });
+  });
+  return groups;
+}
+
+function filteredSkills() {
+  const q = downloadQuery.trim().toLowerCase();
+  if (!q) return SKILLS.slice();
+  return SKILLS.filter(s =>
+    s.id.toLowerCase().includes(q) ||
+    (s.desc || '').toLowerCase().includes(q) ||
+    (s.category || '').toLowerCase().includes(q));
+}
+
+function onDownloadQuery(v) {
+  downloadQuery = v;
+  renderDownloadList();
+}
+
+function clearDownloadQuery() {
+  downloadQuery = '';
+  const box = document.getElementById('dl-search');
+  if (box) box.value = '';
+  renderDownloadList();
+}
+
+function renderDownloadPanel() {
+  const el = document.getElementById('download-scroll');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="wf-section" style="padding:0 0 20px">
+      <div class="wf-section-hdr">Télécharger un skill</div>
+      <div class="onboarding-intro">
+        <p class="gp-hint" style="font-size:13px">Chaque skill est un fichier <code>SKILL.md</code> autonome : téléchargez-le seul, sans installer la librairie ni lancer de commande. Le fichier est construit dans votre navigateur à partir du catalogue — rien n'est envoyé nulle part.</p>
+        <p class="gp-hint" style="font-size:13px">Pour lire la documentation d'un skill avant de le prendre, passez par l'onglet <strong>Catalogue</strong>.</p>
+      </div>
+      <div class="dl-toolbar">
+        <input type="search" id="dl-search" class="cfg-input dl-search" placeholder="Filtrer par nom, description ou catégorie…"
+               oninput="onDownloadQuery(this.value)" aria-label="Filtrer les skills"/>
+        <span class="dl-count micro" id="dl-count"></span>
+        <button class="dl-btn dl-btn-bundle" onclick="downloadFilteredBundle()" id="dl-bundle-btn">↓ Recueil combiné (.md)</button>
+      </div>
+    </div>
+    <div id="download-list"></div>`;
+  document.getElementById('dl-search').value = downloadQuery;
+  renderDownloadList();
+}
+
+function renderDownloadList() {
+  const list = document.getElementById('download-list');
+  if (!list) return;
+  const skills = filteredSkills();
+
+  const countEl = document.getElementById('dl-count');
+  if (countEl) countEl.textContent = `${skills.length} / ${SKILLS.length} skills`;
+  const bundleBtn = document.getElementById('dl-bundle-btn');
+  if (bundleBtn) bundleBtn.classList.toggle('dl-btn-disabled', skills.length === 0);
+
+  if (!skills.length) {
+    list.innerHTML = `<div class="dl-empty">Aucun skill ne correspond à « ${escapeHtml(downloadQuery)} ».<br>
+      <button class="dl-btn dl-btn-ghost" style="margin-top:14px" onclick="clearDownloadQuery()">Effacer le filtre</button></div>`;
+    return;
+  }
+
+  list.innerHTML = skillGroups(skills).map(g => `
+    <div class="wf-section" style="padding:0 0 26px">
+      <div class="wf-section-hdr wf-section-hdr--sub">${escapeHtml(g.label)}<span class="dl-group-n">${g.skills.length}</span></div>
+      <div class="dl-rows">
+        ${g.skills.map(s => `
+          <div class="dl-row" data-skill="${escapeHtml(s.id)}">
+            <div class="dl-main">
+              <div class="dl-name">${escapeHtml(s.id)}<span class="dl-ver">v${escapeHtml(s.version || '—')}</span></div>
+              <div class="dl-desc">${escapeHtml(s.desc || '')}</div>
+              <div class="dl-path">${escapeHtml(s.path || `skills/${s.id}/SKILL.md`)}</div>
+            </div>
+            <div class="dl-actions">
+              <button class="dl-btn" onclick="downloadSkillMd('${s.id}')" title="Télécharger ${escapeHtml(s.id)}.md">↓ .md</button>
+              <button class="dl-btn dl-btn-ghost" id="dl-copy-${s.id}" onclick="copySkillMd('${s.id}')" title="Copier le contenu du fichier">Copier</button>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// One place that turns text into a file, so the single-skill and combined
+// downloads cannot drift apart.
+function triggerDownload(filename, text) {
+  const url = URL.createObjectURL(new Blob([text], { type: 'text/markdown;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  // Revoking in the same tick can cancel the download before the browser has
+  // finished reading the blob.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+function downloadSkillMd(id) {
+  const s = SKILLS.find(x => x.id === id);
+  if (!s || !s.content) {
+    showToast(`❌ Le contenu de « ${id} » est absent du catalogue — relancez generate_catalog.py.`);
+    return;
+  }
+  triggerDownload(`${s.id}.md`, s.content);
+  showToast(`✓ ${s.id}.md téléchargé — à placer dans .claude/${s.path || `skills/${s.id}/SKILL.md`}`, 'ok');
+}
+
+function copySkillMd(id) {
+  const s = SKILLS.find(x => x.id === id);
+  if (!s || !s.content) return;
+  navigator.clipboard.writeText(s.content).then(() => {
+    const btn = document.getElementById(`dl-copy-${id}`);
+    if (!btn) return;
+    btn.textContent = '✓ Copié';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => showToast('❌ Copie impossible — le presse-papiers a été refusé par le navigateur.'));
+}
+
+// Bulk case, without pulling in a zip library: one .md holding every skill
+// currently listed, separated by rules and each under its own repo path. Useful
+// as a single reference document; it is NOT installable as-is, and the heading
+// below says so rather than leaving the reader to find out.
+function downloadFilteredBundle() {
+  const skills = filteredSkills().filter(s => s.content);
+  if (!skills.length) return;
+  const stamp = new Date().toISOString().slice(0, 10);
+  const header =
+    `# Agentic-Claude — recueil de skills (${skills.length})\n\n` +
+    `Exporté le ${stamp} depuis l'installeur Agentic-Claude.\n\n` +
+    `> Ce fichier est un **recueil de lecture** : il concatène plusieurs SKILL.md.\n` +
+    `> Il n'est pas installable tel quel — pour installer un skill, téléchargez-le\n` +
+    `> séparément et placez-le à son chemin indiqué ci-dessous.\n\n` +
+    skills.map(s => `- \`${s.path || `skills/${s.id}/SKILL.md`}\``).join('\n') + '\n';
+  const body = skills.map(s =>
+    `\n\n---\n\n<!-- ${s.path || `skills/${s.id}/SKILL.md`} · v${s.version || '—'} -->\n\n${s.content.trim()}\n`).join('');
+  triggerDownload(`agentic-claude-skills-${stamp}.md`, header + body);
+  showToast(`✓ Recueil de ${skills.length} skills téléchargé.`, 'ok');
 }
 
 // Generic copy-to-clipboard for any .cmd-box (textId holds the text, btnId is
@@ -2077,15 +2583,15 @@ function lifecycleFlowSVG(raci) {
   const rejStartX = diamCx - diamHalfW;
   const rejEndX = respX + boxW / 2;
   const rejMidX = (rejStartX + rejEndX) / 2;
-  content += `<path d="M ${rejStartX},${cy} Q ${rejMidX},${cy + 77} ${rejEndX},${boxY + boxH}" stroke="#f87171" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#${uid}-r)"/>`;
-  content += `<text x="${rejMidX}" y="${cy + 85}" fill="#f87171" font-size="9.5" text-anchor="middle">↩ REJECT / confiance basse</text>`;
+  content += `<path d="M ${rejStartX},${cy} Q ${rejMidX},${cy + 77} ${rejEndX},${boxY + boxH}" stroke="var(--danger)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#${uid}-r)"/>`;
+  content += `<text x="${rejMidX}" y="${cy + 85}" fill="var(--danger)" font-size="9.5" text-anchor="middle">↩ REJECT / confiance basse</text>`;
 
   const totalW = infRight + padX;
   return `<svg viewBox="0 0 ${totalW} 175" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${totalW}px;display:block;margin:0 auto" font-family="Segoe UI,system-ui,sans-serif">
   <defs>
     <marker id="${uid}-b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#6c8fff"/></marker>
     <marker id="${uid}-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#34d399"/></marker>
-    <marker id="${uid}-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#f87171"/></marker>
+    <marker id="${uid}-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="var(--danger)"/></marker>
   </defs>
   ${content}
 </svg>`;
@@ -2097,7 +2603,7 @@ const WF_DIAGRAMS = {
   <defs>
     <marker id="ca-ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#6c8fff"/></marker>
     <marker id="ca-ag" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#34d399"/></marker>
-    <marker id="ca-ar" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#f87171"/></marker>
+    <marker id="ca-ar" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="var(--danger)"/></marker>
   </defs>
   <rect x="10" y="52" width="110" height="52" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
   <text x="65" y="74" fill="var(--diagram-ink)" font-size="12" font-weight="600" text-anchor="middle">🏗️ architect</text>
@@ -2116,14 +2622,14 @@ const WF_DIAGRAMS = {
   <rect x="469" y="52" width="132" height="52" rx="11" fill="#a78bfa18" stroke="#a78bfa" stroke-width="1.5"/>
   <text x="535" y="74" fill="var(--diagram-ink)" font-size="12" font-weight="600" text-anchor="middle">📦 library</text>
   <text x="535" y="92" fill="var(--diagram-ink-dim)" font-size="10" text-anchor="middle">maintainer · MR</text>
-  <path d="M 301,78 Q 256,152 222,104" stroke="#f87171" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#ca-ar)"/>
-  <text x="253" y="163" fill="#f87171" font-size="9.5" text-anchor="middle">↩ REJECT + feedback</text>
+  <path d="M 301,78 Q 256,152 222,104" stroke="var(--danger)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#ca-ar)"/>
+  <text x="253" y="163" fill="var(--danger)" font-size="9.5" text-anchor="middle">↩ REJECT + feedback</text>
 </svg>`,
   'create-skill': `<svg viewBox="0 0 494 175" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:494px;display:block;margin:0 auto" font-family="Segoe UI,system-ui,sans-serif">
   <defs>
     <marker id="cs-ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#6c8fff"/></marker>
     <marker id="cs-ag" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#34d399"/></marker>
-    <marker id="cs-ar" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#f87171"/></marker>
+    <marker id="cs-ar" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="var(--danger)"/></marker>
   </defs>
   <rect x="10" y="52" width="110" height="52" rx="11" fill="#6c8fff18" stroke="#6c8fff" stroke-width="1.5"/>
   <text x="65" y="74" fill="var(--diagram-ink)" font-size="12" font-weight="600" text-anchor="middle">💻 developer</text>
@@ -2138,8 +2644,8 @@ const WF_DIAGRAMS = {
   <rect x="349" y="52" width="132" height="52" rx="11" fill="#a78bfa18" stroke="#a78bfa" stroke-width="1.5"/>
   <text x="415" y="74" fill="var(--diagram-ink)" font-size="12" font-weight="600" text-anchor="middle">📦 library</text>
   <text x="415" y="92" fill="var(--diagram-ink-dim)" font-size="10" text-anchor="middle">maintainer · MR</text>
-  <path d="M 175,78 Q 118,152 68,104" stroke="#f87171" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#cs-ar)"/>
-  <text x="111" y="163" fill="#f87171" font-size="9.5" text-anchor="middle">↩ REJECT + feedback</text>
+  <path d="M 175,78 Q 118,152 68,104" stroke="var(--danger)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#cs-ar)"/>
+  <text x="111" y="163" fill="var(--danger)" font-size="9.5" text-anchor="middle">↩ REJECT + feedback</text>
 </svg>`,
   'onboard-project': `<svg viewBox="0 0 500 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;display:block;margin:0 auto" font-family="Segoe UI,system-ui,sans-serif">
   <defs>
@@ -2214,7 +2720,16 @@ function refreshFromCatalog(cat) {
   // No inline data (opened outside the CI-built standalone) — try a live fetch.
   fetch('./catalog.json')
     .then(r => (r.ok ? r.json() : null))
-    .then(cat => { if (cat) { refreshFromCatalog(cat); updateCounts(); renderCards(); if (mode === 'onboarding') renderOnboardingPanel(); } })
+    .then(cat => {
+      if (!cat) return;
+      refreshFromCatalog(cat);
+      updateCounts();
+      renderCards();
+      // The two full-bleed views render from their own functions, not renderCards,
+      // so whichever one is on screen when the fetch lands needs a repaint too.
+      if (mode === 'onboarding') renderOnboardingPanel();
+      if (mode === 'download')   renderDownloadPanel();
+    })
     .catch(() => {});
 })();
 
@@ -2271,6 +2786,7 @@ function initResizer(resizerId, topId, bottomId, pageId) {
 // Init
 updateCounts();
 renderCards();
+refreshReadiness();
 // mode defaults to 'onboarding' (see `let mode` above) so the page lands there
 // on first paint — setMode() is never called at load time, so the onboarding
 // panel needs its own explicit first render here (mirrors what setMode('onboarding')
