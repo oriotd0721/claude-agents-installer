@@ -722,6 +722,34 @@ a:hover { text-decoration-color: var(--accent); }
   margin-top: 10px;
   line-height: 1.55;
 }
+.dvp-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 12px;
+  line-height: 1.3;
+}
+.dvp-steps {
+  margin: 14px 0 0 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.65;
+}
+.dvp-steps li { margin-bottom: 6px; }
+.dvp-steps li:last-child { margin-bottom: 0; }
+.dvp-step-hint {
+  font-size: 11px;
+  color: var(--dim);
+  font-style: italic;
+}
+.dvp-steps code {
+  font-family: var(--mono);
+  font-size: 11px;
+  background: var(--panel2);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
 @media (max-width: 860px) {
   .download-layout { flex-direction: column; overflow: visible; }
   .download-layout > #download-scroll { flex: 1 1 auto; overflow-y: visible; }
@@ -880,10 +908,17 @@ a:hover { text-decoration-color: var(--accent); }
     <div class="download-video-panel" id="download-video-panel">
       <div class="dvp-inner">
         <div class="dvp-label">Tutoriel d'installation</div>
+        <h3 class="dvp-title">Comment installer un skill</h3>
         <video class="dvp-video" controls preload="metadata" src="Enregistrement%20de%20l%27%C3%A9cran%202026-07-31%20103445.mp4">
           <p style="color:var(--dim);font-size:13px">Votre navigateur ne supporte pas la lecture vidéo.</p>
         </video>
-        <p class="dvp-caption">Comment installer un skill dans Claude Code — de l'installer jusqu'à l'invocation dans un projet.</p>
+        <ol class="dvp-steps">
+          <li>Télécharger le skill depuis cette page <span class="dvp-step-hint">(bouton ↓ .md)</span></li>
+          <li>Ouvrir Claude → <strong>Paramètres</strong></li>
+          <li>Aller dans l'onglet <strong>Compétences</strong></li>
+          <li>Cliquer sur <strong>Téléverser une compétence</strong></li>
+          <li>Sélectionner le fichier <code>.md</code> téléchargé</li>
+        </ol>
       </div>
     </div>
   </div>
