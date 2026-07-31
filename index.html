@@ -677,6 +677,61 @@ a:hover { text-decoration-color: var(--accent); }
 .metier-card.sel, .wf-card.sel { border-color: var(--accent); box-shadow: inset 2px 0 0 var(--accent); }
 .onboarding-reco { max-width: 720px; }
 
+/* ── Download page: two-column layout with video tutorial ─────────────── */
+.download-layout {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+.download-layout > #download-scroll {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.download-video-panel {
+  width: 320px;
+  flex: 0 0 320px;
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 28px 20px 24px;
+  background: var(--panel2);
+}
+.dvp-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--accent-ink);
+  background: var(--accent);
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  margin-bottom: 14px;
+}
+.dvp-video {
+  width: 100%;
+  border-radius: 6px;
+  background: #000;
+  display: block;
+  box-shadow: 0 2px 12px rgba(0,0,0,.18);
+}
+.dvp-caption {
+  font-size: 12px;
+  color: var(--dim);
+  margin-top: 10px;
+  line-height: 1.55;
+}
+@media (max-width: 860px) {
+  .download-layout { flex-direction: column; overflow: visible; }
+  .download-layout > #download-scroll { flex: 1 1 auto; overflow-y: visible; }
+  .download-video-panel {
+    width: 100%; flex: 0 0 auto;
+    border-left: none; border-top: 1px solid var(--border);
+    padding: 20px 16px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -820,7 +875,18 @@ a:hover { text-decoration-color: var(--accent); }
      command, no install — the file is built client-side from the catalog already
      embedded in this page (see renderDownloadPanel/downloadSkillMd). -->
 <div class="page" id="page-download">
-  <div class="onboarding-scroll" id="download-scroll"></div>
+  <div class="download-layout">
+    <div class="onboarding-scroll" id="download-scroll"></div>
+    <div class="download-video-panel" id="download-video-panel">
+      <div class="dvp-inner">
+        <div class="dvp-label">Tutoriel d'installation</div>
+        <video class="dvp-video" controls preload="metadata" src="tutorial.mp4">
+          <p style="color:var(--dim);font-size:13px">Votre navigateur ne supporte pas la lecture vidéo.</p>
+        </video>
+        <p class="dvp-caption">Comment installer un skill dans Claude Code — de l'installer jusqu'à l'invocation dans un projet.</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Contribute: explains the real, governed contribution path (this repo is only
